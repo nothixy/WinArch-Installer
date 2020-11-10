@@ -6,4 +6,12 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="archlinux-logo-large.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\archlinux-logo-large.png" />
+  </ItemGroup>
+
 </Project>

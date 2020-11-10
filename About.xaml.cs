@@ -1,4 +1,4 @@
-/*    WinArch installer - a Windows executable to install Archlinux on your PC
+﻿/*    WinArch installer - a Windows executable to install Archlinux on your PC
     Copyright (C) 2020  srgoti
 
     This program is free software: you can redistribute it and/or modify
@@ -13,13 +13,29 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
+using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 
-[assembly: ThemeInfo(
-    ResourceDictionaryLocation.None, //where theme specific resource dictionaries are located
-                                     //(used if a resource is not found in the page,
-                                     // or application resource dictionaries)
-    ResourceDictionaryLocation.SourceAssembly //where the generic resource dictionary is located
-                                              //(used if a resource is not found in the page,
-                                              // app, or any theme specific resource dictionaries)
-)]
+namespace WinArch
+{
+    /// <summary>
+    /// Interaction logic for About.xaml
+    /// </summary>
+    public partial class About : Page
+    {
+        public About()
+        {
+            InitializeComponent();
+        }
+    }
+}

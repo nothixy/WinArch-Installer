@@ -15,9 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -31,13 +29,18 @@ using System.Windows.Shapes;
 namespace WinArch
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for Welcome.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class Welcome : Page
     {
-        public MainWindow()
+        public Welcome()
         {
             InitializeComponent();
+        }
+        public void Next(object sender, EventArgs e)
+        {
+            NavigationService nav = this.NavigationService;
+            nav.Navigate(new Uri("About.xaml", UriKind.Relative));
         }
     }
 }
