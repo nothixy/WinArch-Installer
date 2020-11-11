@@ -1,4 +1,21 @@
-﻿<Page x:Class="WinArch.Desktop"
+﻿<!--
+    WinArch installer - a Windows executable to install Archlinux on your PC
+    Copyright (C) 2020  srgoti
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    -->
+    <Page x:Class="WinArch.Desktop"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -9,6 +26,34 @@
       Title="Desktop">
 
     <Grid>
-        
+        <TextBlock x:Name="WelcomeMessage" HorizontalAlignment="Center" Margin="0,20,0,0" Text="Desktop environment" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" FontSize="24"/>
+        <Grid x:Name="GridTop" Height="306" VerticalAlignment="Center" Margin="0,50,0,30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <Image Grid.Row="0" Grid.Column="0" x:Name="gnome" HorizontalAlignment="Center" Width="250" Height="130" VerticalAlignment="Top" Source="/Resources/gnome.png"/>
+            <RadioButton Grid.Row="0" Grid.Column="0" x:Name="gnomeButton" Content="Gnome 3 (recommended)" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom" IsChecked="True"/>
+            <Image Grid.Row="0" Grid.Column="1" x:Name="kde" HorizontalAlignment="Center" Width="250" Height="130" VerticalAlignment="Top" Source="/Resources/kde.png"/>
+            <RadioButton Grid.Row="0" Grid.Column="1" x:Name="kdeButton" Content="Plasma 5" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
+            <Image Grid.Row="0" Grid.Column="2" x:Name="budgie" HorizontalAlignment="Center" Width="250" Height="130" VerticalAlignment="Top" Source="/Resources/budgie.png"/>
+            <RadioButton Grid.Row="0" Grid.Column="2" x:Name="budgieButton" Content="Budgie" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
+            <Image Grid.Row="1" Grid.Column="0" x:Name="cinnamon" HorizontalAlignment="Center" Width="250" Height="130" VerticalAlignment="Top" Source="/Resources/cinnamon.png"/>
+            <RadioButton Grid.Row="1" Grid.Column="0" x:Name="cinnamonButton" Content="Cinnamon" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
+            <Image Grid.Row="1" Grid.Column="1" x:Name="mate" HorizontalAlignment="Center" Width="250" Height="130" VerticalAlignment="Top" Source="/Resources/mate.png"/>
+            <RadioButton Grid.Row="1" Grid.Column="1" x:Name="mateButton" Content="MATE" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
+            <Image Grid.Row="1" Grid.Column="2" x:Name="xfce" HorizontalAlignment="Center" Width="250" Height="130" VerticalAlignment="Top" Source="/Resources/xfce.png"/>
+            <RadioButton Grid.Row="1" Grid.Column="2" x:Name="xfceButton" Content="Xfce 4" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
+        </Grid>
+        <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">
+            <Button Content="Go back" HorizontalAlignment="Right" Margin="0,0,44,0" VerticalAlignment="Center" Click="Previous"/>
+            <Button x:Name="NextButton" Content="Next" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" Click="Next"/>
+        </Grid>
+
     </Grid>
 </Page>
