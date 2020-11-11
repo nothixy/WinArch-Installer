@@ -15,6 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,6 +37,24 @@ namespace WinArch
         public About()
         {
             InitializeComponent();
+        }
+        public void Previous(object sender, EventArgs e)
+        {
+            NavigationService nav = this.NavigationService;
+            nav.Navigate(new Uri("Welcome.xaml", UriKind.Relative));
+        }
+        public void Next(object sender, EventArgs e)
+        {
+            NavigationService nav = this.NavigationService;
+            nav.Navigate(new Uri("Partitioning.xaml", UriKind.Relative));
+        }
+        public void Scroller_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            var scrollViewer = (ScrollViewer)sender;
+            if (scrollViewer.VerticalOffset == scrollViewer.ScrollableHeight)
+            {
+                ButtonNext.IsEnabled = true;
+            }
         }
     }
 }

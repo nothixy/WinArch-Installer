@@ -4,14 +4,17 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="archlinux-logo-large.png" />
+    <None Remove="WinArch-icon.png" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Resources\archlinux-logo-large.png" />
+    <Resource Include="Resources\WinArch-icon.png" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,30 @@
+﻿<Page x:Class="WinArch.Locale"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WinArch"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Locale">
+
+    <Grid>
+        <TextBlock x:Name="WelcomeMessage" HorizontalAlignment="Center" Margin="0,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" FontSize="24" Text="Configure your PC"/>
+        <Grid VerticalAlignment="Center" Height="336">
+            <TextBlock x:Name="textBlock" HorizontalAlignment="Center" Margin="0,32,0,0" Text="What language do you speak ? If there are multiple versions of a language, UTF-8 variant is recommended" TextWrapping="Wrap" VerticalAlignment="Top"/>
+            <ComboBox x:Name="lang" HorizontalAlignment="Center" Margin="0,53,0,0" VerticalAlignment="Top" Width="200"/>
+            <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Center" Margin="0,99,0,0" Text="What keymap does your keyboard use ?" TextWrapping="Wrap" VerticalAlignment="Top"/>
+            <ComboBox x:Name="keymap" HorizontalAlignment="Center" Margin="0,120,0,0" VerticalAlignment="Top" Width="200"/>
+            <TextBlock x:Name="textBlock_Copy1" HorizontalAlignment="Center" Margin="0,168,0,0" Text="What is your timezone ?" TextWrapping="Wrap" VerticalAlignment="Top"/>
+            <ComboBox x:Name="timezone" HorizontalAlignment="Center" Margin="0,189,0,0" VerticalAlignment="Top" Width="200"/>
+            <TextBlock x:Name="textBlock_Copy2" HorizontalAlignment="Center" Margin="0,234,0,0" Text="What will be the name of your PC ? Only letters, numbers and hyphens (not at the beginning or the end)" TextWrapping="Wrap" VerticalAlignment="Top"/>
+            <TextBox x:Name="hostname" HorizontalAlignment="Center" Margin="0,255,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="200" MaxLength="63"/>
+            <TextBlock x:Name="hostmissing" HorizontalAlignment="Center" Margin="0,278,0,0" Text="You must set a hostname" TextWrapping="Wrap" VerticalAlignment="Top" Visibility="Hidden" Foreground="Red"/>
+            <TextBlock x:Name="hostregex" HorizontalAlignment="Center" Margin="0,278,0,0" Text="Hostname must be only letters, numbers, and hyphens (not at the beginning or the end)" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="Red" Visibility="Hidden"/>
+        </Grid>
+        <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">
+            <Button Content="Go back" HorizontalAlignment="Right" Margin="0,0,44,0" VerticalAlignment="Center" Click="Previous"/>
+            <Button x:Name="ButtonNext" Content="Next" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" Click="Next"/>
+        </Grid>
+    </Grid>
+</Page>
