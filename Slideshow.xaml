@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
     -->
-    <Page x:Class="WinArch.Slideshow"
+<Page x:Class="WinArch.Slideshow"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -26,6 +26,23 @@
       Title="Slideshow">
 
     <Grid>
-        
+        <TabControl x:Name="tabControl" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,10,10,95">
+            <TabItem Header="Logs">
+                <Grid Background="#FFE5E5E5">
+                    <ScrollViewer x:Name="scroller">
+                        <TextBlock x:Name="logs" HorizontalAlignment="Stretch" Text="Installer logs" TextWrapping="Wrap" VerticalAlignment="Stretch"/>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+            <TabItem Header="TabItem">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+        </TabControl>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Center" Margin="0,0,0,75" Text="Installing" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+        <ProgressBar x:Name="progressCurrent" HorizontalAlignment="Stretch" Height="20" Margin="10,0,10,50" VerticalAlignment="Bottom"/>
+        <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">
+            <Button Width="60" x:Name="ButtonNext" Content="Next" IsEnabled="False" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center"/>
+            <ProgressBar x:Name="progressTotal" Height="20" Margin="10,0,75,0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+        </Grid>
     </Grid>
 </Page>

@@ -17,7 +17,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Packaging;
 using System.Net;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -39,28 +41,85 @@ namespace WinArch
     /// </summary>
     public partial class Slideshow : Page
     {
+        int numberoftasks = 6;
+        double taskpercentage;
         public Slideshow()
         {
             InitializeComponent();
-            downloadLatestGrub();
+            downloadcomponents();
         }
-        public static async Task<string> downloadLatestGrub()
+        public async Task downloadcomponents()
         {
+            string grubfile = await downloadLatestGrub();
+        }
 
-            // Get the object used to communicate with the server.
+        public void updateProgress(bool indeterminate, string currentAction, double? currentPercentage)
+        {
+            progressCurrent.IsIndeterminate = indeterminate;
+            if (!indeterminate)
+            {
+                progressCurrent.Value = (double)currentPercentage;
+            }
+            textBlock.Text = currentAction;
+        }
+        public void updateProgressFull(int currentPercentage)
+        {
+            taskpercentage = (currentPercentage * 100) / 6;
+            progressTotal.Value = taskpercentage;
+        }
+        public void downloadTheRest()
+        {
+            logs.Text = logs.Text + "\nReading md5s file http://mirrors.evowise.com/archlinux/iso/latest/md5sums.txt";
+            scroller.ScrollToBottom();
+            updateProgress(true, "Finding Archlinux archive to download", null);
+            WebClient client2 = new WebClient();
+            Stream test = client2.OpenRead("http://mirrors.evowise.com/archlinux/iso/latest/md5sums.txt");
+            StreamReader sr = new StreamReader(test);
+            string line;
+            string filetodownload = null;
+            while ((line = sr.ReadLine()) != null)
+            {
+                if (Regex.IsMatch(line, "[0-9a-f]{32}\\s{2}archlinux-bootstrap.*"))
+                {
+                    filetodownload = Regex.Replace(line, "[0-9a-f]{32}\\s{2}", "");
+                }
+            }
+            logs.Text = logs.Text + "\nFound filename to download : http://mirrors.evowise.com/archlinux/iso/latest/" + filetodownload + ", downloading";
+            scroller.ScrollToBottom();
+            WebClient client3 = new WebClient();
+            Uri todownload2 = new Uri("http://mirrors.evowise.com/archlinux/iso/latest/" + filetodownload);
+            client3.DownloadProgressChanged += (s, e) =>
+            {
+                updateProgress(false, "Download Archlinux bootstrap archive", e.ProgressPercentage);
+            };
+            client3.DownloadFileCompleted += (s, e) =>
+            {
+                logs.Text = logs.Text + "\nDownloaded to " + Path.GetTempPath() + "arch.tar.gz";
+                scroller.ScrollToBottom();
+                updateProgressFull(2);
+            };
+            client3.DownloadFileAsync(todownload2, Path.GetTempPath() + "arch.tar.gz");
+        }
+        async Task<string> downloadLatestGrub()
+        {
+            logs.Text = logs.Text + "\nQuerying GRUB ftp server for versions";
+            scroller.ScrollToBottom();
+            updateProgress(true, "Finding GRUB version to download", null);
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create("ftp://ftp.gnu.org/gnu/grub/");
             request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
-
-            // This example assumes the FTP site uses anonymous logon.
             request.Credentials = new NetworkCredential("anonymous", "");
-
-            FtpWebResponse response = (FtpWebResponse)request.GetResponse();
-
+            WebResponse webResponse = await request.GetResponseAsync();
+            FtpWebResponse response = (FtpWebResponse)webResponse;
+            
             Stream responseStream = response.GetResponseStream();
             StreamReader reader = new StreamReader(responseStream);
             string[] files = reader.ReadToEnd().Split('\n');
+            logs.Text = logs.Text + "\nGot response";
+            scroller.ScrollToBottom();
             reader.Close();
             response.Close();
+            logs.Text = logs.Text + "\nFinding version to download";
+            scroller.ScrollToBottom();
             List<string> filenames = new List<string>();
             for (int i = 0; i < (files.Length - 1); i++)
             {
@@ -80,9 +139,26 @@ namespace WinArch
                     }
                 }
             }
+            logs.Text = logs.Text + "\nFound version " + filenamemaster;
+            scroller.ScrollToBottom();
             WebClient client = new WebClient();
             client.Credentials = new NetworkCredential("anonymous", "");
-            client.DownloadFile("ftp://ftp.gnu.org/gnu/grub/" + filenamemaster, Path.GetTempPath() + "grub.zip");
+            client.DownloadProgressChanged += (s, e) =>
+            {
+                updateProgress(false, "Downloading GRUB file", e.ProgressPercentage);
+            };
+            client.DownloadFileCompleted += (s, e) =>
+            {
+                logs.Text = logs.Text + "\nDownloaded file to " + Path.GetTempPath() + "grub.zip";
+                scroller.ScrollToBottom();
+                updateProgressFull(1);
+                downloadTheRest();
+            };
+            Uri todownload = new Uri("ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
+            client.DownloadFileAsync(todownload, Path.GetTempPath() + "grub.zip");
+            logs.Text = logs.Text + "\nDownloading file ftp://ftp.gnu.org/gnu/grub/" + filenamemaster;
+            scroller.ScrollToBottom();
+            return Path.GetTempPath() + "grub.zip";
         }
     }
 }

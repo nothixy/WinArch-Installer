@@ -40,8 +40,8 @@
             <TextBlock x:Name="hostregex" HorizontalAlignment="Center" Margin="0,278,0,0" Text="Hostname must be only letters, numbers, and hyphens (not at the beginning or the end)" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="Red" Visibility="Hidden"/>
         </Grid>
         <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">
-            <Button Content="Go back" HorizontalAlignment="Right" Margin="0,0,44,0" VerticalAlignment="Center" Click="Previous"/>
-            <Button x:Name="ButtonNext" Content="Next" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" Click="Next"/>
+            <Button Width="60" Content="Go back" HorizontalAlignment="Right" Margin="0,0,75,0" VerticalAlignment="Center" Click="Previous"/>
+            <Button Width="60" x:Name="ButtonNext" Content="Next" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" Click="Next"/>
         </Grid>
     </Grid>
 </Page>

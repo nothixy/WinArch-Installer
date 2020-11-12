@@ -36,8 +36,8 @@
         </ComboBox>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Center" Margin="0,-40,0,0" Text="Select how much space you want for your linux installation" TextWrapping="Wrap" VerticalAlignment="Center"/>
         <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">
-            <Button Content="Go back" HorizontalAlignment="Right" Margin="0,0,44,0" VerticalAlignment="Center" Click="Previous"/>
-            <Button x:Name="NextButton" Content="Next" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" Click="Next"/>
+            <Button Width="60" Content="Go back" HorizontalAlignment="Right" Margin="0,0,75,0" VerticalAlignment="Center" Click="Previous"/>
+            <Button Width="60" x:Name="NextButton" Content="Next" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" Click="Next"/>
         </Grid>
     </Grid>
 </Page>

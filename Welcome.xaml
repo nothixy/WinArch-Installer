@@ -30,8 +30,8 @@
         <TextBlock x:Name="WelcomeMessage" HorizontalAlignment="Center" Margin="0,20,0,0" Text="Welcome to the WinArch installer" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" FontSize="24"/>
         <Image x:Name="ArchLogoBig" HorizontalAlignment="Center" VerticalAlignment="Center" Source="/Resources/archlinux-logo-large.png" Margin="0,40,0,40"/>
         <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">
-            <Button Content="Cancel" HorizontalAlignment="Right" Margin="0,0,44,0" VerticalAlignment="Center"/>
-            <Button Content="Next" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" Click="Next"/>
+            <Button Width="60" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,75,0" VerticalAlignment="Center"/>
+            <Button Width="60" Content="Next" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" Click="Next"/>
         </Grid>
     </Grid>
 </Page>
