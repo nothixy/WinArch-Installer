@@ -18,9 +18,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Packaging;
+using System.Linq;
+using System.Management;
 using System.Net;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -50,7 +53,8 @@ namespace WinArch
         }
         public async Task downloadcomponents()
         {
-            string grubfile = await downloadLatestGrub();
+            //downloadLatestGrub();
+            doOperations();
         }
 
         public void updateProgress(bool indeterminate, string currentAction, double? currentPercentage)
@@ -67,13 +71,63 @@ namespace WinArch
             taskpercentage = (currentPercentage * 100) / 6;
             progressTotal.Value = taskpercentage;
         }
-        public void downloadTheRest()
+        async Task downloadCloverBootloader()
+        {
+            Uri downloadurl = null;
+            logs.Text = logs.Text + "\nTrying to find Clover version to download";
+            scroller.ScrollToBottom();
+            updateProgress(true, "Finding Clover version to download", null);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://api.github.com/repos/CloverHackyColor/CloverBootloader/releases/latest");
+            request.Headers["Accept"] = "application/vnd.github.v3+json";
+            request.Headers["User-Agent"] = "request";
+            request.Method = "GET";
+            WebResponse responsetest = await request.GetResponseAsync();
+            HttpWebResponse response = (HttpWebResponse)responsetest;
+            Stream dataStream = response.GetResponseStream();
+            StreamReader reader = new StreamReader(dataStream);
+            string responsejson = reader.ReadToEnd();
+            reader.Close();
+            dataStream.Close();
+            var root = JsonSerializer.Deserialize<DocumentRoot>(responsejson);
+            foreach (var obj in root.assets)
+            {
+                if (Regex.IsMatch(obj.name, "CloverV2-[0-9]{4}.zip"))
+                {
+                    downloadurl = new Uri(obj.browser_download_url);
+                }
+            }
+            logs.Text = logs.Text + "\nDownloading file " + downloadurl.AbsoluteUri;
+            scroller.ScrollToBottom();
+            WebClient client = new WebClient();
+            client.DownloadProgressChanged += (s, e) =>
+            {
+                updateProgress(false, "Download Clover zip file", e.ProgressPercentage);
+            };
+            client.DownloadFileCompleted += (s, e) =>
+            {
+                logs.Text = logs.Text + "\nDownloaded to " + Path.GetTempPath() + "clover.zip";
+                scroller.ScrollToBottom();
+                updateProgressFull(3);
+                //doOperations();
+            };
+            client.DownloadFileAsync(downloadurl, Path.GetTempPath() + "clover.zip");
+        }
+        public class DocumentRoot
+        {
+            public List<assetslist> assets { get; set; }
+        }
+        public class assetslist
+        {
+            public string name { get; set; }
+            public string browser_download_url { get; set; }
+        }
+        public void downloadArchBootstrap()
         {
             logs.Text = logs.Text + "\nReading md5s file http://mirrors.evowise.com/archlinux/iso/latest/md5sums.txt";
             scroller.ScrollToBottom();
             updateProgress(true, "Finding Archlinux archive to download", null);
-            WebClient client2 = new WebClient();
-            Stream test = client2.OpenRead("http://mirrors.evowise.com/archlinux/iso/latest/md5sums.txt");
+            WebClient client = new WebClient();
+            Stream test = client.OpenRead("http://mirrors.evowise.com/archlinux/iso/latest/md5sums.txt");
             StreamReader sr = new StreamReader(test);
             string line;
             string filetodownload = null;
@@ -86,21 +140,22 @@ namespace WinArch
             }
             logs.Text = logs.Text + "\nFound filename to download : http://mirrors.evowise.com/archlinux/iso/latest/" + filetodownload + ", downloading";
             scroller.ScrollToBottom();
-            WebClient client3 = new WebClient();
-            Uri todownload2 = new Uri("http://mirrors.evowise.com/archlinux/iso/latest/" + filetodownload);
-            client3.DownloadProgressChanged += (s, e) =>
+            WebClient client2 = new WebClient();
+            Uri todownload = new Uri("http://mirrors.evowise.com/archlinux/iso/latest/" + filetodownload);
+            client2.DownloadProgressChanged += (s, e) =>
             {
                 updateProgress(false, "Download Archlinux bootstrap archive", e.ProgressPercentage);
             };
-            client3.DownloadFileCompleted += (s, e) =>
+            client2.DownloadFileCompleted += (s, e) =>
             {
                 logs.Text = logs.Text + "\nDownloaded to " + Path.GetTempPath() + "arch.tar.gz";
                 scroller.ScrollToBottom();
                 updateProgressFull(2);
+                downloadCloverBootloader();
             };
-            client3.DownloadFileAsync(todownload2, Path.GetTempPath() + "arch.tar.gz");
+            client2.DownloadFileAsync(todownload, Path.GetTempPath() + "arch.tar.gz");
         }
-        async Task<string> downloadLatestGrub()
+        async Task downloadLatestGrub()
         {
             logs.Text = logs.Text + "\nQuerying GRUB ftp server for versions";
             scroller.ScrollToBottom();
@@ -152,13 +207,33 @@ namespace WinArch
                 logs.Text = logs.Text + "\nDownloaded file to " + Path.GetTempPath() + "grub.zip";
                 scroller.ScrollToBottom();
                 updateProgressFull(1);
-                downloadTheRest();
+                downloadArchBootstrap();
             };
             Uri todownload = new Uri("ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
             client.DownloadFileAsync(todownload, Path.GetTempPath() + "grub.zip");
             logs.Text = logs.Text + "\nDownloading file ftp://ftp.gnu.org/gnu/grub/" + filenamemaster;
             scroller.ScrollToBottom();
-            return Path.GetTempPath() + "grub.zip";
+        }
+        public void doOperations()
+        {
+            Process process = new Process();
+            process.StartInfo.FileName = "powershell.exe";
+            process.StartInfo.Arguments = "-Command echo $(Get-ComputerInfo).BiosFirmwareType";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.CreateNoWindow = true;
+            process.Start();
+            process.WaitForExit();
+            string errorOutput = process.StandardOutput.ReadToEnd();
+            if (Regex.Replace(errorOutput, "\\s", "") == "Bios")
+            {
+                Debug.WriteLine("Loser legacy");
+            }
+            else
+            {
+                Debug.WriteLine("Bogoss");
+            }
         }
     }
 }

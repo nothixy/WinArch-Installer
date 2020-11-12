@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Management" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Resources\budgie.png" />
     <Resource Include="Resources\cinnamon.png" />
     <Resource Include="Resources\gnome.png" />
