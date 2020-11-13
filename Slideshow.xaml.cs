@@ -51,7 +51,9 @@ namespace WinArch
         public Slideshow()
         {
             InitializeComponent();
-            spaceleft_mb = (long)Application.Current.Properties["SpaceRequired"];
+            //spaceleft_mb = (long)Application.Current.Properties["SpaceRequired"];
+            spaceleft_mb = 100000;
+            Debug.WriteLine(spaceleft_mb - 600);
             downloadcomponents();
         }
         public async Task downloadcomponents()
@@ -67,6 +69,7 @@ namespace WinArch
         }
         public async Task partitionDisks(bool useExtended)
         {
+            updateProgress(true, "Formatting disks", null);
             string diskpartfile = Path.GetTempPath() + "diskpart.txt";
             if (File.Exists(diskpartfile))
             {
@@ -76,28 +79,46 @@ namespace WinArch
             {
                 string[] lines = { "select disk 0",
                     "select volume C",
-                    "shrink desired=" + spaceleft_mb + "minimum=3600",
-                    "create partition extended " + spaceleft_mb,
-                    "create partition logical " + (spaceleft_mb - 3600),
+                    "shrink desired=" + spaceleft_mb + " minimum=3600",
+                    "create partition extended",
+                    "create partition logical size=" + (spaceleft_mb - 600),
                     "format fs=fat32 quick label=Arch",
-                    "create partition primary 3600",
-                    "format fs=fat32 quick label=preArch",
-                    "assign letter L"
-                };
-            }
-            else
-            {
-                string[] lines = {  "select disk 0",
-                    "select volume C",
-                    "shrink desired=" + spaceleft_mb + "minimum=3600",
-                    "create partition primary " + (spaceleft_mb - 3600),
-                    "format fs=fat32 quick label=Arch",
-                    "create partition primary 3600",
+                    "create partition logical",
                     "format fs=fat32 quick label=preArch",
                     "assign letter L"
                 };
                 System.IO.File.WriteAllLines(diskpartfile, lines);
             }
+            else
+            {
+                string[] lines = {  "select disk 0",
+                    "select volume C",
+                    "shrink desired=" + spaceleft_mb + " minimum=3600",
+                    "create partition primary size=" + (spaceleft_mb - 600),
+                    "format fs=fat32 quick label=Arch",
+                    "create partition primary",
+                    "format fs=fat32 quick label=preArch",
+                    "assign letter L"
+                };
+                System.IO.File.WriteAllLines(diskpartfile, lines);
+            }
+            Process process = new Process();
+            process.Exited += (s, e) =>
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    updateLog(process.StandardOutput.ReadToEnd());
+                });
+            };
+            process.StartInfo.FileName = "diskpart.exe";
+            process.StartInfo.Arguments = "/s " + diskpartfile;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.CreateNoWindow = true;
+            process.EnableRaisingEvents = true;
+            process.Start();
+
         }
         public void updateProgress(bool indeterminate, string currentAction, double? currentPercentage)
         {
