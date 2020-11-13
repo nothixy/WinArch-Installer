@@ -44,7 +44,9 @@ namespace WinArch
     /// </summary>
     public partial class Slideshow : Page
     {
+        Process process;
         int numberoftasks = 6;
+        int partitionsnumber = 0;
         double taskpercentage;
         public Slideshow()
         {
@@ -54,9 +56,14 @@ namespace WinArch
         public async Task downloadcomponents()
         {
             //downloadLatestGrub();
-            doOperations();
+            getBIOSInfo();
+            //doOperations();
         }
-
+        public void updateLog(string toadd)
+        {
+            logs.Text = logs.Text + "\n" + toadd;
+            scroller.ScrollToBottom();
+        }
         public void updateProgress(bool indeterminate, string currentAction, double? currentPercentage)
         {
             progressCurrent.IsIndeterminate = indeterminate;
@@ -71,11 +78,10 @@ namespace WinArch
             taskpercentage = (currentPercentage * 100) / 6;
             progressTotal.Value = taskpercentage;
         }
-        async Task downloadCloverBootloader()
+        async Task downloadLatestClover()
         {
             Uri downloadurl = null;
-            logs.Text = logs.Text + "\nTrying to find Clover version to download";
-            scroller.ScrollToBottom();
+            updateLog("Trying to find Clover version to download");
             updateProgress(true, "Finding Clover version to download", null);
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://api.github.com/repos/CloverHackyColor/CloverBootloader/releases/latest");
             request.Headers["Accept"] = "application/vnd.github.v3+json";
@@ -96,19 +102,17 @@ namespace WinArch
                     downloadurl = new Uri(obj.browser_download_url);
                 }
             }
-            logs.Text = logs.Text + "\nDownloading file " + downloadurl.AbsoluteUri;
-            scroller.ScrollToBottom();
+            updateLog("Downloading file " + downloadurl.AbsoluteUri);
             WebClient client = new WebClient();
             client.DownloadProgressChanged += (s, e) =>
             {
-                updateProgress(false, "Download Clover zip file", e.ProgressPercentage);
+                updateProgress(false, "Downloading Clover zip file", e.ProgressPercentage);
             };
             client.DownloadFileCompleted += (s, e) =>
             {
-                logs.Text = logs.Text + "\nDownloaded to " + Path.GetTempPath() + "clover.zip";
-                scroller.ScrollToBottom();
-                updateProgressFull(3);
-                //doOperations();
+                updateLog("Downloaded to " + Path.GetTempPath() + "clover.zip");
+                updateProgressFull(1);
+                downloadArchBootstrap();
             };
             client.DownloadFileAsync(downloadurl, Path.GetTempPath() + "clover.zip");
         }
@@ -123,8 +127,7 @@ namespace WinArch
         }
         public void downloadArchBootstrap()
         {
-            logs.Text = logs.Text + "\nReading md5s file http://mirrors.evowise.com/archlinux/iso/latest/md5sums.txt";
-            scroller.ScrollToBottom();
+            updateLog("Reading md5s file http://mirrors.evowise.com/archlinux/iso/latest/md5sums.txt");
             updateProgress(true, "Finding Archlinux archive to download", null);
             WebClient client = new WebClient();
             Stream test = client.OpenRead("http://mirrors.evowise.com/archlinux/iso/latest/md5sums.txt");
@@ -138,8 +141,7 @@ namespace WinArch
                     filetodownload = Regex.Replace(line, "[0-9a-f]{32}\\s{2}", "");
                 }
             }
-            logs.Text = logs.Text + "\nFound filename to download : http://mirrors.evowise.com/archlinux/iso/latest/" + filetodownload + ", downloading";
-            scroller.ScrollToBottom();
+            updateLog("Found filename to download : http://mirrors.evowise.com/archlinux/iso/latest/" + filetodownload + ", downloading");
             WebClient client2 = new WebClient();
             Uri todownload = new Uri("http://mirrors.evowise.com/archlinux/iso/latest/" + filetodownload);
             client2.DownloadProgressChanged += (s, e) =>
@@ -148,17 +150,15 @@ namespace WinArch
             };
             client2.DownloadFileCompleted += (s, e) =>
             {
-                logs.Text = logs.Text + "\nDownloaded to " + Path.GetTempPath() + "arch.tar.gz";
-                scroller.ScrollToBottom();
+                updateLog("Downloaded to " + Path.GetTempPath() + "arch.tar.gz");
                 updateProgressFull(2);
-                downloadCloverBootloader();
+                //setupNewSystem();
             };
             client2.DownloadFileAsync(todownload, Path.GetTempPath() + "arch.tar.gz");
         }
         async Task downloadLatestGrub()
         {
-            logs.Text = logs.Text + "\nQuerying GRUB ftp server for versions";
-            scroller.ScrollToBottom();
+            updateLog("Querying GRUB ftp server for versions");
             updateProgress(true, "Finding GRUB version to download", null);
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create("ftp://ftp.gnu.org/gnu/grub/");
             request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
@@ -169,12 +169,10 @@ namespace WinArch
             Stream responseStream = response.GetResponseStream();
             StreamReader reader = new StreamReader(responseStream);
             string[] files = reader.ReadToEnd().Split('\n');
-            logs.Text = logs.Text + "\nGot response";
-            scroller.ScrollToBottom();
+            updateLog("Got response");
             reader.Close();
             response.Close();
-            logs.Text = logs.Text + "\nFinding version to download";
-            scroller.ScrollToBottom();
+            updateLog("Finding version to download");
             List<string> filenames = new List<string>();
             for (int i = 0; i < (files.Length - 1); i++)
             {
@@ -194,8 +192,7 @@ namespace WinArch
                     }
                 }
             }
-            logs.Text = logs.Text + "\nFound version " + filenamemaster;
-            scroller.ScrollToBottom();
+            updateLog("Found version " + filenamemaster);
             WebClient client = new WebClient();
             client.Credentials = new NetworkCredential("anonymous", "");
             client.DownloadProgressChanged += (s, e) =>
@@ -204,35 +201,77 @@ namespace WinArch
             };
             client.DownloadFileCompleted += (s, e) =>
             {
-                logs.Text = logs.Text + "\nDownloaded file to " + Path.GetTempPath() + "grub.zip";
-                scroller.ScrollToBottom();
+                updateLog("Downloaded file to " + Path.GetTempPath() + "grub.zip");
                 updateProgressFull(1);
                 downloadArchBootstrap();
             };
             Uri todownload = new Uri("ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
             client.DownloadFileAsync(todownload, Path.GetTempPath() + "grub.zip");
-            logs.Text = logs.Text + "\nDownloading file ftp://ftp.gnu.org/gnu/grub/" + filenamemaster;
-            scroller.ScrollToBottom();
+            updateLog("Downloading file ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
         }
-        public void doOperations()
+        public async Task getBIOSInfo()
         {
-            Process process = new Process();
+            updateProgress(true, "Getting BIOS mode", null);
+            process = new Process();
+            process.Exited += (s, e) =>
+            {
+                string output = Regex.Replace(process.StandardOutput.ReadToEnd(), "\\s", "").ToUpper();
+                this.Dispatcher.Invoke(() =>
+                {
+                    updateLog("Found current BIOS mode: " + output);
+                });
+                getDisksInfo(output);
+            };
             process.StartInfo.FileName = "powershell.exe";
             process.StartInfo.Arguments = "-Command echo $(Get-ComputerInfo).BiosFirmwareType";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.CreateNoWindow = true;
+            process.EnableRaisingEvents = true;
             process.Start();
-            process.WaitForExit();
-            string errorOutput = process.StandardOutput.ReadToEnd();
-            if (Regex.Replace(errorOutput, "\\s", "") == "Bios")
-            {
-                Debug.WriteLine("Loser legacy");
+        }
+        public void getDisksInfo(string biosmode)
+        {
+            if (biosmode == "BIOS") {
+                var searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_DiskPartition");
+                foreach (var queryObj in searcher.Get())
+                {
+                    /*Debug.WriteLine("-----------------------------------");
+                    Debug.WriteLine("Win32_DiskPartition instance");
+                    Debug.WriteLine("Name:{0}", (string)queryObj["Name"]);
+                    Debug.WriteLine("Index:{0}", (uint)queryObj["Index"]);
+                    Debug.WriteLine("DiskIndex:{0}", (uint)queryObj["DiskIndex"]);
+                    Debug.WriteLine("BootPartition:{0}", (bool)queryObj["BootPartition"]);*/
+                    if ((uint)queryObj["DiskIndex"] == 0)
+                    {
+                        partitionsnumber++;
+                    }
+                }
+                if (partitionsnumber < 4)
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        updateLog("Using GRUB and extended partitions method");
+                        downloadLatestGrub();
+                    });
+                }
+                else
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        updateLog("Using Clover and GPT method");
+                        downloadLatestClover();
+                    });
+                }
             }
             else
             {
-                Debug.WriteLine("Bogoss");
+                this.Dispatcher.Invoke(() =>
+                {
+                    updateLog("Using UEFI GPT (easiest) method");
+                    downloadLatestGrub();
+                });
             }
         }
     }
