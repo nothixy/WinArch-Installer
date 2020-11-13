@@ -64,6 +64,13 @@ namespace WinArch
             logs.Text = logs.Text + "\n" + toadd;
             scroller.ScrollToBottom();
         }
+        public void partitionDisks(bool convertGPT, bool useExtended)
+        {
+            if (convertGPT)
+            {
+
+            }
+        }
         public void updateProgress(bool indeterminate, string currentAction, double? currentPercentage)
         {
             progressCurrent.IsIndeterminate = indeterminate;
@@ -253,6 +260,7 @@ namespace WinArch
                     this.Dispatcher.Invoke(() =>
                     {
                         updateLog("Using GRUB and extended partitions method");
+                        partitionDisks(false, true);
                         downloadLatestGrub();
                     });
                 }
@@ -261,6 +269,7 @@ namespace WinArch
                     this.Dispatcher.Invoke(() =>
                     {
                         updateLog("Using Clover and GPT method");
+                        partitionDisks(true, false);
                         downloadLatestClover();
                     });
                 }
@@ -270,6 +279,7 @@ namespace WinArch
                 this.Dispatcher.Invoke(() =>
                 {
                     updateLog("Using UEFI GPT (easiest) method");
+                    partitionDisks(false, false);
                     downloadLatestGrub();
                 });
             }
