@@ -44,13 +44,14 @@ namespace WinArch
     /// </summary>
     public partial class Slideshow : Page
     {
-        Process process;
         int numberoftasks = 6;
         int partitionsnumber = 0;
         double taskpercentage;
+        long spaceleft_mb;
         public Slideshow()
         {
             InitializeComponent();
+            spaceleft_mb = (long)Application.Current.Properties["SpaceRequired"];
             downloadcomponents();
         }
         public async Task downloadcomponents()
@@ -64,11 +65,38 @@ namespace WinArch
             logs.Text = logs.Text + "\n" + toadd;
             scroller.ScrollToBottom();
         }
-        public void partitionDisks(bool convertGPT, bool useExtended)
+        public async Task partitionDisks(bool useExtended)
         {
-            if (convertGPT)
+            string diskpartfile = Path.GetTempPath() + "diskpart.txt";
+            if (File.Exists(diskpartfile))
             {
-
+                File.Delete(diskpartfile);
+            }
+            if (useExtended)
+            {
+                string[] lines = { "select disk 0",
+                    "select volume C",
+                    "shrink desired=" + spaceleft_mb + "minimum=3600",
+                    "create partition extended " + spaceleft_mb,
+                    "create partition logical " + (spaceleft_mb - 3600),
+                    "format fs=fat32 quick label=Arch",
+                    "create partition primary 3600",
+                    "format fs=fat32 quick label=preArch",
+                    "assign letter L"
+                };
+            }
+            else
+            {
+                string[] lines = {  "select disk 0",
+                    "select volume C",
+                    "shrink desired=" + spaceleft_mb + "minimum=3600",
+                    "create partition primary " + (spaceleft_mb - 3600),
+                    "format fs=fat32 quick label=Arch",
+                    "create partition primary 3600",
+                    "format fs=fat32 quick label=preArch",
+                    "assign letter L"
+                };
+                System.IO.File.WriteAllLines(diskpartfile, lines);
             }
         }
         public void updateProgress(bool indeterminate, string currentAction, double? currentPercentage)
@@ -84,53 +112,6 @@ namespace WinArch
         {
             taskpercentage = (currentPercentage * 100) / 6;
             progressTotal.Value = taskpercentage;
-        }
-        async Task downloadLatestClover()
-        {
-            Uri downloadurl = null;
-            updateLog("Trying to find Clover version to download");
-            updateProgress(true, "Finding Clover version to download", null);
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://api.github.com/repos/CloverHackyColor/CloverBootloader/releases/latest");
-            request.Headers["Accept"] = "application/vnd.github.v3+json";
-            request.Headers["User-Agent"] = "request";
-            request.Method = "GET";
-            WebResponse responsetest = await request.GetResponseAsync();
-            HttpWebResponse response = (HttpWebResponse)responsetest;
-            Stream dataStream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(dataStream);
-            string responsejson = reader.ReadToEnd();
-            reader.Close();
-            dataStream.Close();
-            var root = JsonSerializer.Deserialize<DocumentRoot>(responsejson);
-            foreach (var obj in root.assets)
-            {
-                if (Regex.IsMatch(obj.name, "CloverV2-[0-9]{4}.zip"))
-                {
-                    downloadurl = new Uri(obj.browser_download_url);
-                }
-            }
-            updateLog("Downloading file " + downloadurl.AbsoluteUri);
-            WebClient client = new WebClient();
-            client.DownloadProgressChanged += (s, e) =>
-            {
-                updateProgress(false, "Downloading Clover zip file", e.ProgressPercentage);
-            };
-            client.DownloadFileCompleted += (s, e) =>
-            {
-                updateLog("Downloaded to " + Path.GetTempPath() + "clover.zip");
-                updateProgressFull(1);
-                downloadArchBootstrap();
-            };
-            client.DownloadFileAsync(downloadurl, Path.GetTempPath() + "clover.zip");
-        }
-        public class DocumentRoot
-        {
-            public List<assetslist> assets { get; set; }
-        }
-        public class assetslist
-        {
-            public string name { get; set; }
-            public string browser_download_url { get; set; }
         }
         public void downloadArchBootstrap()
         {
@@ -219,7 +200,7 @@ namespace WinArch
         public async Task getBIOSInfo()
         {
             updateProgress(true, "Getting BIOS mode", null);
-            process = new Process();
+            Process process = new Process();
             process.Exited += (s, e) =>
             {
                 string output = Regex.Replace(process.StandardOutput.ReadToEnd(), "\\s", "").ToUpper();
@@ -244,12 +225,6 @@ namespace WinArch
                 var searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_DiskPartition");
                 foreach (var queryObj in searcher.Get())
                 {
-                    /*Debug.WriteLine("-----------------------------------");
-                    Debug.WriteLine("Win32_DiskPartition instance");
-                    Debug.WriteLine("Name:{0}", (string)queryObj["Name"]);
-                    Debug.WriteLine("Index:{0}", (uint)queryObj["Index"]);
-                    Debug.WriteLine("DiskIndex:{0}", (uint)queryObj["DiskIndex"]);
-                    Debug.WriteLine("BootPartition:{0}", (bool)queryObj["BootPartition"]);*/
                     if ((uint)queryObj["DiskIndex"] == 0)
                     {
                         partitionsnumber++;
@@ -260,8 +235,7 @@ namespace WinArch
                     this.Dispatcher.Invoke(() =>
                     {
                         updateLog("Using GRUB and extended partitions method");
-                        partitionDisks(false, true);
-                        downloadLatestGrub();
+                        partitionDisks(true);
                     });
                 }
                 else
@@ -269,8 +243,8 @@ namespace WinArch
                     this.Dispatcher.Invoke(() =>
                     {
                         updateLog("Using Clover and GPT method");
-                        partitionDisks(true, false);
-                        downloadLatestClover();
+                        //TODO: dialog box for the error
+                        return;
                     });
                 }
             }
@@ -279,10 +253,10 @@ namespace WinArch
                 this.Dispatcher.Invoke(() =>
                 {
                     updateLog("Using UEFI GPT (easiest) method");
-                    partitionDisks(false, false);
-                    downloadLatestGrub();
+                    partitionDisks(false);
                 });
             }
+            downloadLatestGrub();
         }
     }
 }
