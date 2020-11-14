@@ -82,7 +82,7 @@ namespace WinArch
                     "shrink desired=" + spaceleft_mb + " minimum=3600",
                     "create partition extended",
                     "create partition logical size=" + (spaceleft_mb - 600),
-                    "format fs=fat32 quick label=Arch",
+                    "format fs=exFat quick label=Arch",
                     "create partition logical",
                     "format fs=fat32 quick label=preArch",
                     "assign letter L"
@@ -95,13 +95,14 @@ namespace WinArch
                     "select volume C",
                     "shrink desired=" + spaceleft_mb + " minimum=3600",
                     "create partition primary size=" + (spaceleft_mb - 600),
-                    "format fs=fat32 quick label=Arch",
+                    "format fs=exFat quick label=Arch",
                     "create partition primary",
                     "format fs=fat32 quick label=preArch",
                     "assign letter L"
                 };
-                System.IO.File.WriteAllLines(diskpartfile, lines);
+                File.WriteAllLines(diskpartfile, lines);
             }
+
             Process process = new Process();
             process.Exited += (s, e) =>
             {
