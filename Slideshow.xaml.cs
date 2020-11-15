@@ -13,10 +13,14 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
+using SharpCompress.Common;
+using SharpCompress.Readers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.IO.Packaging;
 using System.Linq;
 using System.Management;
@@ -35,6 +39,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ZstdNet;
 using Path = System.IO.Path;
 
 namespace WinArch
@@ -47,10 +52,18 @@ namespace WinArch
         int numberoftasks = 6;
         int partitionsnumber = 0;
         double taskpercentage;
+        double mixedpercentage = 0;
         long spaceleft_mb;
+        int packagesDone;
+        string[] packages;
         public Slideshow()
         {
             InitializeComponent();
+            packages = File.ReadAllLines("../../../Resources/packages.txt");
+            foreach (DictionaryEntry de in Application.Current.Properties)
+            {
+                updateLog(de.Key + ": " + de.Value);
+            }
             //spaceleft_mb = (long)Application.Current.Properties["SpaceRequired"];
             spaceleft_mb = 100000;
             Debug.WriteLine(spaceleft_mb - 600);
@@ -59,7 +72,10 @@ namespace WinArch
         public async Task downloadcomponents()
         {
             //downloadLatestGrub();
-            getBIOSInfo();
+            //await getBIOSInfo();
+            //mountArchIso();
+            //getPackageList();
+            downloadArchIso();
             //doOperations();
         }
         public void updateLog(string toadd)
@@ -109,6 +125,8 @@ namespace WinArch
                 this.Dispatcher.Invoke(() =>
                 {
                     updateLog(process.StandardOutput.ReadToEnd());
+                    downloadLatestGrub();
+                    //setupNewSystem();
                 });
             };
             process.StartInfo.FileName = "diskpart.exe";
@@ -130,41 +148,10 @@ namespace WinArch
             }
             textBlock.Text = currentAction;
         }
-        public void updateProgressFull(int currentPercentage)
+        public void updateProgressFull(float currentPercentage)
         {
             taskpercentage = (currentPercentage * 100) / 6;
             progressTotal.Value = taskpercentage;
-        }
-        public void downloadArchBootstrap()
-        {
-            updateLog("Reading md5s file http://mirrors.evowise.com/archlinux/iso/latest/md5sums.txt");
-            updateProgress(true, "Finding Archlinux archive to download", null);
-            WebClient client = new WebClient();
-            Stream test = client.OpenRead("http://mirrors.evowise.com/archlinux/iso/latest/md5sums.txt");
-            StreamReader sr = new StreamReader(test);
-            string line;
-            string filetodownload = null;
-            while ((line = sr.ReadLine()) != null)
-            {
-                if (Regex.IsMatch(line, "[0-9a-f]{32}\\s{2}archlinux-bootstrap.*"))
-                {
-                    filetodownload = Regex.Replace(line, "[0-9a-f]{32}\\s{2}", "");
-                }
-            }
-            updateLog("Found filename to download : http://mirrors.evowise.com/archlinux/iso/latest/" + filetodownload + ", downloading");
-            WebClient client2 = new WebClient();
-            Uri todownload = new Uri("http://mirrors.evowise.com/archlinux/iso/latest/" + filetodownload);
-            client2.DownloadProgressChanged += (s, e) =>
-            {
-                updateProgress(false, "Download Archlinux bootstrap archive", e.ProgressPercentage);
-            };
-            client2.DownloadFileCompleted += (s, e) =>
-            {
-                updateLog("Downloaded to " + Path.GetTempPath() + "arch.tar.gz");
-                updateProgressFull(2);
-                //setupNewSystem();
-            };
-            client2.DownloadFileAsync(todownload, Path.GetTempPath() + "arch.tar.gz");
         }
         async Task downloadLatestGrub()
         {
@@ -213,11 +200,66 @@ namespace WinArch
             {
                 updateLog("Downloaded file to " + Path.GetTempPath() + "grub.zip");
                 updateProgressFull(1);
-                downloadArchBootstrap();
+                getPackageList();
             };
             Uri todownload = new Uri("ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
             client.DownloadFileAsync(todownload, Path.GetTempPath() + "grub.zip");
             updateLog("Downloading file ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
+        }
+        public void getPackageList()
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                updateProgress(false, "Installing package " + packages[packagesDone], (double)((double)packagesDone / packages.Length * 100));
+            });
+            using (WebClient client = new WebClient())
+            {
+                client.DownloadFileCompleted += async (s, e) =>
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        updateLog("Downloaded package " + packages[packagesDone]);
+                    });
+                    await Task.Run(() =>
+                    {
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            updateLog("Extracting package " + packages[packagesDone]);
+                        });
+                        using (Stream stream = File.OpenRead(Path.GetTempPath() + Regex.Replace(packages[packagesDone], "\\.pkg", "")))
+                        using (var reader = ReaderFactory.Open(stream))
+                        {
+                            while (reader.MoveToNextEntry())
+                            {
+                                if (!reader.Entry.IsDirectory)
+                                {
+                                try
+                                {
+                                    reader.WriteEntryToDirectory(@"L:\", new ExtractionOptions()
+                                    {
+                                        ExtractFullPath = true,
+                                        Overwrite = true
+                                    });
+                                }
+                                catch (IOException ignroed) { }
+                                catch (SharpCompress.Common.ExtractionException ignored) { }
+                                }
+                            }
+                        }
+                    });
+                    packagesDone++;
+                    if (packagesDone < packages.Length)
+                    {
+                        getPackageList();
+                    }
+                    else
+                    {
+                        downloadArchIso();
+                    }
+                };
+                Uri uri = new Uri("https://archive.archlinux.org/repos/2020/01/01/core/os/x86_64/" + packages[packagesDone]);
+                client.DownloadFileAsync(uri, Path.GetTempPath() + Regex.Replace(packages[packagesDone], "\\.pkg", ""));
+            }
         }
         public async Task getBIOSInfo()
         {
@@ -240,6 +282,49 @@ namespace WinArch
             process.StartInfo.CreateNoWindow = true;
             process.EnableRaisingEvents = true;
             process.Start();
+        }
+        public void downloadArchIso()
+        {
+            WebClient client = new WebClient();
+            Stream test = client.OpenRead("http://mirrors.evowise.com/archlinux/iso/latest/md5sums.txt");
+            StreamReader test2 = new StreamReader(test);
+            while (test2.Peek() >= 0)
+            {
+                string currentline = test2.ReadLine();
+                if (Regex.IsMatch(currentline, "[0-9a-f]{32}\\s{2}archlinux.*iso"))
+                {
+                    string downloadfile = Regex.Replace(currentline, "[0-9a-f]{32}\\s{2}", "");
+                    Uri uri = new Uri("http://mirrors.evowise.com/archlinux/iso/latest/" + downloadfile);
+                    WebClient client2 = new WebClient();
+                    client2.DownloadFileCompleted += (s, e) =>
+                    {
+                        Process process = new Process();
+                        process.Exited += (s, e) =>
+                        {
+                            string output = process.StandardOutput.ReadToEnd();
+                            this.Dispatcher.Invoke(() =>
+                            {
+                                updateLog("Mounted disk at " + output);
+                            });
+                            File.Copy(output + ":/Arch/Boot/X86_64/vmlinuz-linux", "F:/Boot");
+                            File.Copy(output + ":/Arch/Boot/X86_64/initramfs-linux.img", "F:/Boot");
+                        };
+                        process.StartInfo.FileName = "powershell.exe";
+                        process.StartInfo.Arguments = "-Command echo (Mount-DiskImage -ImagePath " + Path.GetTempPath() + "arch.iso | Get-Volume).DriveLetter";
+                        process.StartInfo.UseShellExecute = false;
+                        process.StartInfo.RedirectStandardOutput = true;
+                        process.StartInfo.RedirectStandardError = true;
+                        process.StartInfo.CreateNoWindow = true;
+                        process.EnableRaisingEvents = true;
+                        process.Start();
+                    };
+                    client2.DownloadProgressChanged += (s, e) =>
+                    {
+                        updateProgress(false, "Downloading archlinux iso", e.ProgressPercentage);
+                    };
+                    client2.DownloadFileAsync(uri, Path.GetTempPath() + "arch.iso");
+                }
+            }
         }
         public void getDisksInfo(string biosmode)
         {
