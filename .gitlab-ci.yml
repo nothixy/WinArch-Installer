@@ -1,6 +1,6 @@
 image: "archlinux"
 before_script:
-    - pacman -Syu linux
+    - pacman -Syu linux --noconfirm
 build:
     script:
         - mkinitcpio -p linux
