@@ -48,7 +48,6 @@ namespace WinArch
         public void Next(object sender, EventArgs e)
         {
             var btnchecked = GridTop.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked.Value);
-            Debug.WriteLine(btnchecked.Content);
             foreach (DictionaryEntry de in Application.Current.Properties)
             {
                 Debug.WriteLine(de.Key + ": " + de.Value.ToString());

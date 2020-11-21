@@ -71,7 +71,7 @@ namespace WinArch
         public void Previous(object sender, EventArgs e)
         {
             NavigationService nav = this.NavigationService;
-            nav.Navigate(new Uri("Partitionnig.xaml", UriKind.Relative));
+            nav.Navigate(new Uri("Partitioning.xaml", UriKind.Relative));
         }
         public void Next(object sender, EventArgs e)
         {

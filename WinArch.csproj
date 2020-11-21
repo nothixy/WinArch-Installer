@@ -11,9 +11,12 @@
     <None Remove="archlinux-logo-large.png" />
     <None Remove="budgie.png" />
     <None Remove="cinnamon.png" />
+    <None Remove="epic-games-store.png" />
+    <None Remove="gnome-software.png" />
     <None Remove="gnome.png" />
     <None Remove="kde.png" />
     <None Remove="mate.png" />
+    <None Remove="virt-manager.png" />
     <None Remove="WinArch-icon.png" />
     <None Remove="xfce.png" />
   </ItemGroup>
@@ -21,10 +24,11 @@
   <ItemGroup>
     <PackageReference Include="SharpCompress" Version="0.26.0" />
     <PackageReference Include="System.Management" Version="5.0.0" />
-    <PackageReference Include="ZstdNet2" Version="1.3.5" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\epic-games-store.png" />
+    <Resource Include="Resources\gnome-software.png" />
     <Resource Include="Resources\budgie.png" />
     <Resource Include="Resources\cinnamon.png" />
     <Resource Include="Resources\gnome.png" />
@@ -33,6 +37,7 @@
     <Resource Include="Resources\archlinux-logo-large.png" />
     <Resource Include="Resources\WinArch-icon.png" />
     <Resource Include="Resources\xfce.png" />
+    <Resource Include="Resources\virt-manager.png" />
   </ItemGroup>
 
 </Project>

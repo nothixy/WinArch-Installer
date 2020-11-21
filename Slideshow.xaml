@@ -27,15 +27,20 @@
 
     <Grid>
         <TabControl x:Name="tabControl" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,10,10,95">
-            <TabItem Header="Logs">
-                <Grid Background="#FFE5E5E5">
-                    <ScrollViewer x:Name="scroller">
-                        <TextBlock x:Name="logs" HorizontalAlignment="Stretch" Text="Installer logs" TextWrapping="Wrap" VerticalAlignment="Stretch"/>
-                    </ScrollViewer>
+            <TabItem Header="Software center">
+                <Grid Background="#FFA2A2A2">
+                    <Image x:Name="image" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/gnome-software.png"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="TabItem">
-                <Grid Background="#FFE5E5E5"/>
+            <TabItem Header="Windows software">
+                <Grid Background="#FFA2A2A2">
+                    <Image x:Name="image1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/epic-games-store.png"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Virtual machines">
+                <Grid Background="#FFA2A2A2">
+                    <Image x:Name="image2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/virt-manager.png"/>
+                </Grid>
             </TabItem>
         </TabControl>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Center" Margin="0,0,0,75" Text="Installing" TextWrapping="Wrap" VerticalAlignment="Bottom"/>

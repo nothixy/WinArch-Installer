@@ -39,7 +39,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using ZstdNet;
 using Path = System.IO.Path;
 
 namespace WinArch
@@ -53,37 +52,79 @@ namespace WinArch
         int partitionsnumber = 0;
         double taskpercentage;
         double mixedpercentage = 0;
-        long spaceleft_mb;
+        Single spaceleft_mb;
         int packagesDone;
         string[] packages;
+        string currentline;
+        string biosmode;
+        string kernelfile;
+        string initramfsfile;
+        string disktype;
+        bool repartition;
+        string volume;
+        bool createExtended;
         public Slideshow()
         {
             InitializeComponent();
+            biosmode = (string)Application.Current.Properties["biosmode"];
             packages = File.ReadAllLines("../../../Resources/packages.txt");
-            foreach (DictionaryEntry de in Application.Current.Properties)
-            {
-                updateLog(de.Key + ": " + de.Value);
-            }
-            //spaceleft_mb = (long)Application.Current.Properties["SpaceRequired"];
-            spaceleft_mb = 100000;
-            Debug.WriteLine(spaceleft_mb - 600);
+            spaceleft_mb = (Single)Application.Current.Properties["SpaceRequired"];
+            repartition = (bool)Application.Current.Properties["Repartition"];
+            volume = (string)Application.Current.Properties["Volume"];
             downloadcomponents();
         }
         public async Task downloadcomponents()
         {
+            Task.Run(() => slideshow());
             //downloadLatestGrub();
-            //await getBIOSInfo();
+            getDisksInfo(volume);
             //mountArchIso();
             //getPackageList();
-            downloadArchIso();
+            //downloadGentooStage4();
             //doOperations();
         }
-        public void updateLog(string toadd)
+        public void slideshow()
         {
-            logs.Text = logs.Text + "\n" + toadd;
-            scroller.ScrollToBottom();
+            while (true)
+            {
+                System.Threading.Thread.Sleep(10000);
+                this.Dispatcher.Invoke(() =>
+                {
+                    tabControl.SelectedIndex = (tabControl.SelectedIndex + 1) % tabControl.Items.Count;
+                });
+            }
         }
-        public async Task partitionDisks(bool useExtended)
+        public void getDisksInfo(string volume)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                updateProgress(true, "Getting disks info", null);
+            });
+            if (biosmode == "BIOS")
+            {
+                Process process = new Process();
+                process.Exited += (s, e) =>
+                {
+                    createExtended = Boolean.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
+                    Debug.WriteLine(createExtended);
+                    partitionDisks();
+                };
+                process.StartInfo.FileName = "powershell.exe";
+                process.StartInfo.Arguments = "if ((Get-partition -DiskNumber ((Get-Partition -DriveLetter " + volume + ").DiskNumber)).PartitionNumber -contains 0) { echo False } else { echo True }";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.CreateNoWindow = true;
+                process.EnableRaisingEvents = true;
+                process.Start();
+                process.WaitForExit();
+            }
+            else
+            {
+                partitionDisks();
+            }
+        }
+        public void partitionDisks()
         {
             updateProgress(true, "Formatting disks", null);
             string diskpartfile = Path.GetTempPath() + "diskpart.txt";
@@ -91,42 +132,119 @@ namespace WinArch
             {
                 File.Delete(diskpartfile);
             }
-            if (useExtended)
+            if (biosmode == "BIOS")
             {
-                string[] lines = { "select disk 0",
-                    "select volume C",
-                    "shrink desired=" + spaceleft_mb + " minimum=3600",
-                    "create partition extended",
-                    "create partition logical size=" + (spaceleft_mb - 600),
-                    "format fs=exFat quick label=Arch",
-                    "create partition logical",
-                    "format fs=fat32 quick label=preArch",
-                    "assign letter L"
-                };
-                System.IO.File.WriteAllLines(diskpartfile, lines);
+                if (repartition)
+                {
+                    if (createExtended)
+                    {
+                        Debug.WriteLine("case 1");
+                        string[] lines =
+                        {
+                            "select volume " + volume,
+                            "shrink desired=" + spaceleft_mb + " minimum=2500",
+                            "create partition extended",
+                            "create partition logical",
+                            "shrink desired=1500 minimum=1500",
+                            "format fs=exfat quick label=Arch",
+                            "create partition logical",
+                            "format fs=fat32 quick label=PreArch",
+                            "assign letter L",
+                        };
+                        File.WriteAllLines(diskpartfile, lines);
+                    }
+                    else
+                    {
+                        Debug.WriteLine("case 2");
+                        string[] lines =
+                        {
+                            "select volume " + volume,
+                            "shrink desired=" + spaceleft_mb + " minimum=2500",
+                            "shrink desired=1500 minimum=1500",
+                            "format fs=exfat quick label=Arch",
+                            "create partition logical",
+                            "format fs=fat32 quick label=PreArch",
+                            "assign letter L",
+                        };
+                        File.WriteAllLines(diskpartfile, lines);
+                    }
+                }
+                else
+                {
+                    if (createExtended)
+                    {
+                        Debug.WriteLine("case 3");
+                        string[] lines =
+                        {
+                            "select volume " + volume,
+                            "delete partition",
+                            "create partition extended",
+                            "create partition logical",
+                            "shrink desired=1500 minimum=1500",
+                            "format fs=exfat quick label=Arch",
+                            "create partition logical",
+                            "format fs=fat32 quick label=PreArch",
+                            "assign letter L",
+                        };
+                        File.WriteAllLines(diskpartfile, lines);
+                    }
+                    else
+                    {
+                        Debug.WriteLine("case 4");
+                        string[] lines =
+                        {
+                            "select volume " + volume,
+                            "shrink desired=1500 minimum=1500",
+                            "format fs=exfat quick label=Arch",
+                            "create partition logical",
+                            "format fs=fat32 quick label=PreArch",
+                            "assign letter L",
+                        };
+                        File.WriteAllLines(diskpartfile, lines);
+                    }
+                }
             }
             else
             {
-                string[] lines = {  "select disk 0",
-                    "select volume C",
-                    "shrink desired=" + spaceleft_mb + " minimum=3600",
-                    "create partition primary size=" + (spaceleft_mb - 600),
-                    "format fs=exFat quick label=Arch",
-                    "create partition primary",
-                    "format fs=fat32 quick label=preArch",
-                    "assign letter L"
-                };
-                File.WriteAllLines(diskpartfile, lines);
+                if (repartition)
+                {
+                    Debug.WriteLine("case 5");
+                    string[] lines =
+                    {
+                        "select volume " + volume,
+                        "shrink desired=" + spaceleft_mb + " minimum=2500",
+                        "create partition primary",
+                        "shrink desired=1500 minimum=1500",
+                        "format fs=exfat quick label=Arch",
+                        "create partition primary",
+                        "format fs=fat32 quick label=PreArch",
+                        "assign letter L",
+                    };
+                    File.WriteAllLines(diskpartfile, lines);
+                }
+                else
+                {
+                    Debug.WriteLine("case 6");
+                    string[] lines =
+                    {
+                        "select volume " + volume,
+                        "shrink desired=1500 minimum=1500",
+                        "format fs=exfat quick label=Arch",
+                        "create partition primary",
+                        "format fs=fat32 quick label=PreArch",
+                        "assign letter L",
+                    };
+                    File.WriteAllLines(diskpartfile, lines);
+                }
             }
-
             Process process = new Process();
             process.Exited += (s, e) =>
             {
                 this.Dispatcher.Invoke(() =>
                 {
-                    updateLog(process.StandardOutput.ReadToEnd());
-                    downloadLatestGrub();
-                    //setupNewSystem();
+                    Debug.WriteLine(process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd());
+                    updateProgressFull(1);
+                    //downloadLatestGrub();
                 });
             };
             process.StartInfo.FileName = "diskpart.exe";
@@ -137,39 +255,21 @@ namespace WinArch
             process.StartInfo.CreateNoWindow = true;
             process.EnableRaisingEvents = true;
             process.Start();
-
-        }
-        public void updateProgress(bool indeterminate, string currentAction, double? currentPercentage)
-        {
-            progressCurrent.IsIndeterminate = indeterminate;
-            if (!indeterminate)
-            {
-                progressCurrent.Value = (double)currentPercentage;
-            }
-            textBlock.Text = currentAction;
-        }
-        public void updateProgressFull(float currentPercentage)
-        {
-            taskpercentage = (currentPercentage * 100) / 6;
-            progressTotal.Value = taskpercentage;
         }
         async Task downloadLatestGrub()
         {
-            updateLog("Querying GRUB ftp server for versions");
             updateProgress(true, "Finding GRUB version to download", null);
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create("ftp://ftp.gnu.org/gnu/grub/");
             request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
             request.Credentials = new NetworkCredential("anonymous", "");
             WebResponse webResponse = await request.GetResponseAsync();
             FtpWebResponse response = (FtpWebResponse)webResponse;
-            
+
             Stream responseStream = response.GetResponseStream();
             StreamReader reader = new StreamReader(responseStream);
             string[] files = reader.ReadToEnd().Split('\n');
-            updateLog("Got response");
             reader.Close();
             response.Close();
-            updateLog("Finding version to download");
             List<string> filenames = new List<string>();
             for (int i = 0; i < (files.Length - 1); i++)
             {
@@ -189,7 +289,6 @@ namespace WinArch
                     }
                 }
             }
-            updateLog("Found version " + filenamemaster);
             WebClient client = new WebClient();
             client.Credentials = new NetworkCredential("anonymous", "");
             client.DownloadProgressChanged += (s, e) =>
@@ -198,172 +297,190 @@ namespace WinArch
             };
             client.DownloadFileCompleted += (s, e) =>
             {
-                updateLog("Downloaded file to " + Path.GetTempPath() + "grub.zip");
-                updateProgressFull(1);
-                getPackageList();
+                updateProgressFull(2);
+                installGrub();
             };
             Uri todownload = new Uri("ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
             client.DownloadFileAsync(todownload, Path.GetTempPath() + "grub.zip");
-            updateLog("Downloading file ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
         }
-        public void getPackageList()
+        async Task installGrub()
         {
-            this.Dispatcher.Invoke(() =>
+            updateProgress(true, "Installing GRUB", null);
+            ZipArchive archive = new ZipArchive(File.OpenRead(Path.GetTempPath() + "grub.zip"));
+            if (Directory.Exists(Path.GetTempPath() + "grub"))
             {
-                updateProgress(false, "Installing package " + packages[packagesDone], (double)((double)packagesDone / packages.Length * 100));
-            });
-            using (WebClient client = new WebClient())
+                Directory.Delete(Path.GetTempPath() + "grub");
+            }
+            Directory.CreateDirectory(Path.GetTempPath() + "grub");
+            archive.ExtractToDirectory(Path.GetTempPath() + "grub");
+            /*if (biosmode == "BIOS")
             {
-                client.DownloadFileCompleted += async (s, e) =>
+                Process process = new Process();
+                process.Exited += (s, e) =>
                 {
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        updateLog("Downloaded package " + packages[packagesDone]);
-                    });
-                    await Task.Run(() =>
-                    {
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            updateLog("Extracting package " + packages[packagesDone]);
-                        });
-                        using (Stream stream = File.OpenRead(Path.GetTempPath() + Regex.Replace(packages[packagesDone], "\\.pkg", "")))
-                        using (var reader = ReaderFactory.Open(stream))
-                        {
-                            while (reader.MoveToNextEntry())
-                            {
-                                if (!reader.Entry.IsDirectory)
-                                {
-                                try
-                                {
-                                    reader.WriteEntryToDirectory(@"L:\", new ExtractionOptions()
-                                    {
-                                        ExtractFullPath = true,
-                                        Overwrite = true
-                                    });
-                                }
-                                catch (IOException ignroed) { }
-                                catch (SharpCompress.Common.ExtractionException ignored) { }
-                                }
-                            }
-                        }
-                    });
-                    packagesDone++;
-                    if (packagesDone < packages.Length)
-                    {
-                        getPackageList();
-                    }
-                    else
-                    {
-                        downloadArchIso();
-                    }
+
                 };
-                Uri uri = new Uri("https://archive.archlinux.org/repos/2020/01/01/core/os/x86_64/" + packages[packagesDone]);
-                client.DownloadFileAsync(uri, Path.GetTempPath() + Regex.Replace(packages[packagesDone], "\\.pkg", ""));
-            }
-        }
-        public async Task getBIOSInfo()
-        {
-            updateProgress(true, "Getting BIOS mode", null);
-            Process process = new Process();
-            process.Exited += (s, e) =>
-            {
-                string output = Regex.Replace(process.StandardOutput.ReadToEnd(), "\\s", "").ToUpper();
-                this.Dispatcher.Invoke(() =>
-                {
-                    updateLog("Found current BIOS mode: " + output);
-                });
-                getDisksInfo(output);
-            };
-            process.StartInfo.FileName = "powershell.exe";
-            process.StartInfo.Arguments = "-Command echo $(Get-ComputerInfo).BiosFirmwareType";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.CreateNoWindow = true;
-            process.EnableRaisingEvents = true;
-            process.Start();
-        }
-        public void downloadArchIso()
-        {
-            WebClient client = new WebClient();
-            Stream test = client.OpenRead("http://mirrors.evowise.com/archlinux/iso/latest/md5sums.txt");
-            StreamReader test2 = new StreamReader(test);
-            while (test2.Peek() >= 0)
-            {
-                string currentline = test2.ReadLine();
-                if (Regex.IsMatch(currentline, "[0-9a-f]{32}\\s{2}archlinux.*iso"))
-                {
-                    string downloadfile = Regex.Replace(currentline, "[0-9a-f]{32}\\s{2}", "");
-                    Uri uri = new Uri("http://mirrors.evowise.com/archlinux/iso/latest/" + downloadfile);
-                    WebClient client2 = new WebClient();
-                    client2.DownloadFileCompleted += (s, e) =>
-                    {
-                        Process process = new Process();
-                        process.Exited += (s, e) =>
-                        {
-                            string output = process.StandardOutput.ReadToEnd();
-                            this.Dispatcher.Invoke(() =>
-                            {
-                                updateLog("Mounted disk at " + output);
-                            });
-                            File.Copy(output + ":/Arch/Boot/X86_64/vmlinuz-linux", "F:/Boot");
-                            File.Copy(output + ":/Arch/Boot/X86_64/initramfs-linux.img", "F:/Boot");
-                        };
-                        process.StartInfo.FileName = "powershell.exe";
-                        process.StartInfo.Arguments = "-Command echo (Mount-DiskImage -ImagePath " + Path.GetTempPath() + "arch.iso | Get-Volume).DriveLetter";
-                        process.StartInfo.UseShellExecute = false;
-                        process.StartInfo.RedirectStandardOutput = true;
-                        process.StartInfo.RedirectStandardError = true;
-                        process.StartInfo.CreateNoWindow = true;
-                        process.EnableRaisingEvents = true;
-                        process.Start();
-                    };
-                    client2.DownloadProgressChanged += (s, e) =>
-                    {
-                        updateProgress(false, "Downloading archlinux iso", e.ProgressPercentage);
-                    };
-                    client2.DownloadFileAsync(uri, Path.GetTempPath() + "arch.iso");
-                }
-            }
-        }
-        public void getDisksInfo(string biosmode)
-        {
-            if (biosmode == "BIOS") {
-                var searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_DiskPartition");
-                foreach (var queryObj in searcher.Get())
-                {
-                    if ((uint)queryObj["DiskIndex"] == 0)
-                    {
-                        partitionsnumber++;
-                    }
-                }
-                if (partitionsnumber < 4)
-                {
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        updateLog("Using GRUB and extended partitions method");
-                        partitionDisks(true);
-                    });
-                }
-                else
-                {
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        updateLog("Using Clover and GPT method");
-                        //TODO: dialog box for the error
-                        return;
-                    });
-                }
+                process.StartInfo.FileName = Path.GetTempPath() + "grub\\grub-install.exe";
+                process.StartInfo.Arguments = "--boot-directory=L:\\boot --target=i386-pc //./PHYSICALDRIVE0";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.CreateNoWindow = true;
+                process.EnableRaisingEvents = true;
+                process.Start();
             }
             else
             {
-                this.Dispatcher.Invoke(() =>
+                Process process = new Process();
+                process.Exited += (s, e) =>
                 {
-                    updateLog("Using UEFI GPT (easiest) method");
-                    partitionDisks(false);
-                });
+
+                };
+                process.StartInfo.FileName = Path.GetTempPath() + "grub\\grub-install.exe";
+                process.StartInfo.Arguments = "--boot-directory=L:\\boot --target=x86_64-efi --removable --efi-directory=L:\\boot\\EFI";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.CreateNoWindow = true;
+                process.EnableRaisingEvents = true;
+                process.Start();
+            }*/
+            if (biosmode == "BIOS")
+            {
+                disktype = "msdos";
             }
-            downloadLatestGrub();
+            else
+            {
+                disktype = "gpt";
+            }
+            string[] lines = {
+
+                "menuentry 'Linux' {",
+                "insmod exfat",
+                "set root=(hd0," + disktype + "5)",
+                "linux " + kernelfile + "root=LABEL=preArch",
+                "initrd " + initramfsfile + "",
+                "}",
+                "menuentry 'Windows 10' {",
+                "insmod ntfs",
+                "set root=(hd0," + disktype + "1)",
+                "ntldr /bootmgr",
+                "}",
+                "if [\"x${timeout}\" != \"x-1\"]; then",
+                "if keystatus; then",
+                "if keystatus --shift; then",
+                "set timeout = -1",
+                "else",
+                "set timeout = 0",
+                "fi",
+                "else",
+                "if sleep--interruptible 3; then",
+                "set timeout = 0",
+                "fi",
+                "fi",
+                "fi",
+                };
+            File.WriteAllLines("L:\\boot\\grub\\grub.cfg", lines);
+            updateProgressFull(3);
+            downloadGentooStage4();
+        }
+        public void downloadGentooStage4()
+        {
+            updateProgress(true, "Finding Gentoo version to download", null);
+            WebClient client = new WebClient();
+            Stream stream = client.OpenRead("http://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage4-amd64-minimal.txt");
+            StreamReader reader = new StreamReader(stream);
+            while (reader.Peek() >= 0)
+            {
+                currentline = reader.ReadLine();
+                if (Regex.IsMatch(currentline, ".*\\/stage4-amd64-minimal-.*\\.tar\\.xz.*"))
+                {
+                    string downloadlink = "http://distfiles.gentoo.org/releases/amd64/autobuilds/" + Regex.Replace(currentline, "\\s.*", "");
+                    Uri uri = new Uri(downloadlink);
+                    WebClient client2 = new WebClient();
+                    client2.DownloadProgressChanged += (s, e) =>
+                    {
+                        updateProgress(false, "Downloading Gentoo stage4 tarball", e.ProgressPercentage);
+                    };
+                    client2.DownloadFileCompleted += (s, e) =>
+                    {
+                        updateProgressFull(4);
+                        Task.Run(() =>
+                        {
+                            extractArchive();
+                        });
+                    };
+                    client2.DownloadFileAsync(uri, Path.GetTempPath() + "gentoo.tar.xz");
+                }
+            }
+        }
+        public void extractArchive()
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                updateProgress(true, "Extracting Gentoo archive", null);
+            });
+            using (Stream stream = File.OpenRead(Path.GetTempPath() + "gentoo.tar.xz"))
+            using (var reader = ReaderFactory.Open(stream))
+            {
+                while (reader.MoveToNextEntry())
+                {
+                    if (!reader.Entry.IsDirectory)
+                    {
+                        try
+                        {
+                            reader.WriteEntryToDirectory(@"L:/", new ExtractionOptions()
+                            {
+                                ExtractFullPath = true,
+                                Overwrite = true
+                            });
+                        }
+                        catch (UnauthorizedAccessException) { }
+                    }
+                }
+            }
+            updateProgressFull(5);
+            setupsystem();
+        }
+        public void setupsystem()
+        {
+            updateProgress(true, "Installing configuration files", null);
+            foreach (DictionaryEntry de in Application.Current.Properties)
+            {
+                using (StreamWriter sw = File.AppendText("L:\\config.txt"))
+                {
+                    sw.WriteLine(de.Key + "=" + de.Value);
+                }
+            }
+            string[] lines =
+            {
+                "#!/bin/bash",
+                ". /config.txt",
+                "mount /dev/disk/by-label/Arch /mnt",
+                "echo 'Please plug in your ethernet cable'",
+                "net-setup",
+                "pacstrap /mnt linux base networkmanager bluez packagekit-qt5 gnome-software-packagekit-plugin",
+                "cp /config.txt /mnt/config.txt",
+                "reboot"
+            };
+            File.WriteAllLines("L:\\initscript", lines);
+            updateProgressFull(6);
+            updateProgress(false, "Done", 100);
+            ButtonNext.IsEnabled = true;
+        }
+        public void updateProgress(bool indeterminate, string currentAction, double? currentPercentage)
+        {
+            progressCurrent.IsIndeterminate = indeterminate;
+            if (!indeterminate)
+            {
+                progressCurrent.Value = (double)currentPercentage;
+            }
+            textBlock.Text = currentAction;
+        }
+        public void updateProgressFull(float currentPercentage)
+        {
+            taskpercentage = (currentPercentage * 100) / 6;
+            progressTotal.Value = taskpercentage;
         }
     }
 }

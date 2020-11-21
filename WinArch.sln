@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinArch", "WinArch.csproj", "{6B92436B-4652-4AE0-B7B0-5B21CF7C0815}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinArch", "WinArch.csproj", "{6B92436B-4652-4AE0-B7B0-5B21CF7C0815}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
