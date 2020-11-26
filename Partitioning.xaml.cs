@@ -64,7 +64,7 @@ namespace WinArch
             }
             else
             {
-                process.StartInfo.Arguments = "-Command Get-Partition ((Get-Partition -DriveLetter " + partname + ").DiskNumber) ((get-partition ((Get-Partition -DriveLetter " + partname + ").DiskNumber) | where-object {$_.GptType -eq \"{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}\"}).PartitionNumber) | set-partition -newdriveletter Z; (get-volume Z).SizeRemaining";
+                process.StartInfo.Arguments = "Get-Partition ((Get-Partition -DriveLetter " + partname + ").DiskNumber) ((get-partition ((Get-Partition -DriveLetter " + partname + ").DiskNumber) | where-object {$_.GptType -eq \"{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}\"}).PartitionNumber) | set-partition -newdriveletter Z; echo (get-volume Z).SizeRemaining";
             }
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
