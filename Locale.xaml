@@ -25,7 +25,7 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Locale">
 
-    <Grid>
+    <Grid Background="#dddddd">
         <TextBlock x:Name="WelcomeMessage" HorizontalAlignment="Center" Margin="0,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" FontSize="24" Text="Configure your PC"/>
         <Grid VerticalAlignment="Center" Height="336">
             <TextBlock x:Name="textBlock" HorizontalAlignment="Center" Margin="0,32,0,0" Text="What language do you speak ? If there are multiple versions of a language, UTF-8 variant is recommended" TextWrapping="Wrap" VerticalAlignment="Top"/>

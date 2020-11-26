@@ -25,7 +25,7 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Partitioning">
 
-    <Grid>
+    <Grid Background="#dddddd">
         <TextBlock x:Name="WelcomeMessage" HorizontalAlignment="Center" Margin="0,20,0,0" Text="Partitioning" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" FontSize="24"/>
         <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0,60,0,40">
             <TextBox x:Name="TextBoxSize" HorizontalAlignment="Right" Margin="0,100,60,0" TextWrapping="NoWrap" AcceptsReturn="False" VerticalAlignment="Center" Width="60" TextChanged="TextBoxSize_TextChanged" MaxLength="8"/>

@@ -25,7 +25,7 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Slideshow">
 
-    <Grid>
+    <Grid Background="#dddddd">
         <TabControl x:Name="tabControl" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,10,10,95">
             <TabItem Header="Software center">
                 <Grid Background="#FFA2A2A2">

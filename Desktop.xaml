@@ -25,7 +25,7 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Desktop">
 
-    <Grid>
+    <Grid Background="#dddddd">
         <TextBlock x:Name="WelcomeMessage" HorizontalAlignment="Center" Margin="0,20,0,0" Text="Desktop environment" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" FontSize="24"/>
         <Grid x:Name="GridTop" Height="306" VerticalAlignment="Center" Margin="0,50,0,30">
             <Grid.ColumnDefinitions>
