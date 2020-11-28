@@ -146,9 +146,9 @@ namespace WinArch
                             "create partition extended",
                             "create partition logical",
                             "shrink desired=1500 minimum=1500",
-                            "format fs=exfat quick label=Arch",
+                            "format unit=4096 fs=exfat quick label=Arch",
                             "create partition logical",
-                            "format fs=fat32 quick label=PreArch",
+                            "format unit=4096 fs=fat32 quick label=PreArch",
                             "assign letter L",
                         };
                         File.WriteAllLines(diskpartfile, lines);
@@ -161,9 +161,9 @@ namespace WinArch
                             "select volume " + volume,
                             "shrink desired=" + spaceleft_mb + " minimum=2500",
                             "shrink desired=1500 minimum=1500",
-                            "format fs=exfat quick label=Arch",
+                            "format unit=4096 fs=exfat quick label=Arch",
                             "create partition logical",
-                            "format fs=fat32 quick label=PreArch",
+                            "format unit=4096 fs=fat32 quick label=PreArch",
                             "assign letter L",
                         };
                         File.WriteAllLines(diskpartfile, lines);
@@ -181,9 +181,9 @@ namespace WinArch
                             "create partition extended",
                             "create partition logical",
                             "shrink desired=1500 minimum=1500",
-                            "format fs=exfat quick label=Arch",
+                            "format unit=4096 fs=exfat quick label=Arch",
                             "create partition logical",
-                            "format fs=fat32 quick label=PreArch",
+                            "format unit=4096 fs=fat32 quick label=PreArch",
                             "assign letter L",
                         };
                         File.WriteAllLines(diskpartfile, lines);
@@ -195,9 +195,9 @@ namespace WinArch
                         {
                             "select volume " + volume,
                             "shrink desired=1500 minimum=1500",
-                            "format fs=exfat quick label=Arch",
+                            "format unit=4096 fs=exfat quick label=Arch",
                             "create partition logical",
-                            "format fs=fat32 quick label=PreArch",
+                            "format unit=4096 fs=fat32 quick label=PreArch",
                             "assign letter L",
                         };
                         File.WriteAllLines(diskpartfile, lines);
@@ -215,9 +215,9 @@ namespace WinArch
                         "shrink desired=" + spaceleft_mb + " minimum=2500",
                         "create partition primary",
                         "shrink desired=1500 minimum=1500",
-                        "format fs=exfat quick label=Arch",
+                        "format unit=4096 fs=exfat quick label=Arch",
                         "create partition primary",
-                        "format fs=fat32 quick label=PreArch",
+                        "format unit=4096 fs=fat32 quick label=PreArch",
                         "assign letter L",
                     };
                     File.WriteAllLines(diskpartfile, lines);
@@ -229,9 +229,9 @@ namespace WinArch
                     {
                         "select volume " + volume,
                         "shrink desired=1500 minimum=1500",
-                        "format fs=exfat quick label=Arch",
+                        "format unit=4096 fs=exfat quick label=Arch",
                         "create partition primary",
-                        "format fs=fat32 quick label=PreArch",
+                        "format unit=4096 fs=fat32 quick label=PreArch",
                         "assign letter L",
                     };
                     File.WriteAllLines(diskpartfile, lines);
@@ -244,7 +244,7 @@ namespace WinArch
                 {
                     Debug.WriteLine(process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd());
                     updateProgressFull(1);
-                    //downloadLatestGrub();
+                    downloadLatestGrub();
                 });
             };
             process.StartInfo.FileName = "diskpart.exe";
@@ -298,10 +298,76 @@ namespace WinArch
             client.DownloadFileCompleted += (s, e) =>
             {
                 updateProgressFull(2);
-                installGrub();
+                downloadGentooStage4();
             };
             Uri todownload = new Uri("ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
             client.DownloadFileAsync(todownload, Path.GetTempPath() + "grub.zip");
+        }
+        public void downloadGentooStage4()
+        {
+            updateProgress(true, "Finding Gentoo version to download", null);
+            WebClient client = new WebClient();
+            Stream stream = client.OpenRead("http://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage4-amd64-minimal.txt");
+            StreamReader reader = new StreamReader(stream);
+            while (reader.Peek() >= 0)
+            {
+                currentline = reader.ReadLine();
+                if (Regex.IsMatch(currentline, ".*\\/stage4-amd64-minimal-.*\\.tar\\.xz.*"))
+                {
+                    string downloadlink = "http://distfiles.gentoo.org/releases/amd64/autobuilds/" + Regex.Replace(currentline, "\\s.*", "");
+                    Uri uri = new Uri(downloadlink);
+                    WebClient client2 = new WebClient();
+                    client2.DownloadProgressChanged += (s, e) =>
+                    {
+                        updateProgress(false, "Downloading Gentoo stage4 tarball", e.ProgressPercentage);
+                    };
+                    client2.DownloadFileCompleted += (s, e) =>
+                    {
+                        updateProgressFull(3);
+                        Task.Run(() =>
+                        {
+                            extractArchive();
+                        });
+                    };
+                    client2.DownloadFileAsync(uri, Path.GetTempPath() + "gentoo.tar.xz");
+                }
+            }
+        }
+        public void extractArchive()
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                updateProgress(true, "Extracting Gentoo archive", null);
+            });
+            using (Stream stream = File.OpenRead(Path.GetTempPath() + "gentoo.tar.xz"))
+            using (var reader = ReaderFactory.Open(stream))
+            {
+                while (reader.MoveToNextEntry())
+                {
+                    if (!reader.Entry.IsDirectory)
+                    {
+                        if (Regex.IsMatch(reader.Entry.Key, "\\./boot/vmlinuz-.*"))
+                        {
+                            kernelfile = Regex.Replace(reader.Entry.Key, "\\.", "");
+                        }
+                        if (Regex.IsMatch(reader.Entry.Key, "\\./boot/initramfs-.*\\.img"))
+                        {
+                            initramfsfile = Regex.Replace(reader.Entry.Key, "\\.", "");
+                        }
+                        /*try
+                        {
+                            reader.WriteEntryToDirectory(@"L:/", new ExtractionOptions()
+                            {
+                                ExtractFullPath = true,
+                                Overwrite = true
+                            });
+                        }
+                        catch (UnauthorizedAccessException) { }*/
+                    }
+                }
+            }
+            updateProgressFull(4);
+            installGrub();
         }
         async Task installGrub()
         {
@@ -313,7 +379,7 @@ namespace WinArch
             }
             Directory.CreateDirectory(Path.GetTempPath() + "grub");
             archive.ExtractToDirectory(Path.GetTempPath() + "grub");
-            /*if (biosmode == "BIOS")
+            if (biosmode == "BIOS")
             {
                 Process process = new Process();
                 process.Exited += (s, e) =>
@@ -344,7 +410,7 @@ namespace WinArch
                 process.StartInfo.CreateNoWindow = true;
                 process.EnableRaisingEvents = true;
                 process.Start();
-            }*/
+            }
             if (biosmode == "BIOS")
             {
                 disktype = "msdos";
@@ -381,68 +447,10 @@ namespace WinArch
                 "fi",
                 };
             File.WriteAllLines("L:\\boot\\grub\\grub.cfg", lines);
-            updateProgressFull(3);
-            downloadGentooStage4();
-        }
-        public void downloadGentooStage4()
-        {
-            updateProgress(true, "Finding Gentoo version to download", null);
-            WebClient client = new WebClient();
-            Stream stream = client.OpenRead("http://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage4-amd64-minimal.txt");
-            StreamReader reader = new StreamReader(stream);
-            while (reader.Peek() >= 0)
-            {
-                currentline = reader.ReadLine();
-                if (Regex.IsMatch(currentline, ".*\\/stage4-amd64-minimal-.*\\.tar\\.xz.*"))
-                {
-                    string downloadlink = "http://distfiles.gentoo.org/releases/amd64/autobuilds/" + Regex.Replace(currentline, "\\s.*", "");
-                    Uri uri = new Uri(downloadlink);
-                    WebClient client2 = new WebClient();
-                    client2.DownloadProgressChanged += (s, e) =>
-                    {
-                        updateProgress(false, "Downloading Gentoo stage4 tarball", e.ProgressPercentage);
-                    };
-                    client2.DownloadFileCompleted += (s, e) =>
-                    {
-                        updateProgressFull(4);
-                        Task.Run(() =>
-                        {
-                            extractArchive();
-                        });
-                    };
-                    client2.DownloadFileAsync(uri, Path.GetTempPath() + "gentoo.tar.xz");
-                }
-            }
-        }
-        public void extractArchive()
-        {
-            this.Dispatcher.Invoke(() =>
-            {
-                updateProgress(true, "Extracting Gentoo archive", null);
-            });
-            using (Stream stream = File.OpenRead(Path.GetTempPath() + "gentoo.tar.xz"))
-            using (var reader = ReaderFactory.Open(stream))
-            {
-                while (reader.MoveToNextEntry())
-                {
-                    if (!reader.Entry.IsDirectory)
-                    {
-                        try
-                        {
-                            reader.WriteEntryToDirectory(@"L:/", new ExtractionOptions()
-                            {
-                                ExtractFullPath = true,
-                                Overwrite = true
-                            });
-                        }
-                        catch (UnauthorizedAccessException) { }
-                    }
-                }
-            }
             updateProgressFull(5);
-            setupsystem();
+            //setupSystem();
         }
-        public void setupsystem()
+        public void setupSystem()
         {
             updateProgress(true, "Installing configuration files", null);
             foreach (DictionaryEntry de in Application.Current.Properties)
@@ -471,16 +479,22 @@ namespace WinArch
         public void updateProgress(bool indeterminate, string currentAction, double? currentPercentage)
         {
             progressCurrent.IsIndeterminate = indeterminate;
-            if (!indeterminate)
+            this.Dispatcher.Invoke(() =>
             {
-                progressCurrent.Value = (double)currentPercentage;
-            }
-            textBlock.Text = currentAction;
+                if (!indeterminate)
+                {
+                    progressCurrent.Value = (double)currentPercentage;
+                }
+                textBlock.Text = currentAction;
+            });
         }
         public void updateProgressFull(float currentPercentage)
         {
             taskpercentage = (currentPercentage * 100) / 6;
-            progressTotal.Value = taskpercentage;
+            this.Dispatcher.Invoke(() =>
+            {
+                progressTotal.Value = taskpercentage;
+            });
         }
     }
 }

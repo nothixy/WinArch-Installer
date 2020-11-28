@@ -73,7 +73,7 @@ namespace WinArch
             {
                 Application.Current.Properties["Uname"] = unameBox.Text;
             }
-            Application.Current.Properties["UnameSys"] = unameBox.Text;
+            Application.Current.Properties["UnameSys"] = unamesysBox.Text;
             NavigationService nav = this.NavigationService;
             nav.Navigate(new Uri("Desktop.xaml", UriKind.Relative));
         }
