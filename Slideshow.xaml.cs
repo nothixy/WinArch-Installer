@@ -13,7 +13,6 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
-using SharpCompress.Common;
 using SharpCompress.Readers;
 using System;
 using System.Collections;
@@ -21,24 +20,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.IO.Packaging;
-using System.Linq;
-using System.Management;
 using System.Net;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Path = System.IO.Path;
 
 namespace WinArch
@@ -106,7 +92,6 @@ namespace WinArch
                 process.Exited += (s, e) =>
                 {
                     createExtended = Boolean.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
-                    Debug.WriteLine(createExtended);
                     partitionDisks();
                 };
                 process.StartInfo.FileName = "powershell.exe";
@@ -138,7 +123,6 @@ namespace WinArch
                 {
                     if (createExtended)
                     {
-                        Debug.WriteLine("case 1");
                         string[] lines =
                         {
                             "select volume " + volume,
@@ -155,7 +139,6 @@ namespace WinArch
                     }
                     else
                     {
-                        Debug.WriteLine("case 2");
                         string[] lines =
                         {
                             "select volume " + volume,
@@ -173,7 +156,6 @@ namespace WinArch
                 {
                     if (createExtended)
                     {
-                        Debug.WriteLine("case 3");
                         string[] lines =
                         {
                             "select volume " + volume,
@@ -190,7 +172,6 @@ namespace WinArch
                     }
                     else
                     {
-                        Debug.WriteLine("case 4");
                         string[] lines =
                         {
                             "select volume " + volume,
@@ -208,7 +189,6 @@ namespace WinArch
             {
                 if (repartition)
                 {
-                    Debug.WriteLine("case 5");
                     string[] lines =
                     {
                         "select volume " + volume,
@@ -224,7 +204,6 @@ namespace WinArch
                 }
                 else
                 {
-                    Debug.WriteLine("case 6");
                     string[] lines =
                     {
                         "select volume " + volume,
@@ -242,7 +221,6 @@ namespace WinArch
             {
                 this.Dispatcher.Invoke(() =>
                 {
-                    Debug.WriteLine(process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd());
                     updateProgressFull(1);
                     downloadLatestGrub();
                 });

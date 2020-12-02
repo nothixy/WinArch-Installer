@@ -14,18 +14,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WinArch
 {
@@ -39,8 +33,7 @@ namespace WinArch
             InitializeComponent();
 
             string langline;
-            System.IO.StreamReader langfile =
-            new System.IO.StreamReader(@"../../../Resources/langs.txt");
+            StreamReader langfile = new StreamReader(GetType().Assembly.GetManifestResourceStream("WinArch.Resources.langs.txt"));
             while ((langline = langfile.ReadLine()) != null)
             {
                 lang.Items.Add(langline);
@@ -49,8 +42,7 @@ namespace WinArch
             lang.SelectedItem = "en_US.UTF-8 UTF-8";
 
             string keymapline;
-            System.IO.StreamReader keymapfile =
-            new System.IO.StreamReader(@"../../../Resources/keymaps.txt");
+            StreamReader keymapfile = new StreamReader(GetType().Assembly.GetManifestResourceStream("WinArch.Resources.keymaps.txt"));
             while ((keymapline = keymapfile.ReadLine()) != null)
             {
                 keymap.Items.Add(keymapline);
@@ -59,8 +51,7 @@ namespace WinArch
             keymap.SelectedItem = "us";
 
             string tzline;
-            System.IO.StreamReader tzfile =
-            new System.IO.StreamReader(@"../../../Resources/timezones.txt");
+            StreamReader tzfile = new StreamReader(GetType().Assembly.GetManifestResourceStream("WinArch.Resources.timezones.txt"));
             while ((tzline = tzfile.ReadLine()) != null)
             {
                 timezone.Items.Add(tzline);

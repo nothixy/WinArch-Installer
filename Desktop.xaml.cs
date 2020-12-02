@@ -14,20 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WinArch
 {
@@ -48,10 +37,6 @@ namespace WinArch
         public void Next(object sender, EventArgs e)
         {
             var btnchecked = GridTop.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked.Value);
-            foreach (DictionaryEntry de in Application.Current.Properties)
-            {
-                Debug.WriteLine(de.Key + ": " + de.Value.ToString());
-            }
             NavigationService nav = this.NavigationService;
             nav.Navigate(new Uri("Slideshow.xaml", UriKind.Relative));
         }

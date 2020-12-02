@@ -14,22 +14,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WinArch
 {
@@ -53,10 +45,6 @@ namespace WinArch
         void IsDiskInstallable(string partname)
         {
             Process process = new Process();
-            /*process.Exited += (s, e) =>
-            {
-
-            };*/
             process.StartInfo.FileName = "powershell.exe";
             if (biosmode == "BIOS")
             {
@@ -101,6 +89,7 @@ namespace WinArch
             {
                 Mouse.OverrideCursor = Cursors.Arrow;
                 textBlock1.Visibility = Visibility.Hidden;
+                page.IsEnabled = true;
             });
             if (!canInstall)
             {
@@ -109,14 +98,15 @@ namespace WinArch
                 MessageBoxButton button = MessageBoxButton.OK;
                 MessageBoxImage icon = MessageBoxImage.Error;
                 MessageBoxResult result = MessageBox.Show(messageBoxText, caption, button, icon);
-                switch(result)
+                switch (result)
                 {
                     case MessageBoxResult.OK:
                         Environment.Exit(0);
                         break;
                 }
             }
-            this.Dispatcher.Invoke(() => {
+            this.Dispatcher.Invoke(() =>
+            {
                 comboBox.SelectedIndex = 0;
                 checkBox.IsChecked = true;
             });
@@ -179,7 +169,7 @@ namespace WinArch
                 checkBox.IsEnabled = true;
             }
             DriveInfo[] drives = DriveInfo.GetDrives();
-            foreach(DriveInfo d in drives)
+            foreach (DriveInfo d in drives)
             {
                 if (d.Name.Substring(0, 1).ToString() == comboBox.SelectedItem.ToString())
                 {
@@ -210,7 +200,6 @@ namespace WinArch
                 string output = Regex.Replace(process.StandardOutput.ReadToEnd(), "\\s", "").ToUpper();
                 Application.Current.Properties["biosmode"] = output;
                 biosmode = output;
-                Debug.WriteLine(biosmode);
                 MainFunction();
             };
             process.StartInfo.FileName = "powershell.exe";

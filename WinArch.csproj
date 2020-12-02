@@ -17,7 +17,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="archlinux-logo-large.png" />
     <None Remove="budgie.png" />
     <None Remove="cinnamon.png" />
     <None Remove="epic-games-store.png" />
@@ -25,7 +24,11 @@
     <None Remove="gnome.png" />
     <None Remove="kde.png" />
     <None Remove="mate.png" />
+    <None Remove="Resources\keymaps.txt" />
+    <None Remove="Resources\langs.txt" />
+    <None Remove="Resources\timezones.txt" />
     <None Remove="virt-manager.png" />
+    <None Remove="WinArch-icon.ico" />
     <None Remove="WinArch-icon.png" />
     <None Remove="xfce.png" />
   </ItemGroup>
@@ -36,17 +39,51 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\epic-games-store.png" />
-    <Resource Include="Resources\gnome-software.png" />
-    <Resource Include="Resources\budgie.png" />
-    <Resource Include="Resources\cinnamon.png" />
-    <Resource Include="Resources\gnome.png" />
-    <Resource Include="Resources\kde.png" />
-    <Resource Include="Resources\mate.png" />
-    <Resource Include="Resources\archlinux-logo-large.png" />
-    <Resource Include="Resources\WinArch-icon.png" />
-    <Resource Include="Resources\xfce.png" />
-    <Resource Include="Resources\virt-manager.png" />
+    <Content Include="Resources\epic-games-store.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\gnome-software.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\budgie.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\cinnamon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\gnome.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\kde.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="Resources\keymaps.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\langs.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <Content Include="Resources\mate.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\archlinux-logo-large.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="Resources\timezones.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <Content Include="Resources\WinArch-icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\xfce.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\virt-manager.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WinArch-icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
