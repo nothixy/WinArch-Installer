@@ -53,7 +53,6 @@ namespace WinArch
         {
             InitializeComponent();
             biosmode = (string)Application.Current.Properties["biosmode"];
-            packages = File.ReadAllLines("../../../Resources/packages.txt");
             spaceleft_mb = (Single)Application.Current.Properties["SpaceRequired"];
             repartition = (bool)Application.Current.Properties["Repartition"];
             volume = (string)Application.Current.Properties["Volume"];

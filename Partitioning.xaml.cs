@@ -52,7 +52,7 @@ namespace WinArch
             }
             else
             {
-                process.StartInfo.Arguments = "-Command Get-Partition ((Get-Partition -DriveLetter " + partname + ").DiskNumber) ((get-partition ((Get-Partition -DriveLetter " + partname + ").DiskNumber) | where-object {$_.GptType -eq \"{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}\"}).PartitionNumber) | set-partition -newdriveletter Z; if ((get-volume Z).SizeRemaining -gt 2000) { echo True } else { echo False }";
+                process.StartInfo.Arguments = "-Command (get-partition (get-partition -DriveLetter " + partname + ").DiskNumber | where-object {$_.GptType -eq \"{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}\"}) | set-partition -newdriveletter Z; if ((get-wmiobject win32_logicaldisk | where-object {$_.DeviceID -eq \\\"Z:\\\"}).FreeSpace -gt 2000) { echo True } else { echo False }; Get-PSDrive Z | Remove-PSDrive";
             }
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
@@ -91,7 +91,7 @@ namespace WinArch
                 textBlock1.Visibility = Visibility.Hidden;
                 page.IsEnabled = true;
             });
-            if (!canInstall)
+            /*if (!canInstall)
             {
                 string messageBoxText = "There are no partitions on which you can install Arch Linux, please make space or IDK";
                 string caption = "No partition";
@@ -104,7 +104,7 @@ namespace WinArch
                         Environment.Exit(0);
                         break;
                 }
-            }
+            }*/
             this.Dispatcher.Invoke(() =>
             {
                 comboBox.SelectedIndex = 0;
