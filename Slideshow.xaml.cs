@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
-using SharpCompress.Readers;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -52,18 +52,20 @@ namespace WinArch
         public Slideshow()
         {
             InitializeComponent();
-            biosmode = (string)Application.Current.Properties["biosmode"];
+            /*biosmode = (string)Application.Current.Properties["biosmode"];
             spaceleft_mb = (Single)Application.Current.Properties["SpaceRequired"];
             repartition = (bool)Application.Current.Properties["Repartition"];
-            volume = (string)Application.Current.Properties["Volume"];
+            volume = (string)Application.Current.Properties["Volume"];*/
+            //TODO: Restore later
             downloadcomponents();
         }
         public async Task downloadcomponents()
         {
             Task.Run(() => slideshow());
             //downloadLatestGrub();
-            getDisksInfo(volume);
+            //getDisksInfo(volume);
             //mountArchIso();
+            downloadArchIso();
             //getPackageList();
             //downloadGentooStage4();
             //doOperations();
@@ -275,76 +277,40 @@ namespace WinArch
             client.DownloadFileCompleted += (s, e) =>
             {
                 updateProgressFull(2);
-                downloadGentooStage4();
+                downloadArchIso();
             };
             Uri todownload = new Uri("ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
             client.DownloadFileAsync(todownload, Path.GetTempPath() + "grub.zip");
         }
-        public void downloadGentooStage4()
+        public void downloadArchIso()
         {
-            updateProgress(true, "Finding Gentoo version to download", null);
+            //TODO Recheck Plop linux (bootable tarball, heavyweight)
+            string mirrorprefix = "http://mirrors.evowise.com/archlinux/iso/latest/";
             WebClient client = new WebClient();
-            Stream stream = client.OpenRead("http://distfiles.gentoo.org/releases/amd64/autobuilds/latest-stage4-amd64-minimal.txt");
+            Stream stream = client.OpenRead(mirrorprefix + "md5sums.txt");
             StreamReader reader = new StreamReader(stream);
+            string isoname = "";
             while (reader.Peek() >= 0)
             {
-                currentline = reader.ReadLine();
-                if (Regex.IsMatch(currentline, ".*\\/stage4-amd64-minimal-.*\\.tar\\.xz.*"))
+                string currentline = reader.ReadLine();
+                if (Regex.IsMatch(currentline, "[0-9a-fA-f]{32}\\s\\sarchlinux-[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}-x86_64\\.iso"))
                 {
-                    string downloadlink = "http://distfiles.gentoo.org/releases/amd64/autobuilds/" + Regex.Replace(currentline, "\\s.*", "");
-                    Uri uri = new Uri(downloadlink);
-                    WebClient client2 = new WebClient();
-                    client2.DownloadProgressChanged += (s, e) =>
-                    {
-                        updateProgress(false, "Downloading Gentoo stage4 tarball", e.ProgressPercentage);
-                    };
-                    client2.DownloadFileCompleted += (s, e) =>
-                    {
-                        updateProgressFull(3);
-                        Task.Run(() =>
-                        {
-                            extractArchive();
-                        });
-                    };
-                    client2.DownloadFileAsync(uri, Path.GetTempPath() + "gentoo.tar.xz");
+                    isoname = currentline.Substring(34);
+                    Debug.WriteLine(isoname);
                 }
             }
-        }
-        public void extractArchive()
-        {
-            this.Dispatcher.Invoke(() =>
+            WebClient client2 = new WebClient();
+            client2.DownloadProgressChanged += (s, e) =>
             {
-                updateProgress(true, "Extracting Gentoo archive", null);
-            });
-            using (Stream stream = File.OpenRead(Path.GetTempPath() + "gentoo.tar.xz"))
-            using (var reader = ReaderFactory.Open(stream))
+                updateProgress(false, "Downloading Archlinux iso", e.ProgressPercentage);
+            };
+            client2.DownloadFileCompleted += (s, e) =>
             {
-                while (reader.MoveToNextEntry())
-                {
-                    if (!reader.Entry.IsDirectory)
-                    {
-                        if (Regex.IsMatch(reader.Entry.Key, "\\./boot/vmlinuz-.*"))
-                        {
-                            kernelfile = Regex.Replace(reader.Entry.Key, "\\.", "");
-                        }
-                        if (Regex.IsMatch(reader.Entry.Key, "\\./boot/initramfs-.*\\.img"))
-                        {
-                            initramfsfile = Regex.Replace(reader.Entry.Key, "\\.", "");
-                        }
-                        /*try
-                        {
-                            reader.WriteEntryToDirectory(@"L:/", new ExtractionOptions()
-                            {
-                                ExtractFullPath = true,
-                                Overwrite = true
-                            });
-                        }
-                        catch (UnauthorizedAccessException) { }*/
-                    }
-                }
-            }
-            updateProgressFull(4);
-            installGrub();
+                updateProgressFull(3);
+                mountArchIso();
+            };
+            Uri download = new Uri(mirrorprefix + isoname);
+            client2.DownloadFileAsync(download, Path.GetTempPath() + "arch.iso");
         }
         async Task installGrub()
         {
@@ -426,32 +392,6 @@ namespace WinArch
             File.WriteAllLines("L:\\boot\\grub\\grub.cfg", lines);
             updateProgressFull(5);
             //setupSystem();
-        }
-        public void setupSystem()
-        {
-            updateProgress(true, "Installing configuration files", null);
-            foreach (DictionaryEntry de in Application.Current.Properties)
-            {
-                using (StreamWriter sw = File.AppendText("L:\\config.txt"))
-                {
-                    sw.WriteLine(de.Key + "=" + de.Value);
-                }
-            }
-            string[] lines =
-            {
-                "#!/bin/bash",
-                ". /config.txt",
-                "mount /dev/disk/by-label/Arch /mnt",
-                "echo 'Please plug in your ethernet cable'",
-                "net-setup",
-                "pacstrap /mnt linux base networkmanager bluez packagekit-qt5 gnome-software-packagekit-plugin",
-                "cp /config.txt /mnt/config.txt",
-                "reboot"
-            };
-            File.WriteAllLines("L:\\initscript", lines);
-            updateProgressFull(6);
-            updateProgress(false, "Done", 100);
-            ButtonNext.IsEnabled = true;
         }
         public void updateProgress(bool indeterminate, string currentAction, double? currentPercentage)
         {

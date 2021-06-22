@@ -52,7 +52,7 @@ namespace WinArch
             }
             else
             {
-                process.StartInfo.Arguments = "-Command (get-partition (get-partition -DriveLetter " + partname + ").DiskNumber | where-object {$_.GptType -eq \"{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}\"}) | set-partition -newdriveletter Z; if ((get-wmiobject win32_logicaldisk | where-object {$_.DeviceID -eq \\\"Z:\\\"}).FreeSpace -gt 2000) { echo True } else { echo False }; Get-PSDrive Z | Remove-PSDrive";
+                process.StartInfo.Arguments = "-Command (get-partition (get-partition -DriveLetter " + partname + ").DiskNumber | where-object {$_.GptType -eq \"{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}\"}) | set-partition -newdriveletter Z; if ((get-wmiobject win32_logicaldisk | where-object {$_.DeviceID -eq \"Z:\"}).FreeSpace -gt 2000) { echo True } else { echo False }; Get-PSDrive Z | Remove-PSDrive";
             }
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
@@ -61,7 +61,8 @@ namespace WinArch
             process.EnableRaisingEvents = true;
             process.Start();
             process.WaitForExit();
-            returncode = Boolean.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
+            Debug.WriteLine(process.StandardOutput.ReadToEnd());
+            /*returncode = Boolean.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
             if (returncode)
             {
                 this.Dispatcher.Invoke(() =>
@@ -69,7 +70,7 @@ namespace WinArch
                     comboBox.Items.Add(partname);
                 });
                 canInstall = true;
-            }
+            }*/
         }
         public void MainFunction()
         {
@@ -81,6 +82,7 @@ namespace WinArch
                 {
                     if (((float)d.TotalSize / (1024 * 1024)) >= minimalSpaceRequired)
                     {
+                        Debug.WriteLine(d.Name);
                         IsDiskInstallable(d.Name.Substring(0, 1));
                     }
                 }
@@ -91,20 +93,6 @@ namespace WinArch
                 textBlock1.Visibility = Visibility.Hidden;
                 page.IsEnabled = true;
             });
-            /*if (!canInstall)
-            {
-                string messageBoxText = "There are no partitions on which you can install Arch Linux, please make space or IDK";
-                string caption = "No partition";
-                MessageBoxButton button = MessageBoxButton.OK;
-                MessageBoxImage icon = MessageBoxImage.Error;
-                MessageBoxResult result = MessageBox.Show(messageBoxText, caption, button, icon);
-                switch (result)
-                {
-                    case MessageBoxResult.OK:
-                        Environment.Exit(0);
-                        break;
-                }
-            }*/
             this.Dispatcher.Invoke(() =>
             {
                 comboBox.SelectedIndex = 0;
