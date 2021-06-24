@@ -307,7 +307,7 @@ namespace WinArch
             client2.DownloadFileCompleted += (s, e) =>
             {
                 updateProgressFull(3);
-                mountArchIso();
+                //mountArchIso();
             };
             Uri download = new Uri(mirrorprefix + isoname);
             client2.DownloadFileAsync(download, Path.GetTempPath() + "arch.iso");

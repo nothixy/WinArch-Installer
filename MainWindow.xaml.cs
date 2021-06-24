@@ -27,7 +27,7 @@ namespace WinArch
         {
             this.Dispatcher.UnhandledException += (s, e) =>
             {
-                using (StreamWriter sw = File.AppendText(Path.Combine(Path.GetTempPath() + "WinArch.txt")))
+                using (StreamWriter sw = File.AppendText(Path.Combine(Path.GetTempPath() + "WinArch.log")))
                     sw.WriteLine(e.Exception.ToString());
             };
             InitializeComponent();

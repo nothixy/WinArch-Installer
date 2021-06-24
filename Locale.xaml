@@ -35,7 +35,7 @@
             <TextBlock x:Name="textBlock_Copy1" HorizontalAlignment="Center" Margin="0,168,0,0" Text="What is your timezone ?" TextWrapping="Wrap" VerticalAlignment="Top"/>
             <ComboBox x:Name="timezone" HorizontalAlignment="Center" Margin="0,189,0,0" VerticalAlignment="Top" Width="200"/>
             <TextBlock x:Name="textBlock_Copy2" HorizontalAlignment="Center" Margin="0,234,0,0" Text="What will be the name of your PC ? Only letters, numbers and hyphens (not at the beginning or the end)" TextWrapping="Wrap" VerticalAlignment="Top"/>
-            <TextBox x:Name="hostname" HorizontalAlignment="Center" Margin="0,255,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="200" MaxLength="63"/>
+            <TextBox x:Name="hostname" HorizontalAlignment="Center" Margin="0,255,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="200" MaxLength="63" Cursor="IBeam"/>
             <TextBlock x:Name="hostmissing" HorizontalAlignment="Center" Margin="0,278,0,0" Text="You must set a hostname" TextWrapping="Wrap" VerticalAlignment="Top" Visibility="Hidden" Foreground="Red"/>
             <TextBlock x:Name="hostregex" HorizontalAlignment="Center" Margin="0,278,0,0" Text="Hostname must be only letters, numbers, and hyphens (not at the beginning or the end)" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="Red" Visibility="Hidden"/>
         </Grid>

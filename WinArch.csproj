@@ -7,7 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>WinArch-icon.ico</ApplicationIcon>
     <StartupObject>WinArch.App</StartupObject>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>key.pfs.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 

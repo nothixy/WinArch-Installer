@@ -40,11 +40,12 @@
             <ComboBox x:Name="comboBox" HorizontalAlignment="Center" Margin="125,-100,0,0" VerticalAlignment="Center" Width="120" SelectionChanged="comboBox_SelectionChanged"/>
             <CheckBox x:Name="checkBox" Content="Resize to create another partition" HorizontalAlignment="Center" Margin="0,-50,0,0" VerticalAlignment="Center" Checked="checkBox_Checked" Unchecked="checkBox_Unchecked"/>
             <TextBlock x:Name="test" HorizontalAlignment="Center" Margin="-150,-100,0,0" Text="Select a volume to install to" TextWrapping="Wrap" VerticalAlignment="Center" RenderTransformOrigin="0.758,-0.036"/>
-            <TextBlock x:Name="textBlock1" HorizontalAlignment="Center" Margin="0,266,0,0" Text="Finding disks on which we can install" TextWrapping="Wrap" VerticalAlignment="Top"/>
         </Grid>
         <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">
             <Button Width="60" Content="Go back" HorizontalAlignment="Right" Margin="0,0,75,0" VerticalAlignment="Center" Click="Previous"/>
             <Button Width="60" x:Name="NextButton" Content="Next" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" Click="Next"/>
+            <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="10,0,0,0" Text="Finding disks on which we can install" TextWrapping="Wrap" VerticalAlignment="Center"/>
+            <ProgressBar x:Name="progressBar2" HorizontalAlignment="Stretch" Height="20" Margin="209,0,140,0" VerticalAlignment="Stretch"/>
         </Grid>
     </Grid>
 </Page>

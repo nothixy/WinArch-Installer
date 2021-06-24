@@ -61,8 +61,7 @@ namespace WinArch
             process.EnableRaisingEvents = true;
             process.Start();
             process.WaitForExit();
-            Debug.WriteLine(process.StandardOutput.ReadToEnd());
-            /*returncode = Boolean.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
+            returncode = Boolean.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
             if (returncode)
             {
                 this.Dispatcher.Invoke(() =>
@@ -70,19 +69,27 @@ namespace WinArch
                     comboBox.Items.Add(partname);
                 });
                 canInstall = true;
-            }*/
+            }
         }
         public void MainFunction()
         {
             DriveInfo[] allDrives = DriveInfo.GetDrives();
-
+            this.Dispatcher.Invoke(() =>
+            {
+                progressBar2.IsIndeterminate = false;
+                progressBar2.Maximum = allDrives.Length;
+                progressBar2.Value = 0;
+            });
             foreach (DriveInfo d in allDrives)
             {
+                this.Dispatcher.Invoke(() =>
+                {
+                    progressBar2.Value = progressBar2.Value + 1;
+                });
                 if (d.DriveType == DriveType.Fixed)
                 {
                     if (((float)d.TotalSize / (1024 * 1024)) >= minimalSpaceRequired)
                     {
-                        Debug.WriteLine(d.Name);
                         IsDiskInstallable(d.Name.Substring(0, 1));
                     }
                 }
@@ -91,6 +98,7 @@ namespace WinArch
             {
                 Mouse.OverrideCursor = Cursors.Arrow;
                 textBlock1.Visibility = Visibility.Hidden;
+                progressBar2.Visibility = Visibility.Hidden;
                 page.IsEnabled = true;
             });
             this.Dispatcher.Invoke(() =>
