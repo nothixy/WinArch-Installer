@@ -16,34 +16,52 @@ if ! ping -c2 google.com >/dev/null 2>&1; then
 	nmtui
 	if ! ping -c2 google.com >/dev/null; then
 		dialog --msgbox "Please check your network connection with the program of your choice or plug in ethernet cable" 10 50 2>/dev/null
-		exit 0
+		echo "The execution failed, you can try to run nmtui again and when you are connected to the internet please run '/autorun' again"
+		exit 1
 	fi
 fi
+timedatectl set-ntp true
 mount -L Arch /mnt
 if [ biosmode != "BIOS" ]; then
 	mkdir -p /mnt/boot
-	
-	mount "DEVICE" /mnt/boot
+	drive="/dev/$(lsblk -ndo pkname $(findmnt /mnt -o SOURCE -un))"
+	device="$(fdisk -l $device -o Device,Type | grep "EFI System" | cut -d' ' -f1)"
+	mount "$device" /mnt/boot
 fi
 case $desktop in
-	gnome) packages = (gnome gdm gnome-software-packagekit-plugin)
-	kde) packages = (plasma sddm dolphin konsole discover packagekit-qt5)
-	budgie) packages = (budgie-desktop)
-	cinnamon) packages = (cinnamon)
-	pantheon) packages = (pantheon)
-	deepin) packages = (deepin deepin-extra)
+	gnome) export packages=(gnome gdm gnome-software-packagekit-plugin);;
+	kde) export packages=(plasma sddm dolphin konsole discover packagekit-qt5);;
+	budgie) export packages=(budgie-desktop);;
+	cinnamon) export packages=(cinnamon);;
+	pantheon) export packages=(pantheon);;
+	deepin) export packages=(deepin deepin-extra);;
 esac
-pacstrap /mnt base desktop base-devel NetworkManager bluez bash-completion $packages
+pacstrap /mnt base desktop base-devel NetworkManager bluez bash-completion $packages grub os-prober
 genfstab -U /mnt >> /mnt/etc/fstab
 cat <<- EOF | arch-chroot /mnt
-	echo "$hostname" > /etc/hostname
-	echo "$language" >> /etc/locale.gen
-	locale-gen
-	echo "LANG=$(echo $language | cut -d' ' -f1)" > /etc/locale.conf
-	echo "KEYMAP=$keymap" > /etc/vconsole.conf
-	ln -sf /usr/share/zoneinfo/$timezone /etc/localtime
-	echo -e "127.0.0.1	localhost\n::1		localhost\n127.0.1.1	$hostname" > /etc/hosts
+	echo -e "\033[32m---Setting hostname---\033[0m"
+	echo "$hostname" | tee /etc/hostname
+	echo -e "\033[32m---Setting language---\033[0m"
+	echo "$language" | tee -a /etc/locale.gen
+	locale-gen >/dev/null 2>&1
+	echo "LANG=$(echo $language | cut -d' ' -f1)" | tee -a /etc/locale.conf
+	echo -e "\033[32m---Setting keymap---\033[0m"
+	echo "KEYMAP=$keymap" | tee /etc/vconsole.conf
+	echo -e "\033[32m---Setting timezone---\033[0m"
+	ln -svf /usr/share/zoneinfo/$timezone /etc/localtime
+	echo -e "\033[32m---Configuring hosts file---\033[0m"
+	echo -e "127.0.0.1	localhost\n::1		localhost\n127.0.1.1	$hostname" | tee -a /etc/hosts
+	echo -e "\033[32m---Adding user---\033[0m"
 	useradd -mG wheel,sys "$unamesys"
 	echo -e "$password\n$password" | passwd "$unamesys"
 	chfn -f "$uname" "$unamesys"
+	echo -e "\033[32m---Installing bootloader---\033[0m"
+	if [-d /sys/firmware/efi/efivars]; then
+		grub-install --target=x86_64-efi --efi-directory /boot --bootloader-id=GRUB
+	else
+		drive="/dev/$(lsblk -ndo pkname $(findmnt / -o SOURCE -un))"
+		grub-install $drive
+	fi
+	echo "GRUB_DISABLE_OS_PROBER=false" | tee -a /etc/default/grub
+	grub-mkconfig -o /boot/grub/grub.cfg
 EOF
