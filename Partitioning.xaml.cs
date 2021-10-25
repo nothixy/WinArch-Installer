@@ -33,27 +33,23 @@ namespace WinArch
         float spaceleft;
         float spaceleft_mb;
         bool canInstall = false;
-        string biosmode;
-        int minimalSpaceRequired = 2500;
-        bool returncode;
+        private string biosmode;
+        private readonly int minimalSpaceRequired = 2500;
+        private bool returncode;
         public Partitioning()
         {
             InitializeComponent();
             Mouse.OverrideCursor = Cursors.Wait;
-            Task.Run(() => getBIOSMode());
+            _ = Task.Run(() => GetBIOSMode());
         }
-        void IsDiskInstallable(string partname)
+
+        private void IsDiskInstallable(string partname)
         {
             Process process = new Process();
             process.StartInfo.FileName = "powershell.exe";
-            if (biosmode == "BIOS")
-            {
-                process.StartInfo.Arguments = "if ((Get-partition -DiskNumber ((Get-Partition -DriveLetter " + partname + ").DiskNumber)).PartitionNumber -contains 0) { ((Get-Partition -DriveLetter " + partname + ").Offset -ge (Get-Partition -PartitionNumber 0).Offset -and (Get-Partition -DriveLetter " + partname + ").Offset -lt ((Get-Partition -PartitionNumber 0).Offset + (Get-Partition -PartitionNumber 0).Size)) } else { if (((Get-partition -DiskNumber ((Get-Partition -DriveLetter C).DiskNumber)).PartitionNumber | Measure-Object -line).Lines -gt 3) { echo False } else { echo True }}";
-            }
-            else
-            {
-                process.StartInfo.Arguments = @"-executionpolicy unrestricted (Get-Volume | where-object {$_.Path -eq ((Get-Partition -DiskNumber ((Get-Partition -DriveLetter " + partname + ").DiskNumber)) | where-object {$_.GptType -eq '{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}'}).AccessPaths[-1]}).SizeRemaining -gt 50000000";
-            }
+            process.StartInfo.Arguments = biosmode == "BIOS"
+                ? "if ((Get-partition -DiskNumber ((Get-Partition -DriveLetter " + partname + ").DiskNumber)).PartitionNumber -contains 0) { ((Get-Partition -DriveLetter " + partname + ").Offset -ge (Get-Partition -PartitionNumber 0).Offset -and (Get-Partition -DriveLetter " + partname + ").Offset -lt ((Get-Partition -PartitionNumber 0).Offset + (Get-Partition -PartitionNumber 0).Size)) } else { if (((Get-partition -DiskNumber ((Get-Partition -DriveLetter C).DiskNumber)).PartitionNumber | Measure-Object -line).Lines -gt 3) { echo False } else { echo True }}"
+                : @"-executionpolicy unrestricted (Get-Volume | where-object {$_.Path -eq ((Get-Partition -DiskNumber ((Get-Partition -DriveLetter " + partname + ").DiskNumber)) | where-object {$_.GptType -eq '{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}'}).AccessPaths[-1]}).SizeRemaining -gt 50000000";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
@@ -61,12 +57,12 @@ namespace WinArch
             process.EnableRaisingEvents = true;
             process.Start();
             process.WaitForExit();
-            returncode = Boolean.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
+            returncode = bool.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
             if (returncode)
             {
-                this.Dispatcher.Invoke(() =>
+                Dispatcher.Invoke(() =>
                 {
-                    comboBox.Items.Add(partname);
+                    _ = comboBox.Items.Add(partname);
                 });
                 canInstall = true;
             }
@@ -74,7 +70,7 @@ namespace WinArch
         public void MainFunction()
         {
             DriveInfo[] allDrives = DriveInfo.GetDrives();
-            this.Dispatcher.Invoke(() =>
+            Dispatcher.Invoke(() =>
             {
                 progressBar2.IsIndeterminate = false;
                 progressBar2.Maximum = allDrives.Length;
@@ -82,7 +78,7 @@ namespace WinArch
             });
             foreach (DriveInfo d in allDrives)
             {
-                this.Dispatcher.Invoke(() =>
+                Dispatcher.Invoke(() =>
                 {
                     progressBar2.Value = progressBar2.Value + 1;
                 });
@@ -94,14 +90,21 @@ namespace WinArch
                     }
                 }
             }
-            this.Dispatcher.Invoke(() =>
+            if (!canInstall)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    err.Visibility = Visibility.Visible;
+                });
+            };
+            Dispatcher.Invoke(() =>
             {
                 Mouse.OverrideCursor = Cursors.Arrow;
                 textBlock1.Visibility = Visibility.Hidden;
                 progressBar2.Visibility = Visibility.Hidden;
                 page.IsEnabled = true;
             });
-            this.Dispatcher.Invoke(() =>
+            Dispatcher.Invoke(() =>
             {
                 comboBox.SelectedIndex = 0;
                 checkBox.IsChecked = true;
@@ -129,18 +132,18 @@ namespace WinArch
         }
         public void Previous(object sender, EventArgs e)
         {
-            NavigationService nav = this.NavigationService;
-            nav.Navigate(new Uri("About.xaml", UriKind.Relative));
+            NavigationService nav = NavigationService;
+            _ = nav.Navigate(new Uri("About.xaml", UriKind.Relative));
         }
         public void Next(object sender, EventArgs e)
         {
             if (float.Parse(TextBoxSize.Text) < minimalSpaceRequired / Math.Pow(1024, Unit.SelectedIndex))
             {
-                TextBoxSize.Text = Math.Round((minimalSpaceRequired / Math.Pow(1024, Unit.SelectedIndex)), 0).ToString();
+                TextBoxSize.Text = Math.Round(minimalSpaceRequired / Math.Pow(1024, Unit.SelectedIndex), 0).ToString();
             }
             if (float.Parse(TextBoxSize.Text) > spaceleft_mb / Math.Pow(1024, Unit.SelectedIndex))
             {
-                TextBoxSize.Text = Math.Round((spaceleft_mb / Math.Pow(1024, Unit.SelectedIndex)), 0).ToString();
+                TextBoxSize.Text = Math.Round(spaceleft_mb / Math.Pow(1024, Unit.SelectedIndex), 0).ToString();
             }
             float spaceneeded = (float)(float.Parse(TextBoxSize.Text) * Math.Pow(1024, Unit.SelectedIndex));
             if ((bool)checkBox.IsChecked)
@@ -149,11 +152,11 @@ namespace WinArch
             }
             Application.Current.Properties["Repartition"] = checkBox.IsChecked;
             Application.Current.Properties["Volume"] = comboBox.SelectedItem;
-            NavigationService nav = this.NavigationService;
-            nav.Navigate(new Uri("Locale.xaml", UriKind.Relative));
+            NavigationService nav = NavigationService;
+            _ = nav.Navigate(new Uri("Locale.xaml", UriKind.Relative));
         }
 
-        private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (comboBox.SelectedItem.ToString() == "C")
             {
@@ -184,11 +187,11 @@ namespace WinArch
                 string caption = "Requirement error";
                 MessageBoxButton button = MessageBoxButton.OK;
                 MessageBoxImage icon = MessageBoxImage.Error;
-                MessageBox.Show(messageBoxText, caption, button, icon);
+                _ = MessageBox.Show(messageBoxText, caption, button, icon);
             }
             SizeSlider.Maximum = spaceleft_mb;
         }
-        public void getBIOSMode()
+        public void GetBIOSMode()
         {
             Process process = new Process();
             process.Exited += (s, e) =>
@@ -205,17 +208,17 @@ namespace WinArch
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.CreateNoWindow = true;
             process.EnableRaisingEvents = true;
-            process.Start();
+            _ = process.Start();
         }
 
-        private void checkBox_Checked(object sender, RoutedEventArgs e)
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             SizeSlider.IsEnabled = true;
             Unit.IsEnabled = true;
             TextBoxSize.IsEnabled = true;
         }
 
-        private void checkBox_Unchecked(object sender, RoutedEventArgs e)
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             SizeSlider.IsEnabled = false;
             Unit.IsEnabled = false;

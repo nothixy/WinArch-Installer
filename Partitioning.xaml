@@ -37,9 +37,10 @@
                 <ComboBoxItem x:Name="TB" Content="TB"/>
             </ComboBox>
             <TextBlock x:Name="textBlock" HorizontalAlignment="Center" Margin="0,50,0,0" Text="Select how much space you want for your linux installation" TextWrapping="Wrap" VerticalAlignment="Center"/>
-            <ComboBox x:Name="comboBox" HorizontalAlignment="Center" Margin="125,-100,0,0" VerticalAlignment="Center" Width="120" SelectionChanged="comboBox_SelectionChanged"/>
-            <CheckBox x:Name="checkBox" Content="Resize to create another partition" HorizontalAlignment="Center" Margin="0,-50,0,0" VerticalAlignment="Center" Checked="checkBox_Checked" Unchecked="checkBox_Unchecked"/>
+            <ComboBox x:Name="comboBox" HorizontalAlignment="Center" Margin="125,-100,0,0" VerticalAlignment="Center" Width="120" SelectionChanged="ComboBox_SelectionChanged"/>
+            <CheckBox x:Name="checkBox" Content="Resize to create another partition" HorizontalAlignment="Center" Margin="0,-50,0,0" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
             <TextBlock x:Name="test" HorizontalAlignment="Center" Margin="-150,-100,0,0" Text="Select a volume to install to" TextWrapping="Wrap" VerticalAlignment="Center" RenderTransformOrigin="0.758,-0.036"/>
+            <TextBlock x:Name="err" HorizontalAlignment="Center" Margin="0,324,0,0" Text="Sorry, we can't install Archlinux on any of your disks" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.527,0.501" Visibility="Hidden" Foreground="Red"/>
         </Grid>
         <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">
             <Button Width="60" Content="Go back" HorizontalAlignment="Right" Margin="0,0,75,0" VerticalAlignment="Center" Click="Previous"/>

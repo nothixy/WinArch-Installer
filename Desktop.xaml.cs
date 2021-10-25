@@ -15,6 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 using System;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 
@@ -31,13 +32,14 @@ namespace WinArch
         }
         public void Previous(object sender, EventArgs e)
         {
-            NavigationService nav = this.NavigationService;
+            NavigationService nav = NavigationService;
             nav.Navigate(new Uri("User.xaml", UriKind.Relative));
         }
         public void Next(object sender, EventArgs e)
         {
             var btnchecked = GridTop.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked.Value);
-            NavigationService nav = this.NavigationService;
+            Application.Current.Properties["Desktop"] = btnchecked.Name;
+            NavigationService nav = NavigationService;
             nav.Navigate(new Uri("Slideshow.xaml", UriKind.Relative));
         }
     }

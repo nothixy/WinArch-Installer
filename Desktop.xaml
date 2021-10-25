@@ -38,17 +38,17 @@
                 <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
             <Image Grid.Row="0" Grid.Column="0" x:Name="gnome" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/gnome.png" Margin="5,0,5,25"/>
-            <RadioButton Grid.Row="0" Grid.Column="0" x:Name="gnomeButton" Content="Gnome 3 (recommended)" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom" IsChecked="True"/>
+            <RadioButton Grid.Row="0" Grid.Column="0" x:Name="gnomeButton" Content="Gnome 40 (recommended)" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom" IsChecked="True"/>
             <Image Grid.Row="0" Grid.Column="1" x:Name="kde" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/kde.png" Margin="5,0,5,25"/>
             <RadioButton Grid.Row="0" Grid.Column="1" x:Name="kdeButton" Content="Plasma 5" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
             <Image Grid.Row="0" Grid.Column="2" x:Name="budgie" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/budgie.png" Margin="5,0,5,25"/>
             <RadioButton Grid.Row="0" Grid.Column="2" x:Name="budgieButton" Content="Budgie" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
             <Image Grid.Row="1" Grid.Column="0" x:Name="cinnamon" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/cinnamon.png" Margin="5,0,5,25"/>
             <RadioButton Grid.Row="1" Grid.Column="0" x:Name="cinnamonButton" Content="Cinnamon" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
-            <Image Grid.Row="1" Grid.Column="1" x:Name="mate" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/mate.png" Margin="5,0,5,25"/>
-            <RadioButton Grid.Row="1" Grid.Column="1" x:Name="mateButton" Content="MATE" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
-            <Image Grid.Row="1" Grid.Column="2" x:Name="xfce" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/xfce.png" Margin="5,0,5,25"/>
-            <RadioButton Grid.Row="1" Grid.Column="2" x:Name="xfceButton" Content="Xfce 4" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
+            <Image Grid.Row="1" Grid.Column="1" x:Name="dde" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/dde.png" Margin="5,0,5,25"/>
+            <RadioButton Grid.Row="1" Grid.Column="1" x:Name="mateButton" Content="Deepin Desktop" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
+            <Image Grid.Row="1" Grid.Column="2" x:Name="pantheon" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/pantheon.png" Margin="5,0,5,25"/>
+            <RadioButton Grid.Row="1" Grid.Column="2" x:Name="xfceButton" Content="Pantheon" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
         </Grid>
         <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">
             <Button Width="60" Content="Go back" HorizontalAlignment="Right" Margin="0,0,75,0" VerticalAlignment="Center" Click="Previous"/>

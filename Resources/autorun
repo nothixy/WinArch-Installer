@@ -1,0 +1,49 @@
+﻿#!/bin/sh
+
+hostname
+language
+keymap
+timezone
+password
+uname
+unamesys
+desktop
+biosmode
+
+rfkill unblock all
+dhcpcd
+if ! ping -c2 google.com >/dev/null 2>&1; then
+	nmtui
+	if ! ping -c2 google.com >/dev/null; then
+		dialog --msgbox "Please check your network connection with the program of your choice or plug in ethernet cable" 10 50 2>/dev/null
+		exit 0
+	fi
+fi
+mount -L Arch /mnt
+if [ biosmode != "BIOS" ]; then
+	mkdir -p /mnt/boot
+	
+	mount "DEVICE" /mnt/boot
+fi
+case $desktop in
+	gnome) packages = (gnome gdm gnome-software-packagekit-plugin)
+	kde) packages = (plasma sddm dolphin konsole discover packagekit-qt5)
+	budgie) packages = (budgie-desktop)
+	cinnamon) packages = (cinnamon)
+	pantheon) packages = (pantheon)
+	deepin) packages = (deepin deepin-extra)
+esac
+pacstrap /mnt base desktop base-devel NetworkManager bluez bash-completion $packages
+genfstab -U /mnt >> /mnt/etc/fstab
+cat <<- EOF | arch-chroot /mnt
+	echo "$hostname" > /etc/hostname
+	echo "$language" >> /etc/locale.gen
+	locale-gen
+	echo "LANG=$(echo $language | cut -d' ' -f1)" > /etc/locale.conf
+	echo "KEYMAP=$keymap" > /etc/vconsole.conf
+	ln -sf /usr/share/zoneinfo/$timezone /etc/localtime
+	echo -e "127.0.0.1	localhost\n::1		localhost\n127.0.1.1	$hostname" > /etc/hosts
+	useradd -mG wheel,sys "$unamesys"
+	echo -e "$password\n$password" | passwd "$unamesys"
+	chfn -f "$uname" "$unamesys"
+EOF

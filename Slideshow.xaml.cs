@@ -34,7 +34,6 @@ namespace WinArch
     /// </summary>
     public partial class Slideshow : Page
     {
-        int numberoftasks = 6;
         int partitionsnumber = 0;
         double taskpercentage;
         double mixedpercentage = 0;
@@ -43,57 +42,70 @@ namespace WinArch
         string[] packages;
         string currentline;
         string biosmode;
-        string kernelfile;
-        string initramfsfile;
         string disktype;
         bool repartition;
         string volume;
         bool createExtended;
+        string hostname;
+        string language;
+        string keymap;
+        string timezone;
+        string password;
+        string uname;
+        string unameSys;
+        string desktop;
         public Slideshow()
         {
             InitializeComponent();
-            /*biosmode = (string)Application.Current.Properties["biosmode"];
-            spaceleft_mb = (Single)Application.Current.Properties["SpaceRequired"];
+            biosmode = (string)Application.Current.Properties["biosmode"];
+            spaceleft_mb = (float)Application.Current.Properties["SpaceRequired"];
             repartition = (bool)Application.Current.Properties["Repartition"];
-            volume = (string)Application.Current.Properties["Volume"];*/
-            //TODO: Restore later
-            downloadcomponents();
+            volume = (string)Application.Current.Properties["Volume"];
+            hostname = (string)Application.Current.Properties["Hostname"];
+            language = (string)Application.Current.Properties["Language"];
+            keymap = (string)Application.Current.Properties["Keymap"];
+            timezone = (string)Application.Current.Properties["Timezone"];
+            password = (string)Application.Current.Properties["Password"];
+            uname = (string)Application.Current.Properties["Uname"];
+            unameSys = (string)Application.Current.Properties["UnameSys"];
+            desktop = (string)Application.Current.Properties["Desktop"];
+            Downloadcomponents();
         }
-        public async Task downloadcomponents()
+        public void Downloadcomponents()
         {
-            Task.Run(() => slideshow());
+            _ = Task.Run(() => DoSlideshow());
             //downloadLatestGrub();
-            //getDisksInfo(volume);
-            mountArchIso();
+            GetDisksInfo(volume);
+            //MountArchIso();
             //downloadArchIso();
             //getPackageList();
             //downloadGentooStage4();
             //doOperations();
         }
-        public void slideshow()
+        public void DoSlideshow()
         {
             while (true)
             {
                 System.Threading.Thread.Sleep(10000);
-                this.Dispatcher.Invoke(() =>
+                Dispatcher.Invoke(() =>
                 {
                     tabControl.SelectedIndex = (tabControl.SelectedIndex + 1) % tabControl.Items.Count;
                 });
             }
         }
-        public void getDisksInfo(string volume)
+        public void GetDisksInfo(string volume)
         {
-            this.Dispatcher.Invoke(() =>
+            Dispatcher.Invoke(() =>
             {
-                updateProgress(true, "Getting disks info", null);
+                UpdateProgress(true, "Getting disks info", null);
             });
             if (biosmode == "BIOS")
             {
                 Process process = new Process();
                 process.Exited += (s, e) =>
                 {
-                    createExtended = Boolean.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
-                    partitionDisks();
+                    createExtended = bool.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
+                    PartitionDisks();
                 };
                 process.StartInfo.FileName = "powershell.exe";
                 process.StartInfo.Arguments = "if ((Get-partition -DiskNumber ((Get-Partition -DriveLetter " + volume + ").DiskNumber)).PartitionNumber -contains 0) { echo False } else { echo True }";
@@ -102,17 +114,17 @@ namespace WinArch
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.CreateNoWindow = true;
                 process.EnableRaisingEvents = true;
-                process.Start();
+                _ = process.Start();
                 process.WaitForExit();
             }
             else
             {
-                partitionDisks();
+                PartitionDisks();
             }
         }
-        public void partitionDisks()
+        public void PartitionDisks()
         {
-            updateProgress(true, "Formatting disks", null);
+            UpdateProgress(true, "Formatting disks", null);
             string diskpartfile = Path.GetTempPath() + "diskpart.txt";
             if (File.Exists(diskpartfile))
             {
@@ -220,10 +232,10 @@ namespace WinArch
             Process process = new Process();
             process.Exited += (s, e) =>
             {
-                this.Dispatcher.Invoke(() =>
+                Dispatcher.Invoke(() =>
                 {
-                    updateProgressFull(1);
-                    downloadLatestGrub();
+                    UpdateProgressFull(1);
+                    _ = DownloadLatestGrub();
                 });
             };
             process.StartInfo.FileName = "diskpart.exe";
@@ -235,9 +247,9 @@ namespace WinArch
             process.EnableRaisingEvents = true;
             process.Start();
         }
-        async Task downloadLatestGrub()
+        async Task DownloadLatestGrub()
         {
-            updateProgress(true, "Finding GRUB version to download", null);
+            UpdateProgress(true, "Finding GRUB version to download", null);
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create("ftp://ftp.gnu.org/gnu/grub/");
             request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
             request.Credentials = new NetworkCredential("anonymous", "");
@@ -262,7 +274,7 @@ namespace WinArch
             {
                 for (int i = 1; i < filenames.Count; i++)
                 {
-                    if (String.Compare(filenamemaster, filenames[i]).ToString() == "-1")
+                    if (string.Compare(filenamemaster, filenames[i]).ToString() == "-1")
                     {
                         filenamemaster = filenames[i];
                     }
@@ -272,32 +284,55 @@ namespace WinArch
             client.Credentials = new NetworkCredential("anonymous", "");
             client.DownloadProgressChanged += (s, e) =>
             {
-                updateProgress(false, "Downloading GRUB file", e.ProgressPercentage);
+                UpdateProgress(false, "Downloading GRUB file", e.ProgressPercentage);
             };
             client.DownloadFileCompleted += (s, e) =>
             {
-                updateProgressFull(2);
-                downloadArchIso();
+                UpdateProgressFull(2);
+                DownloadArchIso();
             };
             Uri todownload = new Uri("ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
             client.DownloadFileAsync(todownload, Path.GetTempPath() + "grub.zip");
         }
-        public void downloadArchIso()
+        public void DownloadArchIso()
         {
             WebClient client2 = new WebClient();
             client2.DownloadProgressChanged += (s, e) =>
             {
-                updateProgress(false, "Downloading Archlinux iso", e.ProgressPercentage);
+                UpdateProgress(false, "Downloading Archlinux iso", e.ProgressPercentage);
             };
             client2.DownloadFileCompleted += (s, e) =>
             {
-                updateProgressFull(3);
-                mountArchIso();
+                UpdateProgressFull(3);
+                MountArchIso();
             };
             Uri download = new Uri("https://sourceforge.net/projects/systemrescuecd/files/latest/download");
             client2.DownloadFileAsync(download, Path.GetTempPath() + "arch.iso");
         }
-        public void mountArchIso ()
+        public void CopyAll(DirectoryInfo source, DirectoryInfo target, int i, int j)
+        {
+            if (source.FullName.ToLower() == target.FullName.ToLower())
+            {
+                return;
+            }
+            if (Directory.Exists(target.FullName) == false)
+            {
+                Directory.CreateDirectory(target.FullName);
+            }
+            foreach (FileInfo fi in source.GetFiles())
+            {
+                Debug.WriteLine(@"Copying {0}\{1}", target.FullName, fi.Name);
+                _ = fi.CopyTo(Path.Combine(target.ToString(), fi.Name), true);
+                j++;
+                UpdateProgress(false, "Copying Archlinux files to the new partition", j * 100 / i);
+            }
+            foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
+            {
+                DirectoryInfo nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
+                CopyAll(diSourceSubDir, nextTargetSubDir, i, j);
+            }
+        }
+        public void MountArchIso()
         {
             Process process = new Process();
             process.StartInfo.UseShellExecute = false;
@@ -305,15 +340,23 @@ namespace WinArch
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.FileName = "powershell.exe";
-            process.StartInfo.Arguments = "mountvol ZZW: (Mount-DiskImage -ImagePath " + Path.GetTempPath() + "arch.iso -NoDriveLetter | Get-Volume).UniqueId";
-            process.Start();
+            process.StartInfo.Arguments = "mountvol.exe U: (Mount-DiskImage -ImagePath " + Path.GetTempPath() + "arch.iso -NoDriveLetter | Get-Volume).UniqueId";
+            _ = process.Start();
             process.WaitForExit();
-            Debug.WriteLine(process.StandardOutput.ReadToEnd());
-            Debug.WriteLine(process.StandardError.ReadToEnd());
+            DirectoryInfo dI = new DirectoryInfo(@"U:\sysresccd\");
+            int i = 0;
+            foreach (FileInfo file in dI.EnumerateFiles()) 
+            {
+                i++;
+            }
+            CopyAll(new DirectoryInfo(@"U:\sysresccd\"), new DirectoryInfo(@"L:\sysresccd\"), i, 0);
+            UpdateProgressFull(4);
+            InstallGrub();
         }
-        async Task installGrub()
+
+        private void InstallGrub()
         {
-            updateProgress(true, "Installing GRUB", null);
+            UpdateProgress(true, "Installing GRUB", null);
             ZipArchive archive = new ZipArchive(File.OpenRead(Path.GetTempPath() + "grub.zip"));
             if (Directory.Exists(Path.GetTempPath() + "grub"))
             {
@@ -363,11 +406,15 @@ namespace WinArch
             }
             string[] lines = {
 
-                "menuentry 'Linux' {",
+                "menuentry 'SystenRescue' {",
+                "load_video",
+                "insmod gzio",
+                "insmod part_gpt",
+                "insmod part_msdos",
                 "insmod exfat",
                 "search --no-floppy --label PreArch --set=root",
-                "linux " + kernelfile + "root=LABEL=preArch",
-                "initrd " + initramfsfile + "",
+                "linux /sysresccd/boot/x86_64/vmlinuz archisobasedir=sysresccd archisolabel=boot copytoram setkmap=us ar_nowait",
+                "initrd /sysresccd/boot/x86_64/sysresccd.img",
                 "}",
                 "if [\"x${timeout}\" != \"x-1\"]; then",
                 "if keystatus; then",
@@ -384,13 +431,17 @@ namespace WinArch
                 "fi",
                 };
             File.WriteAllLines("L:\\boot\\grub\\grub.cfg", lines);
-            updateProgressFull(5);
-            //setupSystem();
+            UpdateProgressFull(5);
+            SetupSystem();
         }
-        public void updateProgress(bool indeterminate, string currentAction, double? currentPercentage)
+        public void SetupSystem()
+        {
+
+        }
+        public void UpdateProgress(bool indeterminate, string currentAction, double? currentPercentage)
         {
             progressCurrent.IsIndeterminate = indeterminate;
-            this.Dispatcher.Invoke(() =>
+            Dispatcher.Invoke(() =>
             {
                 if (!indeterminate)
                 {
@@ -399,10 +450,10 @@ namespace WinArch
                 textBlock.Text = currentAction;
             });
         }
-        public void updateProgressFull(float currentPercentage)
+        public void UpdateProgressFull(float currentPercentage)
         {
-            taskpercentage = (currentPercentage * 100) / 6;
-            this.Dispatcher.Invoke(() =>
+            taskpercentage = currentPercentage * 100 / 6;
+            Dispatcher.Invoke(() =>
             {
                 progressTotal.Value = taskpercentage;
             });
