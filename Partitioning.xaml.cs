@@ -52,12 +52,12 @@ namespace WinArch
             }
             else
             {
-                process.StartInfo.Arguments = "-Command (get-partition (get-partition -DriveLetter " + partname + ").DiskNumber | where-object {$_.GptType -eq \"{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}\"}) | set-partition -newdriveletter Z; if ((get-wmiobject win32_logicaldisk | where-object {$_.DeviceID -eq \"Z:\"}).FreeSpace -gt 2000) { echo True } else { echo False }; Get-PSDrive Z | Remove-PSDrive";
+                process.StartInfo.Arguments = @"-executionpolicy unrestricted (Get-Volume | where-object {$_.Path -eq ((Get-Partition -DiskNumber ((Get-Partition -DriveLetter " + partname + ").DiskNumber)) | where-object {$_.GptType -eq '{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}'}).AccessPaths[-1]}).SizeRemaining -gt 50000000";
             }
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.CreateNoWindow = false;
             process.EnableRaisingEvents = true;
             process.Start();
             process.WaitForExit();
