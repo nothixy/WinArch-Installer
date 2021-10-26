@@ -42,8 +42,8 @@ namespace WinArch
         public void Next(object sender, EventArgs e)
         {
             NavigationService nav = this.NavigationService;
-            nav.Navigate(new Uri("About.xaml", UriKind.Relative));
-            //nav.Navigate(new Uri("Slideshow.xaml", UriKind.Relative));
+            //nav.Navigate(new Uri("About.xaml", UriKind.Relative));
+            nav.Navigate(new Uri("Desktop.xaml", UriKind.Relative));
         }
     }
 }

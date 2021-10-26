@@ -64,8 +64,8 @@ namespace WinArch
             Task.Run(() => slideshow());
             //downloadLatestGrub();
             //getDisksInfo(volume);
-            //mountArchIso();
-            downloadArchIso();
+            mountArchIso();
+            //downloadArchIso();
             //getPackageList();
             //downloadGentooStage4();
             //doOperations();
@@ -284,21 +284,6 @@ namespace WinArch
         }
         public void downloadArchIso()
         {
-            //TODO Recheck Plop linux (bootable tarball, heavyweight)
-            string mirrorprefix = "http://mirrors.evowise.com/archlinux/iso/latest/";
-            WebClient client = new WebClient();
-            Stream stream = client.OpenRead(mirrorprefix + "md5sums.txt");
-            StreamReader reader = new StreamReader(stream);
-            string isoname = "";
-            while (reader.Peek() >= 0)
-            {
-                string currentline = reader.ReadLine();
-                if (Regex.IsMatch(currentline, "[0-9a-fA-f]{32}\\s\\sarchlinux-[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}-x86_64\\.iso"))
-                {
-                    isoname = currentline.Substring(34);
-                    Debug.WriteLine(isoname);
-                }
-            }
             WebClient client2 = new WebClient();
             client2.DownloadProgressChanged += (s, e) =>
             {
@@ -307,10 +292,24 @@ namespace WinArch
             client2.DownloadFileCompleted += (s, e) =>
             {
                 updateProgressFull(3);
-                //mountArchIso();
+                mountArchIso();
             };
-            Uri download = new Uri(mirrorprefix + isoname);
+            Uri download = new Uri("https://sourceforge.net/projects/systemrescuecd/files/latest/download");
             client2.DownloadFileAsync(download, Path.GetTempPath() + "arch.iso");
+        }
+        public void mountArchIso ()
+        {
+            Process process = new Process();
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.FileName = "powershell.exe";
+            process.StartInfo.Arguments = "mountvol ZZW: (Mount-DiskImage -ImagePath " + Path.GetTempPath() + "arch.iso -NoDriveLetter | Get-Volume).UniqueId";
+            process.Start();
+            process.WaitForExit();
+            Debug.WriteLine(process.StandardOutput.ReadToEnd());
+            Debug.WriteLine(process.StandardError.ReadToEnd());
         }
         async Task installGrub()
         {
@@ -366,14 +365,9 @@ namespace WinArch
 
                 "menuentry 'Linux' {",
                 "insmod exfat",
-                "set root=(hd0," + disktype + "5)",
+                "search --no-floppy --label PreArch --set=root",
                 "linux " + kernelfile + "root=LABEL=preArch",
                 "initrd " + initramfsfile + "",
-                "}",
-                "menuentry 'Windows 10' {",
-                "insmod ntfs",
-                "set root=(hd0," + disktype + "1)",
-                "ntldr /bootmgr",
                 "}",
                 "if [\"x${timeout}\" != \"x-1\"]; then",
                 "if keystatus; then",

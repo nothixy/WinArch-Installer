@@ -57,7 +57,7 @@ namespace WinArch
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.CreateNoWindow = false;
+            process.StartInfo.CreateNoWindow = true;
             process.EnableRaisingEvents = true;
             process.Start();
             process.WaitForExit();
