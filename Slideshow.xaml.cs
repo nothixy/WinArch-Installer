@@ -415,7 +415,18 @@ namespace WinArch
             {
                 Process process1 = new Process();
                 process1.StartInfo.FileName = "powershell.exe";
-                process1.StartInfo.Arguments = "$newguid = bcdedit.exe /create /d \"GRUB\"; bcdedit.exe /set "
+                process1.StartInfo.Arguments = "$newguid = bcdedit.exe --% /copy {bootmgr} /d \"GRUB\"; $guid = \"{\" + ($newguid -split '[{}]')[1] + \"}\"; bcdedit.exe --% /set $guid device partition=Z:; bcdedit --% /set %guid path \\EFI\\Boot\\BOOTX64.efi; bcdedit --% /set {fwbootmgr} displayorder $guid /addfirst";
+                process1.StartInfo.UseShellExecute = false;
+                process1.StartInfo.RedirectStandardOutput = true;
+                process1.StartInfo.RedirectStandardError = true;
+                process1.StartInfo.CreateNoWindow = true;
+                process1.EnableRaisingEvents = true;
+                process1.Start();
+                process1.WaitForExit();
+                string stO = process1.StandardOutput.ReadToEnd();
+                string stE = process1.StandardError.ReadToEnd();
+                Debug.WriteLine(stO);
+                Debug.WriteLine(stE);
             }
             UpdateProgressFull(5);
             SetupSystem();
