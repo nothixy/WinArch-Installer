@@ -1,17 +1,5 @@
-﻿#!/bin/sh
-
-hostname
-language
-keymap
-timezone
-password
-uname
-unamesys
-desktop
-biosmode
-
+﻿
 rfkill unblock all
-dhcpcd
 if ! ping -c2 google.com >/dev/null 2>&1; then
 	nmtui
 	if ! ping -c2 google.com >/dev/null; then
@@ -22,7 +10,7 @@ if ! ping -c2 google.com >/dev/null 2>&1; then
 fi
 timedatectl set-ntp true
 mount -L Arch /mnt
-if [ biosmode != "BIOS" ]; then
+if [ -d /sys/firmware/efi/efivars ]; then
 	mkdir -p /mnt/boot
 	drive="/dev/$(lsblk -ndo pkname $(findmnt /mnt -o SOURCE -un))"
 	device="$(fdisk -l $device -o Device,Type | grep "EFI System" | cut -d' ' -f1)"

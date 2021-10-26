@@ -34,26 +34,20 @@ namespace WinArch
     /// </summary>
     public partial class Slideshow : Page
     {
-        int partitionsnumber = 0;
         double taskpercentage;
-        double mixedpercentage = 0;
-        Single spaceleft_mb;
-        int packagesDone;
-        string[] packages;
-        string currentline;
-        string biosmode;
-        string disktype;
-        bool repartition;
-        string volume;
+        readonly float spaceleft_mb;
+        readonly string biosmode;
+        readonly bool repartition;
+        readonly string volume;
         bool createExtended;
-        string hostname;
-        string language;
-        string keymap;
-        string timezone;
-        string password;
-        string uname;
-        string unameSys;
-        string desktop;
+        readonly string hostname;
+        readonly string language;
+        readonly string keymap;
+        readonly string timezone;
+        readonly string password;
+        readonly string uname;
+        readonly string unameSys;
+        readonly string desktop;
         public Slideshow()
         {
             InitializeComponent();
@@ -74,13 +68,8 @@ namespace WinArch
         public void Downloadcomponents()
         {
             _ = Task.Run(() => DoSlideshow());
-            //downloadLatestGrub();
             GetDisksInfo(volume);
-            //MountArchIso();
-            //downloadArchIso();
-            //getPackageList();
-            //downloadGentooStage4();
-            //doOperations();
+            //SetupSystem();
         }
         public void DoSlideshow()
         {
@@ -309,7 +298,7 @@ namespace WinArch
             Uri download = new Uri("https://sourceforge.net/projects/systemrescuecd/files/latest/download");
             client2.DownloadFileAsync(download, Path.GetTempPath() + "arch.iso");
         }
-        public void CopyAll(DirectoryInfo source, DirectoryInfo target, int i, int j)
+        public void CopyAll(DirectoryInfo source, DirectoryInfo target)
         {
             if (source.FullName.ToLower() == target.FullName.ToLower())
             {
@@ -323,17 +312,16 @@ namespace WinArch
             {
                 Debug.WriteLine(@"Copying {0}\{1}", target.FullName, fi.Name);
                 _ = fi.CopyTo(Path.Combine(target.ToString(), fi.Name), true);
-                j++;
-                UpdateProgress(false, "Copying Archlinux files to the new partition", j * 100 / i);
             }
             foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
             {
                 DirectoryInfo nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
-                CopyAll(diSourceSubDir, nextTargetSubDir, i, j);
+                CopyAll(diSourceSubDir, nextTargetSubDir);
             }
         }
         public void MountArchIso()
         {
+            UpdateProgress(true, "Copying Archlinux files to the new partition", null);
             Process process = new Process();
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
@@ -345,13 +333,26 @@ namespace WinArch
             process.WaitForExit();
             DirectoryInfo dI = new DirectoryInfo(@"U:\sysresccd\");
             int i = 0;
-            foreach (FileInfo file in dI.EnumerateFiles()) 
+            foreach (FileInfo file in dI.EnumerateFiles())
             {
                 i++;
             }
-            CopyAll(new DirectoryInfo(@"U:\sysresccd\"), new DirectoryInfo(@"L:\sysresccd\"), i, 0);
+            CopyAll(new DirectoryInfo(@"U:\sysresccd\"), new DirectoryInfo(@"L:\sysresccd\"));
             UpdateProgressFull(4);
             InstallGrub();
+        }
+        public void mount_efi()
+        {
+            Process process = new Process();
+            process.StartInfo.FileName = "powershell.exe";
+            process.StartInfo.Arguments = "mountvol.exe Z: ((get-partition -DiskNumber ((Get-Partition -DriveLetter L).DiskNumber)) | where-object {$_.GptType -eq \"{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}\"}).AccessPaths[-1]";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.CreateNoWindow = true;
+            process.EnableRaisingEvents = true;
+            process.Start();
+            process.WaitForExit();
         }
 
         private void InstallGrub()
@@ -360,60 +361,39 @@ namespace WinArch
             ZipArchive archive = new ZipArchive(File.OpenRead(Path.GetTempPath() + "grub.zip"));
             if (Directory.Exists(Path.GetTempPath() + "grub"))
             {
-                Directory.Delete(Path.GetTempPath() + "grub");
+                Directory.Delete(Path.GetTempPath() + "grub", true);
             }
             Directory.CreateDirectory(Path.GetTempPath() + "grub");
             archive.ExtractToDirectory(Path.GetTempPath() + "grub");
+            string[] dirs = Directory.GetDirectories(Path.GetTempPath() + "grub");
+            Process process = new Process();
+            Debug.WriteLine("PATH : " + @dirs[0] + @"\grub-install.exe");
+            process.StartInfo.FileName = @dirs[0] + @"\grub-install.exe";
             if (biosmode == "BIOS")
             {
-                Process process = new Process();
-                process.Exited += (s, e) =>
-                {
-
-                };
-                process.StartInfo.FileName = Path.GetTempPath() + "grub\\grub-install.exe";
                 process.StartInfo.Arguments = "--boot-directory=L:\\boot --target=i386-pc //./PHYSICALDRIVE0";
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.CreateNoWindow = true;
-                process.EnableRaisingEvents = true;
-                process.Start();
-            }
-            else
-            {
-                Process process = new Process();
-                process.Exited += (s, e) =>
-                {
 
-                };
-                process.StartInfo.FileName = Path.GetTempPath() + "grub\\grub-install.exe";
-                process.StartInfo.Arguments = "--boot-directory=L:\\boot --target=x86_64-efi --removable --efi-directory=L:\\boot\\EFI";
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.CreateNoWindow = true;
-                process.EnableRaisingEvents = true;
-                process.Start();
-            }
-            if (biosmode == "BIOS")
-            {
-                disktype = "msdos";
             }
             else
             {
-                disktype = "gpt";
+                mount_efi();
+                process.StartInfo.Arguments = "--boot-directory=L:\\boot --target=x86_64-efi --removable --efi-directory=Z:\\";
             }
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.CreateNoWindow = true;
+            process.EnableRaisingEvents = true;
+            process.Start();
+            process.WaitForExit();
             string[] lines = {
-
                 "menuentry 'SystenRescue' {",
-                "load_video",
                 "insmod gzio",
                 "insmod part_gpt",
                 "insmod part_msdos",
                 "insmod exfat",
-                "search --no-floppy --label PreArch --set=root",
-                "linux /sysresccd/boot/x86_64/vmlinuz archisobasedir=sysresccd archisolabel=boot copytoram setkmap=us ar_nowait",
+                "search --no-floppy --label PREARCH --set=root",
+                "linux /sysresccd/boot/x86_64/vmlinuz archisobasedir=sysresccd archisolabel=PREARCH copytoram setkmap=us ar_nowait",
                 "initrd /sysresccd/boot/x86_64/sysresccd.img",
                 "}",
                 "if [\"x${timeout}\" != \"x-1\"]; then",
@@ -430,13 +410,36 @@ namespace WinArch
                 "fi",
                 "fi",
                 };
-            File.WriteAllLines("L:\\boot\\grub\\grub.cfg", lines);
+            File.WriteAllLines(@"L:\boot\grub\grub.cfg", lines);
             UpdateProgressFull(5);
             SetupSystem();
         }
         public void SetupSystem()
         {
-
+            UpdateProgress(true, "Preparing Linux autorun file", null);
+            StreamReader setupfile = new StreamReader(GetType().Assembly.GetManifestResourceStream("WinArch.Resources.autorun"));
+            List<string> list = new List<string>();
+            string line;
+            while ((line = setupfile.ReadLine()) != null)
+            {
+                list.Add(line);
+            }
+            string[] autorun = list.ToArray();
+            string[] lines =
+            {
+                "#!/bin/sh",
+                "desktop=" + desktop,
+                "hostname=" + hostname,
+                "language=\"" + language + "\"",
+                "keymap=" + keymap,
+                "timezone=" + timezone,
+                "password=" + password,
+                "uname=" + uname,
+                "unamesys=" + unameSys,
+            };
+            File.WriteAllLines(@"L:\autorun", lines);
+            File.AppendAllLines(@"L:\autorun", autorun);
+            UpdateProgressFull(6);
         }
         public void UpdateProgress(bool indeterminate, string currentAction, double? currentPercentage)
         {
