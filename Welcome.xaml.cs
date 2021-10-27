@@ -27,23 +27,22 @@ namespace WinArch
     {
         public Welcome()
         {
-            this.Dispatcher.UnhandledException += (s, e) =>
+            Dispatcher.UnhandledException += (s, e) =>
             {
-                using (StreamWriter sw = File.AppendText(Path.Combine(Path.GetTempPath() + "WinArch.txt")))
-                    sw.WriteLine(e.Exception.ToString());
+                using StreamWriter sw = File.AppendText(Path.Combine(Path.GetTempPath() + "WinArch.txt"));
+                sw.WriteLine(e.Exception.ToString());
             };
             InitializeComponent();
-            this.Dispatcher.UnhandledException += (s, e) =>
+            Dispatcher.UnhandledException += (s, e) =>
             {
-                using (StreamWriter sw = File.AppendText(Path.Combine(Path.GetTempPath() + "WinArch.txt")))
-                    sw.WriteLine(e.Exception.ToString());
+                using StreamWriter sw = File.AppendText(Path.Combine(Path.GetTempPath() + "WinArch.txt"));
+                sw.WriteLine(e.Exception.ToString());
             };
         }
         public void Next(object sender, EventArgs e)
         {
-            NavigationService nav = this.NavigationService;
-            nav.Navigate(new Uri("About.xaml", UriKind.Relative));
-            //nav.Navigate(new Uri("Slideshow.xaml", UriKind.Relative));
+            _ = NavigationService.Navigate(new Uri("About.xaml", UriKind.Relative));
+            //_ = NavigationService.Navigate(new Uri("Slideshow.xaml", UriKind.Relative));
         }
     }
 }

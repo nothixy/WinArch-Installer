@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Path = System.IO.Path;
+using System.Management.Automation;
 
 namespace WinArch
 {
@@ -69,7 +70,7 @@ namespace WinArch
         {
             _ = Task.Run(() => DoSlideshow());
             GetDisksInfo(volume);
-            //SetupSystem();
+            //TestFN();
         }
         public void DoSlideshow()
         {
@@ -341,7 +342,7 @@ namespace WinArch
             UpdateProgressFull(4);
             InstallGrub();
         }
-        public void mount_efi()
+        public void Mount_efi()
         {
             Process process = new Process();
             process.StartInfo.FileName = "powershell.exe";
@@ -376,8 +377,8 @@ namespace WinArch
             }
             else
             {
-                mount_efi();
-                process.StartInfo.Arguments = "--boot-directory=L:\\boot --target=x86_64-efi --removable --efi-directory=Z:\\";
+                Mount_efi();
+                process.StartInfo.Arguments = "--bootloader-id=GRUB --boot-directory=L:\\boot --target=x86_64-efi --efi-directory=Z:\\";
             }
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
@@ -411,23 +412,6 @@ namespace WinArch
                 "fi",
                 };
             File.WriteAllLines(@"L:\boot\grub\grub.cfg", lines);
-            if (biosmode != "BIOS")
-            {
-                Process process1 = new Process();
-                process1.StartInfo.FileName = "powershell.exe";
-                process1.StartInfo.Arguments = "$newguid = bcdedit.exe --% /copy {bootmgr} /d \"GRUB\"; $guid = \"{\" + ($newguid -split '[{}]')[1] + \"}\"; bcdedit.exe --% /set $guid device partition=Z:; bcdedit --% /set %guid path \\EFI\\Boot\\BOOTX64.efi; bcdedit --% /set {fwbootmgr} displayorder $guid /addfirst";
-                process1.StartInfo.UseShellExecute = false;
-                process1.StartInfo.RedirectStandardOutput = true;
-                process1.StartInfo.RedirectStandardError = true;
-                process1.StartInfo.CreateNoWindow = true;
-                process1.EnableRaisingEvents = true;
-                process1.Start();
-                process1.WaitForExit();
-                string stO = process1.StandardOutput.ReadToEnd();
-                string stE = process1.StandardError.ReadToEnd();
-                Debug.WriteLine(stO);
-                Debug.WriteLine(stE);
-            }
             UpdateProgressFull(5);
             SetupSystem();
         }
@@ -457,6 +441,14 @@ namespace WinArch
             File.WriteAllLines(@"L:\autorun", lines);
             File.AppendAllLines(@"L:\autorun", autorun);
             UpdateProgressFull(6);
+            _ = NavigationService.Navigate(new Uri("Finish.xaml", UriKind.Relative));
+        }
+
+        public void TestFN()
+        {
+            StreamReader setupfile = new StreamReader(GetType().Assembly.GetManifestResourceStream("WinArch.Resources.updateUEFI.ps1"));
+            string script = setupfile.ReadToEnd();
+            Uri path = new Uri("pack://application:,,,/Resources/updateUEFI.ps1");
         }
         public void UpdateProgress(bool indeterminate, string currentAction, double? currentPercentage)
         {

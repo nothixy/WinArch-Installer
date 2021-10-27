@@ -46,8 +46,7 @@
         <TextBlock x:Name="textBlock" HorizontalAlignment="Center" Margin="0,0,0,75" Text="Installing" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
         <ProgressBar x:Name="progressCurrent" HorizontalAlignment="Stretch" Height="20" Margin="10,0,10,50" VerticalAlignment="Bottom"/>
         <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">
-            <Button Width="60" x:Name="ButtonNext" Content="Next" IsEnabled="False" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center"/>
-            <ProgressBar x:Name="progressTotal" Height="20" Margin="10,0,75,0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+            <ProgressBar x:Name="progressTotal" Height="20" Margin="10,0,10,0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
         </Grid>
     </Grid>
 </Page>

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>WinArch-icon.ico</ApplicationIcon>
@@ -23,18 +23,21 @@
     <None Remove="gnome-software.png" />
     <None Remove="gnome.png" />
     <None Remove="kde.png" />
-    <None Remove="mate.png" />
+    <None Remove="pantheon.png" />
     <None Remove="Resources\keymaps.txt" />
     <None Remove="Resources\langs.txt" />
     <None Remove="Resources\timezones.txt" />
+	<None Remove="Resources\autorun" />
+	<None Remove="Resources\updateUEFI.ps1" />
     <None Remove="virt-manager.png" />
     <None Remove="WinArch-icon.ico" />
     <None Remove="WinArch-icon.png" />
-    <None Remove="xfce.png" />
+    <None Remove="dde.png" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Management" Version="6.0.0-preview.5.21301.5" />
+    <PackageReference Include="System.Management.Automation" Version="6.0.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -59,6 +62,9 @@
     <EmbeddedResource Include="Resources\keymaps.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\updateUEFI.ps1">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </EmbeddedResource>
     <EmbeddedResource Include="Resources\langs.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
