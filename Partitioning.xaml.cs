@@ -50,7 +50,7 @@ namespace WinArch
             process.StartInfo.FileName = "powershell.exe";
             process.StartInfo.Arguments = biosmode == "BIOS"
                 ? "if ((Get-partition -DiskNumber ((Get-Partition -DriveLetter " + partname + ").DiskNumber)).PartitionNumber -contains 0) { ((Get-Partition -DriveLetter " + partname + ").Offset -ge (Get-Partition -PartitionNumber 0).Offset -and (Get-Partition -DriveLetter " + partname + ").Offset -lt ((Get-Partition -PartitionNumber 0).Offset + (Get-Partition -PartitionNumber 0).Size)) } else { if (((Get-partition -DiskNumber ((Get-Partition -DriveLetter C).DiskNumber)).PartitionNumber | Measure-Object -line).Lines -gt 3) { echo False } else { echo True }}"
-                : @"-executionpolicy unrestricted (Get-Volume | where-object {$_.Path -eq ((Get-Partition -DiskNumber ((Get-Partition -DriveLetter " + partname + ").DiskNumber)) | where-object {$_.GptType -eq '{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}'}).AccessPaths[-1]}).SizeRemaining -gt 50000000";
+                : @"-executionpolicy unrestricted (Get-Volume | where-object {$_.Path -eq ((Get-Partition -DiskNumber 0) | where-object {$_.GptType -eq '{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}'}).AccessPaths[-1]}).SizeRemaining -gt 50000000";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;

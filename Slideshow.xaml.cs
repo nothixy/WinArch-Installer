@@ -47,6 +47,7 @@ namespace WinArch
         private readonly string uname;
         private readonly string unameSys;
         private readonly string desktop;
+        private int disknumber;
         public Slideshow()
         {
             InitializeComponent();
@@ -68,7 +69,7 @@ namespace WinArch
         {
             _ = Task.Run(() => DoSlideshow());
             GetDisksInfo(volume);
-            //TestFN();
+            //MountArchIso();
         }
         public void DoSlideshow()
         {
@@ -103,7 +104,6 @@ namespace WinArch
                 process.StartInfo.CreateNoWindow = true;
                 process.EnableRaisingEvents = true;
                 _ = process.Start();
-                process.WaitForExit();
             }
             else
             {
@@ -327,25 +327,23 @@ namespace WinArch
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
+            process.EnableRaisingEvents = true;
             process.StartInfo.FileName = "powershell.exe";
             process.StartInfo.Arguments = "mountvol.exe U: (Mount-DiskImage -ImagePath " + Path.GetTempPath() + "arch.iso -NoDriveLetter | Get-Volume).UniqueId";
-            _ = process.Start();
-            process.WaitForExit();
-            DirectoryInfo dI = new(@"U:\sysresccd\");
-            int i = 0;
-            foreach (FileInfo file in dI.EnumerateFiles())
+            process.Exited += (s, e) =>
             {
-                i++;
-            }
-            CopyAll(new DirectoryInfo(@"U:\sysresccd\"), new DirectoryInfo(@"L:\sysresccd\"));
-            UpdateProgressFull(4);
-            InstallGrub();
+                Debug.WriteLine("============Copying===========");
+                CopyAll(new DirectoryInfo(@"U:\sysresccd\"), new DirectoryInfo(@"L:\sysresccd\"));
+                UpdateProgressFull(4);
+                InstallGrub();
+            };
+            _ = process.Start();
         }
         public static void Mountefi()
         {
             Process process = new();
             process.StartInfo.FileName = "powershell.exe";
-            process.StartInfo.Arguments = "mountvol.exe Z: ((get-partition -DiskNumber ((Get-Partition -DriveLetter L).DiskNumber)) | where-object {$_.GptType -eq \"{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}\"}).AccessPaths[-1]";
+            process.StartInfo.Arguments = "mountvol.exe Z: /S";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
@@ -353,26 +351,15 @@ namespace WinArch
             process.EnableRaisingEvents = true;
             _ = process.Start();
             process.WaitForExit();
-        }
-
-        public static int BiosDiskNumber()
-        {
-            Process process = new();
-            process.StartInfo.FileName = "powershell.exe";
-            process.StartInfo.Arguments = "(Get-Partition -DriveLetter L).DiskNumber";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.CreateNoWindow = true;
-            process.EnableRaisingEvents = true;
-            _ = process.Start();
-            process.WaitForExit();
-            int number = int.Parse(process.StandardOutput.ReadToEnd());
-            return number;
+            Debug.WriteLine(process.StandardOutput.ReadToEnd());
+            Debug.WriteLine(process.StandardError.ReadToEnd());
         }
         private void InstallGrub()
         {
-            UpdateProgress(true, "Installing GRUB", null);
+            Dispatcher.Invoke(() =>
+            {
+                UpdateProgress(true, "Installing GRUB", null);
+            });
             ZipArchive archive = new(File.OpenRead(Path.GetTempPath() + "grub.zip"));
             if (Directory.Exists(Path.GetTempPath() + "grub"))
             {
@@ -386,8 +373,7 @@ namespace WinArch
             process.StartInfo.FileName = @dirs[0] + @"\grub-install.exe";
             if (biosmode == "BIOS")
             {
-                int drivenumber = BiosDiskNumber();
-                process.StartInfo.Arguments = "--boot-directory=L:\\boot --target=i386-pc //./PHYSICALDRIVE" + drivenumber;
+                process.StartInfo.Arguments = "--boot-directory=L:\\boot --target=i386-pc //./PHYSICALDRIVE0";
             }
             else
             {
@@ -399,9 +385,9 @@ namespace WinArch
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.CreateNoWindow = true;
             process.EnableRaisingEvents = true;
-            _ = process.Start();
-            process.WaitForExit();
-            string[] lines = {
+            process.Exited += (s, e) =>
+            {
+                string[] lines = {
                 "menuentry 'SystenRescue' {",
                 "insmod gzio",
                 "insmod part_gpt",
@@ -425,13 +411,18 @@ namespace WinArch
                 "fi",
                 "fi",
                 };
-            File.WriteAllLines(@"L:\boot\grub\grub.cfg", lines);
-            UpdateProgressFull(5);
-            SetupSystem();
+                File.WriteAllLines(@"L:\boot\grub\grub.cfg", lines);
+                UpdateProgressFull(5);
+                SetupSystem();
+            };
+            _ = process.Start();
         }
         public void SetupSystem()
         {
-            UpdateProgress(true, "Preparing Linux autorun file", null);
+            Dispatcher.Invoke(() =>
+            {
+                UpdateProgress(true, "Preparing Linux autorun file", null);
+            });
             StreamReader setupfile = new(GetType().Assembly.GetManifestResourceStream("WinArch.Resources.autorun"));
             List<string> list = new();
             string line;
@@ -455,7 +446,10 @@ namespace WinArch
             File.WriteAllLines(@"L:\autorun", lines);
             File.AppendAllLines(@"L:\autorun", autorun);
             UpdateProgressFull(6);
-            _ = NavigationService.Navigate(new Uri("Finish.xaml", UriKind.Relative));
+            Dispatcher.Invoke(() =>
+            {
+                _ = NavigationService.Navigate(new Uri("Finish.xaml", UriKind.Relative));
+            });
         }
         public void UpdateProgress(bool indeterminate, string currentAction, double? currentPercentage)
         {

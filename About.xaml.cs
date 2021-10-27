@@ -30,13 +30,13 @@ namespace WinArch
         }
         public void Previous(object sender, EventArgs e)
         {
-            NavigationService nav = this.NavigationService;
+            NavigationService nav = NavigationService;
             nav.Navigate(new Uri("Welcome.xaml", UriKind.Relative));
         }
         public void Next(object sender, EventArgs e)
         {
-            NavigationService nav = this.NavigationService;
-            nav.Navigate(new Uri("Partitioning.xaml", UriKind.Relative));
+            NavigationService nav = NavigationService;
+            nav.Navigate(new Uri("Secureboot.xaml", UriKind.Relative));
         }
         public void Scroller_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
