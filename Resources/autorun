@@ -46,7 +46,7 @@ cat <<- EOF | arch-chroot /mnt
 	echo -e "\033[32m---Enabling services---\033[0m"
 	for dm in lightdm gdm sddm; do
 		if type $dm >/dev/null 2>&1; then
-			systemctl enable dm
+			systemctl enable $dm
 		fi
 	done
 	systemctl enable NetworkManager bluetooth
