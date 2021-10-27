@@ -30,9 +30,9 @@ namespace WinArch
     /// </summary>
     public partial class Partitioning : Page
     {
-        float spaceleft;
-        float spaceleft_mb;
-        bool canInstall = false;
+        private float spaceleft;
+        private float spaceleft_mb;
+        private bool canInstall;
         private string biosmode;
         private readonly int minimalSpaceRequired = 2500;
         private bool returncode;
@@ -40,7 +40,8 @@ namespace WinArch
         {
             InitializeComponent();
             Mouse.OverrideCursor = Cursors.Wait;
-            _ = Task.Run(() => GetBIOSMode());
+            biosmode = (string)Application.Current.Properties["biosmode"];
+            MainFunction();
         }
 
         private void IsDiskInstallable(string partname)
@@ -190,25 +191,6 @@ namespace WinArch
                 _ = MessageBox.Show(messageBoxText, caption, button, icon);
             }
             SizeSlider.Maximum = spaceleft_mb;
-        }
-        public void GetBIOSMode()
-        {
-            Process process = new Process();
-            process.Exited += (s, e) =>
-            {
-                string output = Regex.Replace(process.StandardOutput.ReadToEnd(), "\\s", "").ToUpper();
-                Application.Current.Properties["biosmode"] = output;
-                biosmode = output;
-                MainFunction();
-            };
-            process.StartInfo.FileName = "powershell.exe";
-            process.StartInfo.Arguments = "-Command echo $(Get-ComputerInfo).BiosFirmwareType";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.CreateNoWindow = true;
-            process.EnableRaisingEvents = true;
-            _ = process.Start();
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)

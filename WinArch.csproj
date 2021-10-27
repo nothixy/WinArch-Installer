@@ -28,7 +28,6 @@
     <None Remove="Resources\langs.txt" />
     <None Remove="Resources\timezones.txt" />
 	<None Remove="Resources\autorun" />
-	<None Remove="Resources\updateUEFI.ps1" />
     <None Remove="virt-manager.png" />
     <None Remove="WinArch-icon.ico" />
     <None Remove="WinArch-icon.png" />
@@ -62,9 +61,6 @@
     <EmbeddedResource Include="Resources\keymaps.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\updateUEFI.ps1">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </EmbeddedResource>
     <EmbeddedResource Include="Resources\langs.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
