@@ -133,7 +133,7 @@ namespace WinArch
                             "shrink desired=1500 minimum=1500",
                             "format unit=4096 fs=exfat quick label=Arch",
                             "create partition logical",
-                            "format unit=4096 fs=fat32 quick label=PreArch",
+                            "format unit=4096 fs=ntfs quick label=PREARCH",
                             "assign letter L",
                         };
                         File.WriteAllLines(diskpartfile, lines);
@@ -147,7 +147,7 @@ namespace WinArch
                             "shrink desired=1500 minimum=1500",
                             "format unit=4096 fs=exfat quick label=Arch",
                             "create partition logical",
-                            "format unit=4096 fs=fat32 quick label=PreArch",
+                            "format unit=4096 fs=ntfs quick label=PREARCH",
                             "assign letter L",
                         };
                         File.WriteAllLines(diskpartfile, lines);
@@ -166,7 +166,7 @@ namespace WinArch
                             "shrink desired=1500 minimum=1500",
                             "format unit=4096 fs=exfat quick label=Arch",
                             "create partition logical",
-                            "format unit=4096 fs=fat32 quick label=PreArch",
+                            "format unit=4096 fs=ntfs quick label=PREARCH",
                             "assign letter L",
                         };
                         File.WriteAllLines(diskpartfile, lines);
@@ -179,7 +179,7 @@ namespace WinArch
                             "shrink desired=1500 minimum=1500",
                             "format unit=4096 fs=exfat quick label=Arch",
                             "create partition logical",
-                            "format unit=4096 fs=fat32 quick label=PreArch",
+                            "format unit=4096 fs=ntfs quick label=PREARCH",
                             "assign letter L",
                         };
                         File.WriteAllLines(diskpartfile, lines);
@@ -198,7 +198,7 @@ namespace WinArch
                         "shrink desired=1500 minimum=1500",
                         "format unit=4096 fs=exfat quick label=Arch",
                         "create partition primary",
-                        "format unit=4096 fs=fat32 quick label=PreArch",
+                        "format unit=4096 fs=ntfs quick label=PREARCH",
                         "assign letter L",
                     };
                     File.WriteAllLines(diskpartfile, lines);
@@ -211,7 +211,7 @@ namespace WinArch
                         "shrink desired=1500 minimum=1500",
                         "format unit=4096 fs=exfat quick label=Arch",
                         "create partition primary",
-                        "format unit=4096 fs=fat32 quick label=PreArch",
+                        "format unit=4096 fs=ntfs quick label=PREARCH",
                         "assign letter L",
                     };
                     File.WriteAllLines(diskpartfile, lines);
@@ -388,7 +388,7 @@ namespace WinArch
             process.Exited += (s, e) =>
             {
                 string[] lines = {
-                "menuentry 'SystenRescue' {",
+                "menuentry 'SystemRescue' {",
                 "insmod gzio",
                 "insmod part_gpt",
                 "insmod part_msdos",
@@ -445,6 +445,7 @@ namespace WinArch
             };
             File.WriteAllLines(@"L:\autorun", lines);
             File.AppendAllLines(@"L:\autorun", autorun);
+            Process.Start("reg.exe", "ADD \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power\" /V HiberbootEnabled /T REG_dWORD /D 1 /F");
             UpdateProgressFull(6);
             Dispatcher.Invoke(() =>
             {
