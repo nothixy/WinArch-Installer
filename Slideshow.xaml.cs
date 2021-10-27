@@ -411,6 +411,12 @@ namespace WinArch
                 "fi",
                 };
             File.WriteAllLines(@"L:\boot\grub\grub.cfg", lines);
+            if (biosmode != "BIOS")
+            {
+                Process process1 = new Process();
+                process1.StartInfo.FileName = "powershell.exe";
+                process1.StartInfo.Arguments = "$newguid = bcdedit.exe /create /d \"GRUB\"; bcdedit.exe /set "
+            }
             UpdateProgressFull(5);
             SetupSystem();
         }
