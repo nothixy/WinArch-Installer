@@ -19,12 +19,12 @@ fi
 case $desktop in
 	gnome) export packages=(gnome gdm gnome-software-packagekit-plugin);;
 	kde) export packages=(plasma sddm dolphin konsole discover packagekit-qt5);;
-	budgie) export packages=(budgie-desktop);;
-	cinnamon) export packages=(cinnamon);;
-	pantheon) export packages=(pantheon);;
-	deepin) export packages=(deepin deepin-extra);;
+	budgie) export packages=(budgie-desktop gnome gnome-software-packagekit-plugin lightdm lightdm-webkit2-greeter lightdm-webkit-theme-litarvan);;
+	cinnamon) export packages=(cinnamon lightdm lightdm-slick-greeter);;
+	pantheon) export packages=(pantheon lightdm ligthdm-pantheon-greeter);;
+	deepin) export packages=(deepin deepin-extra lightdm deepin-session-shell);;
 esac
-pacstrap /mnt base desktop base-devel NetworkManager bluez bash-completion $packages grub os-prober
+pacstrap /mnt base base-devel networkmanager bluez bash-completion $packages grub os-prober
 genfstab -U /mnt >> /mnt/etc/fstab
 cat <<- EOF | arch-chroot /mnt
 	echo -e "\033[32m---Setting hostname---\033[0m"
@@ -43,6 +43,13 @@ cat <<- EOF | arch-chroot /mnt
 	useradd -mG wheel,sys "$unamesys"
 	echo -e "$password\n$password" | passwd "$unamesys"
 	chfn -f "$uname" "$unamesys"
+	echo -e "\033[32m---Enabling services---\033[0m"
+	for dm in lightdm gdm sddm; do
+		if type $dm >/dev/null 2>&1; then
+			systemctl enable dm
+		fi
+	done
+	systemctl enable NetworkManager bluetooth
 	echo -e "\033[32m---Installing bootloader---\033[0m"
 	if [-d /sys/firmware/efi/efivars]; then
 		grub-install --target=x86_64-efi --efi-directory /boot --bootloader-id=GRUB
@@ -52,4 +59,5 @@ cat <<- EOF | arch-chroot /mnt
 	fi
 	echo "GRUB_DISABLE_OS_PROBER=false" | tee -a /etc/default/grub
 	grub-mkconfig -o /boot/grub/grub.cfg
+	dialog --msgbox "Everything should (TM) work normally now" 10 50 2>/dev/null
 EOF
