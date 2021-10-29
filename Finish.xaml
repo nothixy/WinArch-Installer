@@ -15,6 +15,8 @@
         <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">
             <Button Width="120" IsEnabled="false" x:Name="ButtonRebootNow" Content="Reboot now" HorizontalAlignment="Right" VerticalAlignment="Center" Click="ButtonRebootNow_Click" Margin="0,0,10,0"/>
             <Button Width="120" IsEnabled="false" x:Name="ButtonRebootLater" Content="Reboot later" HorizontalAlignment="Right" VerticalAlignment="Center" Click="ButtonRebootLater_Click" Margin="0,0,135,0"/>
+            <ProgressBar x:Name="progressBar2" HorizontalAlignment="Stretch" Height="20" Margin="148,0,260,0" VerticalAlignment="Stretch" IsIndeterminate="true"/>
+            <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="10,0,0,0" Text="Checking for Secure Boot" TextWrapping="Wrap" VerticalAlignment="Center"/>
         </Grid>
     </Grid>
 </Page>

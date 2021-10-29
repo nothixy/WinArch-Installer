@@ -47,6 +47,8 @@ namespace WinArch
                 {
                     ButtonRebootLater.IsEnabled = true;
                     ButtonRebootNow.IsEnabled = true;
+                    progressBar2.Visibility = Visibility.Hidden;
+                    textBlock1.Visibility = Visibility.Hidden;
                 });
 
             };

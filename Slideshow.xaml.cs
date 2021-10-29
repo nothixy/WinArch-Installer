@@ -71,15 +71,19 @@ namespace WinArch
         }
         public void DoSlideshow()
         {
-            while (tabControl.SelectedIndex != tabControl.Items.Count - 1)
+            while (true)
             {
                 System.Threading.Thread.Sleep(10000);
                 Dispatcher.Invoke(() =>
                 {
-                    tabControl.SelectedIndex = (tabControl.SelectedIndex + 1) % (tabControl.Items.Count - 1);
+                    if (tabControl.SelectedIndex != tabControl.Items.Count - 1)
+                    {
+                        tabControl.SelectedIndex = (tabControl.SelectedIndex + 1) % (tabControl.Items.Count - 1);
+                    }
                 });
             }
         }
+
         public void PartitionDisks()
         {
             UpdateProgress(true, "Formatting disks", null);
@@ -95,7 +99,7 @@ namespace WinArch
                     "select volume " + volume,
                     "shrink desired=" + spaceleft_mb + " minimum=2500",
                     "create partition primary",
-                    "format unit=4096 fs=fat32 quick label=ARCH",
+                    "format unit=4096 fs=exfat quick label=ARCH",
                     "assign letter L",
                 };
                 File.WriteAllLines(diskpartfile, lines);
@@ -107,7 +111,7 @@ namespace WinArch
                     "select volume " + volume,
                     "delete volume",
                     "create partition primary",
-                    "format unit=4096 fs=fat32 quick label=ARCH",
+                    "format unit=4096 fs=exfat quick label=ARCH",
                     "assign letter L",
                 };
                 File.WriteAllLines(diskpartfile, lines);
@@ -323,19 +327,7 @@ namespace WinArch
                 "linux /sysresccd/boot/x86_64/vmlinuz archisobasedir=sysresccd archisolabel=ARCH copytoram setkmap=us ar_nowait ar_nofail",
                 "initrd /sysresccd/boot/x86_64/sysresccd.img",
                 "}",
-                "if [\"x${timeout}\" != \"x-1\"]; then",
-                "if keystatus; then",
-                "if keystatus --shift; then",
-                "set timeout = -1",
-                "else",
-                "set timeout = 0",
-                "fi",
-                "else",
-                "if sleep--interruptible 3; then",
-                "set timeout = 0",
-                "fi",
-                "fi",
-                "fi",
+                "set timeout = 1",
                 };
                 if (!Directory.Exists(@"Z:\grub"))
                 {
@@ -370,7 +362,7 @@ namespace WinArch
                 "keymap=" + keymap,
                 "timezone=" + timezone,
                 "password=" + password,
-                "uname=" + uname,
+                "uname=\"" + uname + "\"",
                 "unamesys=" + unameSys,
             };
             File.WriteAllLines(@"L:\autorun", lines);

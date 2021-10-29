@@ -100,7 +100,7 @@ namespace WinArch
             {
                 Dispatcher.Invoke(() =>
                 {
-                    progressBar2.Value = progressBar2.Value + 1;
+                    progressBar2.Value++;
                 });
                 if (d.DriveType == DriveType.Fixed)
                 {
