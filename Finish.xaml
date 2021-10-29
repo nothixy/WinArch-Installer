@@ -11,10 +11,10 @@
     <Grid Margin="0,0,0,0">
         <TextBlock x:Name="WelcomeMessage" HorizontalAlignment="Center" Margin="0,20,0,0" Text="Archlinux has been successfully installed to your computer" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" FontSize="24"/>
         <Image x:Name="ArchLogoBig" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/archlinux-logo-large.png" Margin="0,40,0,40"/>
-        <TextBlock x:Name="Reminder" HorizontalAlignment="Center" Margin="0,0,0,40" Text="If you choose to reboot, you will be dropped in UEFI settings, and you will have to disable Secure Boot, otherwise your system will not be bootable" Foreground="Red" TextWrapping="Wrap" VerticalAlignment="Bottom" FontWeight="Bold" FontSize="12"/>
+        <TextBlock x:Name="Reminder" Visibility="Hidden" HorizontalAlignment="Center" Margin="0,0,0,40" Text="If you choose to reboot now, you will be dropped in UEFI settings, and you will have to disable Secure Boot, otherwise your system will automatically reboot to Windows" Foreground="Red" TextWrapping="Wrap" VerticalAlignment="Bottom" FontWeight="Bold" FontSize="12"/>
         <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">
-            <Button Width="120" x:Name="ButtonRebootNow" Content="Reboot now" HorizontalAlignment="Right" VerticalAlignment="Center" Click="ButtonRebootNow_Click" Margin="0,0,10,0"/>
-            <Button Width="120" x:Name="ButtonRebootLater" Content="Reboot later" HorizontalAlignment="Right" VerticalAlignment="Center" Click="ButtonRebootLater_Click" Margin="0,0,135,0"/>
+            <Button Width="120" IsEnabled="false" x:Name="ButtonRebootNow" Content="Reboot now" HorizontalAlignment="Right" VerticalAlignment="Center" Click="ButtonRebootNow_Click" Margin="0,0,10,0"/>
+            <Button Width="120" IsEnabled="false" x:Name="ButtonRebootLater" Content="Reboot later" HorizontalAlignment="Right" VerticalAlignment="Center" Click="ButtonRebootLater_Click" Margin="0,0,135,0"/>
         </Grid>
     </Grid>
 </Page>

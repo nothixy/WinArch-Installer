@@ -38,7 +38,6 @@ namespace WinArch
         private readonly string biosmode;
         private readonly bool repartition;
         private readonly string volume;
-        private bool createExtended;
         private readonly string hostname;
         private readonly string language;
         private readonly string keymap;
@@ -47,7 +46,7 @@ namespace WinArch
         private readonly string uname;
         private readonly string unameSys;
         private readonly string desktop;
-        private int disknumber;
+        private bool AutoScroll = true;
         public Slideshow()
         {
             InitializeComponent();
@@ -68,46 +67,17 @@ namespace WinArch
         public void Downloadcomponents()
         {
             _ = Task.Run(() => DoSlideshow());
-            GetDisksInfo(volume);
-            //MountArchIso();
+            PartitionDisks();
         }
         public void DoSlideshow()
         {
-            while (true)
+            while (tabControl.SelectedIndex != tabControl.Items.Count - 1)
             {
                 System.Threading.Thread.Sleep(10000);
                 Dispatcher.Invoke(() =>
                 {
-                    tabControl.SelectedIndex = (tabControl.SelectedIndex + 1) % tabControl.Items.Count;
+                    tabControl.SelectedIndex = (tabControl.SelectedIndex + 1) % (tabControl.Items.Count - 1);
                 });
-            }
-        }
-        public void GetDisksInfo(string volume)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                UpdateProgress(true, "Getting disks info", null);
-            });
-            if (biosmode == "BIOS")
-            {
-                Process process = new Process();
-                process.Exited += (s, e) =>
-                {
-                    createExtended = bool.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
-                    PartitionDisks();
-                };
-                process.StartInfo.FileName = "powershell.exe";
-                process.StartInfo.Arguments = "if ((Get-partition -DiskNumber ((Get-Partition -DriveLetter " + volume + ").DiskNumber)).PartitionNumber -contains 0) { echo False } else { echo True }";
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.CreateNoWindow = true;
-                process.EnableRaisingEvents = true;
-                _ = process.Start();
-            }
-            else
-            {
-                PartitionDisks();
             }
         }
         public void PartitionDisks()
@@ -118,110 +88,38 @@ namespace WinArch
             {
                 File.Delete(diskpartfile);
             }
-            if (biosmode == "BIOS")
+            if (repartition)
             {
-                if (repartition)
+                string[] lines =
                 {
-                    if (createExtended)
-                    {
-                        string[] lines =
-                        {
-                            "select volume " + volume,
-                            "shrink desired=" + spaceleft_mb + " minimum=2500",
-                            "create partition extended",
-                            "create partition logical",
-                            "shrink desired=1500 minimum=1500",
-                            "format unit=4096 fs=exfat quick label=Arch",
-                            "create partition logical",
-                            "format unit=4096 fs=ntfs quick label=PREARCH",
-                            "assign letter L",
-                        };
-                        File.WriteAllLines(diskpartfile, lines);
-                    }
-                    else
-                    {
-                        string[] lines =
-                        {
-                            "select volume " + volume,
-                            "shrink desired=" + spaceleft_mb + " minimum=2500",
-                            "shrink desired=1500 minimum=1500",
-                            "format unit=4096 fs=exfat quick label=Arch",
-                            "create partition logical",
-                            "format unit=4096 fs=ntfs quick label=PREARCH",
-                            "assign letter L",
-                        };
-                        File.WriteAllLines(diskpartfile, lines);
-                    }
-                }
-                else
-                {
-                    if (createExtended)
-                    {
-                        string[] lines =
-                        {
-                            "select volume " + volume,
-                            "delete partition",
-                            "create partition extended",
-                            "create partition logical",
-                            "shrink desired=1500 minimum=1500",
-                            "format unit=4096 fs=exfat quick label=Arch",
-                            "create partition logical",
-                            "format unit=4096 fs=ntfs quick label=PREARCH",
-                            "assign letter L",
-                        };
-                        File.WriteAllLines(diskpartfile, lines);
-                    }
-                    else
-                    {
-                        string[] lines =
-                        {
-                            "select volume " + volume,
-                            "shrink desired=1500 minimum=1500",
-                            "format unit=4096 fs=exfat quick label=Arch",
-                            "create partition logical",
-                            "format unit=4096 fs=ntfs quick label=PREARCH",
-                            "assign letter L",
-                        };
-                        File.WriteAllLines(diskpartfile, lines);
-                    }
-                }
+                    "select volume " + volume,
+                    "shrink desired=" + spaceleft_mb + " minimum=2500",
+                    "create partition primary",
+                    "format unit=4096 fs=fat32 quick label=ARCH",
+                    "assign letter L",
+                };
+                File.WriteAllLines(diskpartfile, lines);
             }
             else
             {
-                if (repartition)
+                string[] lines =
                 {
-                    string[] lines =
-                    {
-                        "select volume " + volume,
-                        "shrink desired=" + spaceleft_mb + " minimum=2500",
-                        "create partition primary",
-                        "shrink desired=1500 minimum=1500",
-                        "format unit=4096 fs=exfat quick label=Arch",
-                        "create partition primary",
-                        "format unit=4096 fs=ntfs quick label=PREARCH",
-                        "assign letter L",
-                    };
-                    File.WriteAllLines(diskpartfile, lines);
-                }
-                else
-                {
-                    string[] lines =
-                    {
-                        "select volume " + volume,
-                        "shrink desired=1500 minimum=1500",
-                        "format unit=4096 fs=exfat quick label=Arch",
-                        "create partition primary",
-                        "format unit=4096 fs=ntfs quick label=PREARCH",
-                        "assign letter L",
-                    };
-                    File.WriteAllLines(diskpartfile, lines);
-                }
+                    "select volume " + volume,
+                    "delete volume",
+                    "create partition primary",
+                    "format unit=4096 fs=fat32 quick label=ARCH",
+                    "assign letter L",
+                };
+                File.WriteAllLines(diskpartfile, lines);
             }
             Process process = new();
             process.Exited += (s, e) =>
             {
                 Dispatcher.Invoke(() =>
                 {
+                    logText.Text += "------Running Diskpart------\n";
+                    logText.Text += "Arguments : " + process.StartInfo.Arguments + "\n";
+                    logText.Text += process.StandardOutput.ReadToEnd() + "\n";
                     UpdateProgressFull(1);
                     _ = DownloadLatestGrub();
                 });
@@ -244,7 +142,6 @@ namespace WinArch
             request.Credentials = new NetworkCredential("anonymous", "");
             WebResponse webResponse = await request.GetResponseAsync();
             FtpWebResponse response = (FtpWebResponse)webResponse;
-
             Stream responseStream = response.GetResponseStream();
             StreamReader reader = new(responseStream);
             string[] files = reader.ReadToEnd().Split('\n');
@@ -277,10 +174,19 @@ namespace WinArch
             };
             client.DownloadFileCompleted += (s, e) =>
             {
+                Dispatcher.Invoke(() =>
+                {
+                    logText.Text += "Downloaded\n";
+                });
                 UpdateProgressFull(2);
                 DownloadArchIso();
             };
             Uri todownload = new("ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
+            Dispatcher.Invoke(() =>
+            {
+                logText.Text += "------Downloading GRUB------\n";
+                logText.Text += "Downloading " + todownload.AbsoluteUri + " as grub.zip" + "\n";
+            });
             client.DownloadFileAsync(todownload, Path.GetTempPath() + "grub.zip");
         }
         public void DownloadArchIso()
@@ -292,10 +198,19 @@ namespace WinArch
             };
             client2.DownloadFileCompleted += (s, e) =>
             {
+                Dispatcher.Invoke(() =>
+                {
+                    logText.Text += "Downloaded\n";
+                });
                 UpdateProgressFull(3);
                 MountArchIso();
             };
             Uri download = new("https://sourceforge.net/projects/systemrescuecd/files/latest/download");
+            Dispatcher.Invoke(() =>
+            {
+                logText.Text += "------Downloading Archlinux------\n";
+                logText.Text += "Downloading " + download.AbsoluteUri + " as arch.iso\n";
+            });
             client2.DownloadFileAsync(download, Path.GetTempPath() + "arch.iso");
         }
         public void CopyAll(DirectoryInfo source, DirectoryInfo target)
@@ -310,7 +225,10 @@ namespace WinArch
             }
             foreach (FileInfo fi in source.GetFiles())
             {
-                Debug.WriteLine(@"Copying {0}\{1}", target.FullName, fi.Name);
+                Dispatcher.Invoke(() =>
+                {
+                    logText.Text += "Copying " + source.FullName + "\\" + fi.Name + "\n";
+                });
                 _ = fi.CopyTo(Path.Combine(target.ToString(), fi.Name), true);
             }
             foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
@@ -322,6 +240,10 @@ namespace WinArch
         public void MountArchIso()
         {
             UpdateProgress(true, "Copying Archlinux files to the new partition", null);
+            Dispatcher.Invoke(() =>
+            {
+                logText.Text += "------Copying Archlinux installation files------\n";
+            });
             Process process = new();
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
@@ -332,7 +254,6 @@ namespace WinArch
             process.StartInfo.Arguments = "mountvol.exe U: (Mount-DiskImage -ImagePath " + Path.GetTempPath() + "arch.iso -NoDriveLetter | Get-Volume).UniqueId";
             process.Exited += (s, e) =>
             {
-                Debug.WriteLine("============Copying===========");
                 CopyAll(new DirectoryInfo(@"U:\sysresccd\"), new DirectoryInfo(@"L:\sysresccd\"));
                 UpdateProgressFull(4);
                 InstallGrub();
@@ -358,6 +279,7 @@ namespace WinArch
         {
             Dispatcher.Invoke(() =>
             {
+                logText.Text += "------Installing GRUB------\n";
                 UpdateProgress(true, "Installing GRUB", null);
             });
             ZipArchive archive = new(File.OpenRead(Path.GetTempPath() + "grub.zip"));
@@ -378,7 +300,7 @@ namespace WinArch
             else
             {
                 Mountefi();
-                process.StartInfo.Arguments = "--bootloader-id=GRUB --boot-directory=L:\\boot --target=x86_64-efi --efi-directory=Z:\\";
+                process.StartInfo.Arguments = "--bootloader-id=GRUB --boot-directory=Z:\\ --target=x86_64-efi --efi-directory=Z:\\";
             }
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
@@ -387,14 +309,18 @@ namespace WinArch
             process.EnableRaisingEvents = true;
             process.Exited += (s, e) =>
             {
+                Dispatcher.Invoke(() =>
+                {
+                    logText.Text += process.StandardOutput + "\n";
+                });
                 string[] lines = {
                 "menuentry 'SystemRescue' {",
                 "insmod gzio",
                 "insmod part_gpt",
                 "insmod part_msdos",
                 "insmod exfat",
-                "search --no-floppy --label PREARCH --set=root",
-                "linux /sysresccd/boot/x86_64/vmlinuz archisobasedir=sysresccd archisolabel=PREARCH copytoram setkmap=us ar_nowait",
+                "search --no-floppy --label ARCH --set=root",
+                "linux /sysresccd/boot/x86_64/vmlinuz archisobasedir=sysresccd archisolabel=ARCH copytoram setkmap=us ar_nowait ar_nofail",
                 "initrd /sysresccd/boot/x86_64/sysresccd.img",
                 "}",
                 "if [\"x${timeout}\" != \"x-1\"]; then",
@@ -411,7 +337,11 @@ namespace WinArch
                 "fi",
                 "fi",
                 };
-                File.WriteAllLines(@"L:\boot\grub\grub.cfg", lines);
+                if (!Directory.Exists(@"Z:\grub"))
+                {
+                    _ = Directory.CreateDirectory(@"Z:\grub");
+                }
+                File.WriteAllLines(@"Z:\grub\grub.cfg", lines);
                 UpdateProgressFull(5);
                 SetupSystem();
             };
@@ -445,8 +375,34 @@ namespace WinArch
             };
             File.WriteAllLines(@"L:\autorun", lines);
             File.AppendAllLines(@"L:\autorun", autorun);
-            Process.Start("reg.exe", "ADD \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power\" /V HiberbootEnabled /T REG_dWORD /D 1 /F");
+            Dispatcher.Invoke(() =>
+            {
+                logText.Text += "------Creating linux autorun file------\n";
+                logText.Text += File.ReadAllText(@"L:\autorun") + "\n";
+            });
             UpdateProgressFull(6);
+            Cleanup();
+        }
+        public void Cleanup()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                UpdateProgress(true, "Cleaning things up", null);
+            });
+            Process.Start("mountvol.exe", "Z: /D");
+            Process.Start("mountvol.exe", "L: /D");
+            Process.Start("mountvol.exe", "U: /D");
+            Dispatcher.Invoke(() =>
+            {
+                logText.Text += "------Unmounted ESP, Linux Partition and Archiso------\n";
+            });
+            Process.Start("reg.exe", "ADD \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power\" /V HiberbootEnabled /T REG_dWORD /D 1 /F");
+            Process.Start("powercfg.exe", "/H off");
+            Dispatcher.Invoke(() =>
+            {
+                logText.Text += "------Disabled Fast Startup and Hibernation------\n";
+            });
+            UpdateProgressFull(7);
             Dispatcher.Invoke(() =>
             {
                 _ = NavigationService.Navigate(new Uri("Finish.xaml", UriKind.Relative));
@@ -466,11 +422,36 @@ namespace WinArch
         }
         public void UpdateProgressFull(float currentPercentage)
         {
-            taskpercentage = currentPercentage * 100 / 6;
+            taskpercentage = currentPercentage * 100 / 7;
             Dispatcher.Invoke(() =>
             {
                 progressTotal.Value = taskpercentage;
             });
+        }
+
+        private void ScrollViewer_ScrollChanged(Object sender, ScrollChangedEventArgs e)
+        {
+            // User scroll event : set or unset auto-scroll mode
+            if (e.ExtentHeightChange == 0)
+            {   // Content unchanged : user scroll event
+                if (Scroller.VerticalOffset == Scroller.ScrollableHeight)
+                {   // Scroll bar is in bottom
+                    // Set auto-scroll mode
+                    AutoScroll = true;
+                }
+                else
+                {   // Scroll bar isn't in bottom
+                    // Unset auto-scroll mode
+                    AutoScroll = false;
+                }
+            }
+
+            // Content scroll event : auto-scroll eventually
+            if (AutoScroll && e.ExtentHeightChange != 0)
+            {   // Content changed and auto-scroll mode set
+                // Autoscroll
+                Scroller.ScrollToVerticalOffset(Scroller.ExtentHeight);
+            }
         }
     }
 }

@@ -8,9 +8,9 @@ if ! ping -c2 google.com >/dev/null 2>&1; then
 	fi
 fi
 timedatectl set-ntp true
-dialog --colors --infobox "\Z2Wait\Zn : Formatting partitions" 10 50
-mkfs.ext4 -q -L Arch /dev/disk/by-label/Arch
-mount -L Arch /mnt
+dialog --colors --infobox "\Z2Wait\Zn : Formatting partitions" 50 100
+mkfs.ext4 -q -L ARCH /dev/disk/by-label/ARCH | dialog --progressbox 50 100
+mount -L ARCH /mnt
 if [ -d /sys/firmware/efi/efivars ]; then
 	mkdir -p /mnt/boot
 	drive="/dev/$(lsblk -ndo pkname $(findmnt /mnt -o SOURCE -un))"
@@ -23,32 +23,34 @@ case $desktop in
 	budgie) export packages=(budgie-desktop gnome gnome-software-packagekit-plugin lightdm lightdm-webkit2-greeter lightdm-webkit-theme-litarvan);;
 	cinnamon) export packages=(cinnamon lightdm lightdm-slick-greeter);;
 	pantheon) export packages=(pantheon lightdm ligthdm-pantheon-greeter);;
-	deepin) export packages=(deepin deepin-extra lightdm deepin-session-shell);;
+	dde) export packages=(deepin deepin-extra lightdm deepin-session-shell);;
 esac
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Wait\Zn : Installing packages" 10 50
-pacstrap /mnt linux base base-devel networkmanager bluez bash-completion $packages grub os-prober | tee -a /mnt/installer.log
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Wait\Zn : Editing fstab" 10 50
-genfstab -U /mnt | tee -a /mnt/etc/fstab | tee -a /mnt/installer.log
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Wait\Zn : Setting hostname" 10 50
-cat <<- EOF | arch-chroot /mnt
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Wait\Zn : Installing packages" 50 100
+pacstrap /mnt linux base base-devel networkmanager bluez bash-completion $packages grub os-prober efibootmgr | dialog --progressbox 50 100
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Wait\Zn : Editing fstab" 50 100
+genfstab -U /mnt | tee -a /mnt/etc/fstab | dialog --progressbox 50 100
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Wait\Zn : Setting hostname" 50 100
+cat <<- EOF | arch-chroot /mnt | dialog --progressbox 50 100
 	echo "$hostname" | tee /etc/hostname
 EOF
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\Z2Wait\Zn : Configuring locale" 10 50
-cat <<- EOF | arch-chroot /mnt
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Wait\Zn : Configuring locale" 50 100
+cat <<- EOF | arch-chroot /mnt | dialog --progressbox 50 100
 	echo "$language" | tee -a /etc/locale.gen
 	locale-gen
 	echo "LANG=$(echo $language | cut -d' ' -f1)" | tee -a /etc/locale.conf
 	echo "KEYMAP=$keymap" | tee /etc/vconsole.conf
 	ln -svf /usr/share/zoneinfo/$timezone /etc/localtime
 EOF
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\Z2Done\Zn : Configuring locale\Z2Wait\Zn : Configuring user" 10 50
-cat <<- EOF | arch-chroot /mnt
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Done\Zn : Configuring locale\n\Z2Wait\Zn : Configuring users" 50 100
+cat <<- EOF | arch-chroot /mnt | dialog --progressbox 50 100
 	useradd -mG wheel,sys "$unamesys"
 	echo -e "$password\n$password" | passwd "$unamesys"
 	chfn -f "$uname" "$unamesys"
+	rand=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
+	echo -e "$rand\n$rand" | passwd root
 EOF
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\Z2Done\Zn : Configuring locale\Z2Done\Zn : Configuring user\Z2Wait\Zn : Configuring system services" 10 50
-cat <<- EOF | arch-chroot /mnt
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Done\Zn : Configuring locale\n\Z2Done\Zn : Configuring user\n\Z2Wait\Zn : Configuring system services" 50 100
+cat <<- EOF | arch-chroot /mnt | dialog --progressbox 50 100
 	for dm in lightdm gdm sddm; do
 		if type $dm >/dev/null 2>&1; then
 			systemctl enable $dm
@@ -56,21 +58,15 @@ cat <<- EOF | arch-chroot /mnt
 	done
 	systemctl enable NetworkManager bluetooth
 EOF
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\Z2Done\Zn : Configuring locale\Z2Done\Zn : Configuring user\Z2Done\Zn : Configuring system services\Z2Wait\Zn : Configuring details" 10 50
-cat <<- EOF | arch-chroot /mnt
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Done\Zn : Configuring locale\n\Z2Done\Zn : Configuring user\n\Z2Done\Zn : Configuring system services\n\Z2Wait\Zn : Configuring details" 50 100
+cat <<- EOF | arch-chroot /mnt | dialog --progressbox 50 100
 	echo -e "127.0.0.1	localhost\n::1		localhost\n127.0.1.1	$hostname" | tee -a /etc/hosts
 	echo -e "%wheel ALL=(ALL) ALL" | tee -a /etc/sudoers
 EOF
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\Z2Done\Zn : Configuring locale\Z2Done\Zn : Configuring user\Z2Done\Zn : Configuring system services\Z2Done\Zn : Configuring details\Z2Wait\Zn : Installing bootloader" 10 50
-cat <<- EOF | arch-chroot /mnt
-	if [-d /sys/firmware/efi/efivars]; then
-		grub-install --target=x86_64-efi --efi-directory /boot --bootloader-id=GRUB
-	else
-		drive="/dev/$(lsblk -ndo pkname $(findmnt / -o SOURCE -un))"
-		grub-install $drive
-	fi
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Done\Zn : Configuring locale\n\Z2Done\Zn : Configuring user\n\Z2Done\Zn : Configuring system services\n\Z2Done\Zn : Configuring details\n\Z2Wait\Zn : Installing bootloader" 50 100
+cat <<- EOF | arch-chroot /mnt | dialog --progressbox 50 100
 	echo "GRUB_DISABLE_OS_PROBER=false" | tee -a /etc/default/grub
 	grub-mkconfig -o /boot/grub/grub.cfg
 EOF
-dialog --infobox "Everything should be installed now, press Enter to reboot" 20 50
+dialog --infobox "Everything should be installed now, press Enter to reboot" 50 100
 systemctl reboot

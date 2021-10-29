@@ -40,10 +40,29 @@ namespace WinArch
         {
             InitializeComponent();
             Mouse.OverrideCursor = Cursors.Wait;
-            biosmode = (string)Application.Current.Properties["biosmode"];
-            MainFunction();
+            GetBIOSMode();
         }
+        public void GetBIOSMode()
+        {
+            Process process = new();
+            process.StartInfo.FileName = "powershell.exe";
+            process.StartInfo.Arguments = "-Command echo $(Get-ComputerInfo).BiosFirmwareType";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.CreateNoWindow = true;
+            process.EnableRaisingEvents = true;
+            process.Exited += (s, e) =>
+            {
+                string output = Regex.Replace(process.StandardOutput.ReadToEnd(), "\\s", "").ToUpper();
+                Application.Current.Properties["biosmode"] = output;
+                biosmode = output;
+                Debug.WriteLine(biosmode);
+                MainFunction();
+            };
+            _ = process.Start();
 
+        }
         private void IsDiskInstallable(string partname)
         {
             Process process = new Process();

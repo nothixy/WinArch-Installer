@@ -34,12 +34,23 @@
             </TabItem>
             <TabItem Header="Windows software">
                 <Grid Background="#FFA2A2A2">
-                    <Image x:Name="image1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/epic-games-store.png"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="341*"/>
+                        <ColumnDefinition Width="433*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image x:Name="image1" Source="/Resources/epic-games-store.png" Grid.ColumnSpan="2"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Virtual machines">
                 <Grid Background="#FFA2A2A2">
                     <Image x:Name="image2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/virt-manager.png"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Installer logs">
+                <Grid Background="#FFA2A2A2">
+                    <ScrollViewer ScrollChanged="ScrollViewer_ScrollChanged" x:Name="Scroller">
+                        <TextBlock x:Name="logText" TextWrapping="Wrap" Text=""/>
+                    </ScrollViewer>
                 </Grid>
             </TabItem>
         </TabControl>

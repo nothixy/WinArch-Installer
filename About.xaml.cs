@@ -36,7 +36,7 @@ namespace WinArch
         public void Next(object sender, EventArgs e)
         {
             NavigationService nav = NavigationService;
-            nav.Navigate(new Uri("Secureboot.xaml", UriKind.Relative));
+            nav.Navigate(new Uri("Partitioning.xaml", UriKind.Relative));
         }
         public void Scroller_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {

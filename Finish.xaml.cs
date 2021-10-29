@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Diagnostics;
+using System;
 
 namespace WinArch
 {
@@ -12,17 +14,55 @@ namespace WinArch
         public Finish()
         {
             InitializeComponent();
-            secureboot = (bool)Application.Current.Properties["secureboot"];
+            Main();
         }
+        public void Main()
+        {
+            GetSecureBootStatus();
+        }
+        public void GetSecureBootStatus()
+        {
+            Process process = new();
+            process.StartInfo.FileName = "powershell.exe";
+            process.StartInfo.Arguments = "Confirm-SecureBootUEFI";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.CreateNoWindow = true;
+            process.EnableRaisingEvents = true;
+            process.Exited += (s, e) =>
+            {
+                string output = process.StandardOutput.ReadToEnd();
+                Debug.WriteLine("Secure Boot : " + output);
+                if (output == "True")
+                {
+                    secureboot = true;
+                    Reminder.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    secureboot = false;
+                }
+                Dispatcher.Invoke(() =>
+                {
+                    ButtonRebootLater.IsEnabled = true;
+                    ButtonRebootNow.IsEnabled = true;
+                });
+
+            };
+            _ = process.Start();
+
+        }
+
         private void ButtonRebootNow_Click(object sender, RoutedEventArgs e)
         {
             if (secureboot)
             {
-                System.Diagnostics.Process.Start("shutdown.exe", "/r /fw /t 120");
+                Process.Start("shutdown.exe", "/r /fw /t 60");
             }
             else
             {
-                System.Diagnostics.Process.Start("shutdown.exe", "/r /t 120");
+                Process.Start("shutdown.exe", "/r /t 60");
             }
             Application.Current.Shutdown();
         }
