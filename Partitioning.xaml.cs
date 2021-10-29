@@ -166,10 +166,7 @@ namespace WinArch
                 TextBoxSize.Text = Math.Round(spaceleft_mb / Math.Pow(1024, Unit.SelectedIndex), 0).ToString();
             }
             float spaceneeded = (float)(float.Parse(TextBoxSize.Text) * Math.Pow(1024, Unit.SelectedIndex));
-            if ((bool)checkBox.IsChecked)
-            {
-                Application.Current.Properties["SpaceRequired"] = spaceneeded;
-            }
+            Application.Current.Properties["SpaceRequired"] = spaceneeded;
             Application.Current.Properties["Repartition"] = checkBox.IsChecked;
             Application.Current.Properties["Volume"] = comboBox.SelectedItem;
             NavigationService nav = NavigationService;
