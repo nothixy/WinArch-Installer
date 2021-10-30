@@ -37,7 +37,8 @@
             <PasswordBox x:Name="pwdBox2" HorizontalAlignment="Center" Margin="0,268,0,0" VerticalAlignment="Top" Width="200" RenderTransformOrigin="0.505,0.557" Cursor="IBeam"/>
             <TextBlock x:Name="idempty" HorizontalAlignment="Center" Margin="0,78,0,0" Text="User ID cannot be empty" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="Red" Visibility="Hidden"/>
             <TextBlock x:Name="idregex" HorizontalAlignment="Center" Margin="0,78,0,0" Text="User ID can only contain lowercase letters and numbers" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="Red" Visibility="Hidden"/>
-            <TextBlock x:Name="passwordmatch" HorizontalAlignment="Center" Margin="0,268,0,0" Text="Passwords do not match" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="Red" Visibility="Hidden"/>
+            <TextBlock x:Name="passwordmatch" HorizontalAlignment="Center" Margin="0,288,0,0" Text="Passwords do not match" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="Red" Visibility="Hidden"/>
+            <TextBlock x:Name="passwordempty" HorizontalAlignment="Center" Margin="0,288,0,0" Text="Password cannot be empty" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="Red" Visibility="Hidden"/>
         </Grid>
         <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">
             <Button Width="60" Content="Go back" HorizontalAlignment="Right" Margin="0,0,75,0" VerticalAlignment="Center" Click="Previous"/>

@@ -43,7 +43,9 @@ dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Inst
 cat <<- EOF | arch-chroot /mnt > /dev/tty2 2>&1
 	useradd -mG wheel,sys "$unamesys"
 	echo -e "$password\n$password" | passwd "$unamesys"
-	chfn -f "$uname" "$unamesys"
+	if [ $uname != "" ]; then
+		chfn -f "$uname" "$unamesys"
+	fi
 	rand=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
 	echo -e "$rand\n$rand" | passwd root
 EOF

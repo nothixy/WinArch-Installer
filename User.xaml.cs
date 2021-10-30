@@ -39,6 +39,7 @@ namespace WinArch
             idempty.Visibility = Visibility.Hidden;
             idregex.Visibility = Visibility.Hidden;
             passwordmatch.Visibility = Visibility.Hidden;
+            passwordempty.Visibility = Visibility.Hidden;
             if (string.IsNullOrEmpty(unamesysBox.Text))
             {
                 idempty.Visibility = Visibility.Visible;
@@ -54,14 +55,13 @@ namespace WinArch
                 passwordmatch.Visibility = Visibility.Visible;
                 return;
             }
-            if (!string.IsNullOrEmpty(pwdBox1.Password))
+            if (string.IsNullOrEmpty(pwdBox1.Password))
             {
-                Application.Current.Properties["Password"] = pwdBox1.Password;
+                passwordempty.Visibility = Visibility.Visible;
+                return;
             }
-            if (!string.IsNullOrEmpty(unameBox.Text))
-            {
-                Application.Current.Properties["Uname"] = unameBox.Text;
-            }
+            Application.Current.Properties["Password"] = pwdBox1.Password;
+            Application.Current.Properties["Uname"] = unameBox.Text;
             Application.Current.Properties["UnameSys"] = unamesysBox.Text;
             _ = NavigationService.Navigate(new Uri("Desktop.xaml", UriKind.Relative));
         }
