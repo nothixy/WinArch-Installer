@@ -10,7 +10,6 @@ namespace WinArch
     /// </summary>
     public partial class Finish : Page
     {
-        //ADD UEFI DETECTION FFS
         bool secureboot;
         public Finish()
         {
