@@ -35,7 +35,6 @@ namespace WinArch
     {
         private double taskpercentage;
         private readonly float spaceleft_mb;
-        private readonly string biosmode;
         private readonly bool repartition;
         private readonly string volume;
         private readonly string hostname;
@@ -50,7 +49,6 @@ namespace WinArch
         public Slideshow()
         {
             InitializeComponent();
-            biosmode = (string)Application.Current.Properties["biosmode"];
             spaceleft_mb = (float)Application.Current.Properties["SpaceRequired"];
             repartition = (bool)Application.Current.Properties["Repartition"];
             volume = (string)Application.Current.Properties["Volume"];
@@ -294,18 +292,11 @@ namespace WinArch
             _ = Directory.CreateDirectory(Path.GetTempPath() + "grub");
             archive.ExtractToDirectory(Path.GetTempPath() + "grub");
             string[] dirs = Directory.GetDirectories(Path.GetTempPath() + "grub");
+            Mountefi();
             Process process = new();
             Debug.WriteLine("PATH : " + @dirs[0] + @"\grub-install.exe");
             process.StartInfo.FileName = @dirs[0] + @"\grub-install.exe";
-            if (biosmode == "BIOS")
-            {
-                process.StartInfo.Arguments = "--boot-directory=L:\\boot --target=i386-pc //./PHYSICALDRIVE0";
-            }
-            else
-            {
-                Mountefi();
-                process.StartInfo.Arguments = "--bootloader-id=GRUB --boot-directory=Z:\\ --target=x86_64-efi --efi-directory=Z:\\";
-            }
+            process.StartInfo.Arguments = "--bootloader-id=GRUB --boot-directory=Z:\\ --target=x86_64-efi --efi-directory=Z:\\";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
@@ -318,16 +309,16 @@ namespace WinArch
                     logText.Text += process.StandardOutput + "\n";
                 });
                 string[] lines = {
-                "menuentry 'SystemRescue' {",
-                "insmod gzio",
-                "insmod part_gpt",
-                "insmod part_msdos",
-                "insmod exfat",
-                "search --no-floppy --label ARCH --set=root",
-                "linux /sysresccd/boot/x86_64/vmlinuz archisobasedir=sysresccd archisolabel=ARCH copytoram setkmap=us ar_nowait ar_nofail",
-                "initrd /sysresccd/boot/x86_64/sysresccd.img",
-                "}",
-                "set timeout = 1",
+                    "menuentry 'SystemRescue' {",
+                    "insmod gzio",
+                    "insmod part_gpt",
+                    "insmod part_msdos",
+                    "insmod exfat",
+                    "search --no-floppy --label ARCH --set=root",
+                    "linux /sysresccd/boot/x86_64/vmlinuz archisobasedir=sysresccd archisolabel=ARCH copytoram setkmap=us ar_nowait ar_nofail",
+                    "initrd /sysresccd/boot/x86_64/sysresccd.img",
+                    "}",
+                    "set timeout = 1",
                 };
                 if (!Directory.Exists(@"Z:\grub"))
                 {
@@ -420,28 +411,22 @@ namespace WinArch
                 progressTotal.Value = taskpercentage;
             });
         }
-
         private void ScrollViewer_ScrollChanged(Object sender, ScrollChangedEventArgs e)
         {
-            // User scroll event : set or unset auto-scroll mode
             if (e.ExtentHeightChange == 0)
-            {   // Content unchanged : user scroll event
+            {
                 if (Scroller.VerticalOffset == Scroller.ScrollableHeight)
-                {   // Scroll bar is in bottom
-                    // Set auto-scroll mode
+                {
                     AutoScroll = true;
                 }
                 else
-                {   // Scroll bar isn't in bottom
-                    // Unset auto-scroll mode
+                {
                     AutoScroll = false;
                 }
             }
 
-            // Content scroll event : auto-scroll eventually
             if (AutoScroll && e.ExtentHeightChange != 0)
-            {   // Content changed and auto-scroll mode set
-                // Autoscroll
+            {
                 Scroller.ScrollToVerticalOffset(Scroller.ExtentHeight);
             }
         }

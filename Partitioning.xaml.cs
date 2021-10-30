@@ -32,8 +32,6 @@ namespace WinArch
     {
         private float spaceleft;
         private float spaceleft_mb;
-        private bool canInstall;
-        private string biosmode;
         private readonly int minimalSpaceRequired = 2500;
         private bool returncode;
         public Partitioning()
@@ -55,37 +53,55 @@ namespace WinArch
             process.Exited += (s, e) =>
             {
                 string output = Regex.Replace(process.StandardOutput.ReadToEnd(), "\\s", "").ToUpper();
-                Application.Current.Properties["biosmode"] = output;
-                biosmode = output;
-                Debug.WriteLine(biosmode);
-                MainFunction();
+                if (output != "UEFI")
+                {
+                    string messageBoxText = "Error : this tool is made for UEFI machines only";
+                    string caption = "Requirement error";
+                    MessageBoxButton button = MessageBoxButton.OK;
+                    MessageBoxImage icon = MessageBoxImage.Error;
+                    _ = MessageBox.Show(messageBoxText, caption, button, icon);
+                    Dispatcher.Invoke(() =>
+                    {
+                        Application.Current.Shutdown();
+                    });
+                }
+                IsDiskInstallable();
             };
-            _ = process.Start();
+            process.Start();
 
         }
-        private void IsDiskInstallable(string partname)
+        private void IsDiskInstallable()
         {
             Process process = new Process();
             process.StartInfo.FileName = "powershell.exe";
-            process.StartInfo.Arguments = biosmode == "BIOS"
-                ? "if ((Get-partition -DiskNumber ((Get-Partition -DriveLetter " + partname + ").DiskNumber)).PartitionNumber -contains 0) { ((Get-Partition -DriveLetter " + partname + ").Offset -ge (Get-Partition -PartitionNumber 0).Offset -and (Get-Partition -DriveLetter " + partname + ").Offset -lt ((Get-Partition -PartitionNumber 0).Offset + (Get-Partition -PartitionNumber 0).Size)) } else { if (((Get-partition -DiskNumber ((Get-Partition -DriveLetter C).DiskNumber)).PartitionNumber | Measure-Object -line).Lines -gt 3) { echo False } else { echo True }}"
-                : @"-executionpolicy unrestricted (Get-Volume | where-object {$_.Path -eq ((Get-Partition -DiskNumber 0) | where-object {$_.GptType -eq '{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}'}).AccessPaths[-1]}).SizeRemaining -gt 50000000";
+            process.StartInfo.Arguments = "(Get-Volume | where-object {$_.Path -eq ((Get-Partition -DiskNumber 0) | where-object {$_.GptType -eq '{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}'}).AccessPaths[-1]}).SizeRemaining -gt 50000000";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.CreateNoWindow = true;
             process.EnableRaisingEvents = true;
-            process.Start();
-            process.WaitForExit();
-            returncode = bool.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
-            if (returncode)
+            process.Exited += (s, e) =>
             {
-                Dispatcher.Invoke(() =>
+                returncode = bool.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
+                if (returncode)
                 {
-                    _ = comboBox.Items.Add(partname);
-                });
-                canInstall = true;
-            }
+                    MainFunction();
+                }
+                else
+                {
+                    string messageBoxText = "Error : not enough space left on the ESP, please make some and try again";
+                    string caption = "Requirement error";
+                    MessageBoxButton button = MessageBoxButton.OK;
+                    MessageBoxImage icon = MessageBoxImage.Error;
+                    _ = MessageBox.Show(messageBoxText, caption, button, icon);
+                    Dispatcher.Invoke(() =>
+                    {
+                        Application.Current.Shutdown();
+                    });
+                }
+            };
+            process.Start();
+
         }
         public void MainFunction()
         {
@@ -106,16 +122,24 @@ namespace WinArch
                 {
                     if (((float)d.TotalSize / (1024 * 1024)) >= minimalSpaceRequired)
                     {
-                        IsDiskInstallable(d.Name.Substring(0, 1));
+                        Dispatcher.Invoke(() =>
+                        {
+                            comboBox.Items.Add(d.Name[..1]);
+                        });
                     }
                 }
             }
-            if (!canInstall)
+            if (comboBox.Items.Count == 0)
             {
-                Dispatcher.Invoke(() =>
-                {
-                    err.Visibility = Visibility.Visible;
-                });
+                    string messageBoxText = "Error : not enough space left on any partition, please make some and try again";
+                    string caption = "Requirement error";
+                    MessageBoxButton button = MessageBoxButton.OK;
+                    MessageBoxImage icon = MessageBoxImage.Error;
+                    _ = MessageBox.Show(messageBoxText, caption, button, icon);
+                    Dispatcher.Invoke(() =>
+                    {
+                        Application.Current.Shutdown();
+                    });
             };
             Dispatcher.Invoke(() =>
             {
@@ -133,7 +157,7 @@ namespace WinArch
 
         private void Unit_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            SizeSlider.Minimum = Math.Round((long)minimalSpaceRequired / Math.Pow(1024, Unit.SelectedIndex), 0);
+            SizeSlider.Minimum = Math.Round(minimalSpaceRequired / Math.Pow(1024, Unit.SelectedIndex), 0);
             SizeSlider.Maximum = Math.Round((long)spaceleft_mb / Math.Pow(1024, Unit.SelectedIndex), 0);
             SizeSlider.Value = SizeSlider.Minimum;
         }
@@ -175,6 +199,30 @@ namespace WinArch
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            DriveInfo[] drives = DriveInfo.GetDrives();
+            foreach (DriveInfo d in drives)
+            {
+                if (d.Name[..1].ToString() == comboBox.SelectedItem.ToString())
+                {
+                    spaceleft = d.AvailableFreeSpace;
+                    if (d.Name[..1].ToString() == "C")
+                    {
+                        comboBox.Items.Remove("C");
+                        if (comboBox.Items.Count == 0)
+                        {
+                            string messageBoxText = "Error : not enough space left on any partition, please make some and try again";
+                            string caption = "Requirement error";
+                            MessageBoxButton button = MessageBoxButton.OK;
+                            MessageBoxImage icon = MessageBoxImage.Error;
+                            _ = MessageBox.Show(messageBoxText, caption, button, icon);
+                            Dispatcher.Invoke(() =>
+                            {
+                                Application.Current.Shutdown();
+                            });
+                        }
+                    };
+                }
+            }
             if (comboBox.SelectedItem.ToString() == "C")
             {
                 checkBox.IsChecked = true;
@@ -184,14 +232,6 @@ namespace WinArch
             {
                 checkBox.IsEnabled = true;
             }
-            DriveInfo[] drives = DriveInfo.GetDrives();
-            foreach (DriveInfo d in drives)
-            {
-                if (d.Name.Substring(0, 1).ToString() == comboBox.SelectedItem.ToString())
-                {
-                    spaceleft = d.AvailableFreeSpace;
-                }
-            }
 
             spaceleft_mb = spaceleft / (1024 * 1024);
             if (spaceleft_mb < 1024 * 1024)
@@ -200,11 +240,8 @@ namespace WinArch
             }
             if (spaceleft_mb < minimalSpaceRequired)
             {
-                string messageBoxText = "Error : you don't have enough free space on this partition, please make space and try again";
-                string caption = "Requirement error";
-                MessageBoxButton button = MessageBoxButton.OK;
-                MessageBoxImage icon = MessageBoxImage.Error;
-                _ = MessageBox.Show(messageBoxText, caption, button, icon);
+                checkBox.IsChecked = false;
+                checkBox.IsEnabled = false;
             }
             SizeSlider.Maximum = spaceleft_mb;
         }

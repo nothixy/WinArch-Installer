@@ -10,6 +10,7 @@ namespace WinArch
     /// </summary>
     public partial class Finish : Page
     {
+        //ADD UEFI DETECTION FFS
         bool secureboot;
         public Finish()
         {
@@ -32,7 +33,7 @@ namespace WinArch
             process.EnableRaisingEvents = true;
             process.Exited += (s, e) =>
             {
-                string output = process.StandardOutput.ReadToEnd();
+                string output = process.StandardOutput.ReadToEnd().Trim();
                 Debug.WriteLine("Secure Boot : " + output);
                 if (output == "True")
                 {
