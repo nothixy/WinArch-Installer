@@ -16,7 +16,7 @@ mkdir -p /mnt/boot
 drive="/dev/$(lsblk -ndo pkname $(findmnt /mnt -o SOURCE -un))"
 device="$(fdisk -l $device -o Device,Type | grep "EFI System" | cut -d' ' -f1)"
 mount "$device" /mnt/boot
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Wait\Zn : Installing packages" 20 5
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Wait\Zn : Installing packages" 20 50
 case $desktop in
 	gnome) pacstrap /mnt gnome-software-packagekit-plugin gnome gdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg > /dev/tty2 2>&1; export dm=gdm;;
 	kde) pacstrap /mnt plasma dolphin konsole discover packagekit-qt5 plasma-wayland-session sddm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg > /dev/tty2 2>&1; export dm=sddm;;
