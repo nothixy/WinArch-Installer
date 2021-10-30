@@ -8,12 +8,12 @@ stages:
 build:
   stage: build
   script:
-    - dotnet build
+    - dotnet build ./WinArch.csproj
 
 test:
   stage: test
   script:
-    - dotnet test
+    - dotnet test ./WinArch.csproj
 
 release:
   stage: release
@@ -23,4 +23,4 @@ release:
     paths:
       - publish/
   script:
-    - dotnet publish -c Release -o publish -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -p:DebugType=None .\WinArch.csproj
+    - dotnet publish -c Release -o publish -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -p:DebugType=None ./WinArch.csproj
