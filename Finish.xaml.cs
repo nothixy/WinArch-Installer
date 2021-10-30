@@ -74,7 +74,7 @@ namespace WinArch
         private void ButtonRebootNow_Click(object sender, RoutedEventArgs e)
         {
             Process process = new();
-            process.StartInfo.FileName = "powershell.exe";
+            process.StartInfo.FileName = "shutdown.exe";
             process.StartInfo.Arguments = secureboot ? "/r /fw /t 60" : "/r /t 60";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
