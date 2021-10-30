@@ -1,17 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
@@ -22,7 +12,7 @@ namespace WinArch
     /// </summary>
     public partial class Secureboot : Page
     {
-        string biosmode;
+        private string biosmode;
         public Secureboot()
         {
             InitializeComponent();
@@ -40,19 +30,19 @@ namespace WinArch
             process.EnableRaisingEvents = true;
             process.Exited += (s, e) =>
             {
-                string output = Regex.Replace(process.StandardOutput.ReadToEnd(), "\\s", "").ToUpper();
+                string output = Regex.Replace(process.StandardOutput.ReadToEnd(), "\\s", "").ToUpper(System.Globalization.CultureInfo.InvariantCulture);
                 Application.Current.Properties["biosmode"] = output;
                 biosmode = output;
                 Debug.WriteLine(biosmode);
                 if (biosmode == "UEFI")
                 {
                     GetSecureBootStatus();
-                } 
+                }
                 else
                 {
                     Dispatcher.Invoke(() =>
                     {
-                        NavigationService.Navigate(new Uri("Partitioning.xaml", UriKind.Relative));
+                        _ = NavigationService.Navigate(new Uri("Partitioning.xaml", UriKind.Relative));
 
                     });
                 }
@@ -74,17 +64,10 @@ namespace WinArch
             {
                 string output = process.StandardOutput.ReadToEnd();
                 Debug.WriteLine("Secure Boot : " + output);
-                if (output == "True")
-                {
-                    Application.Current.Properties["secureboot"] = true;
-                }
-                else
-                {
-                    Application.Current.Properties["secureboot"] = false;
-                }
+                Application.Current.Properties["secureboot"] = output == "True" ? true : (object)false;
                 Dispatcher.Invoke(() =>
                 {
-                    this.NavigationService.Navigate(new Uri("Partitioning.xaml", UriKind.Relative));
+                    _ = NavigationService.Navigate(new Uri("Partitioning.xaml", UriKind.Relative));
                 });
             };
             _ = process.Start();
@@ -92,7 +75,7 @@ namespace WinArch
 
         private void Previous(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new Uri("About.xaml", UriKind.Relative));
+            _ = NavigationService.Navigate(new Uri("About.xaml", UriKind.Relative));
         }
     }
 }

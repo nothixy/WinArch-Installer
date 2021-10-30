@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Path = System.IO.Path;
+using Microsoft.Win32;
 
 namespace WinArch
 {
@@ -162,7 +163,7 @@ namespace WinArch
             {
                 for (int i = 1; i < filenames.Count; i++)
                 {
-                    if (string.Compare(filenamemaster, filenames[i]).ToString() == "-1")
+                    if (string.Compare(filenamemaster, filenames[i], StringComparison.Ordinal) == -1)
                     {
                         filenamemaster = filenames[i];
                     }
@@ -217,7 +218,7 @@ namespace WinArch
         }
         public void CopyAll(DirectoryInfo source, DirectoryInfo target)
         {
-            if (source.FullName.ToLower() == target.FullName.ToLower())
+            if (source.FullName.ToLower(System.Globalization.CultureInfo.InvariantCulture) == target.FullName.ToLower(System.Globalization.CultureInfo.InvariantCulture))
             {
                 return;
             }
@@ -294,7 +295,6 @@ namespace WinArch
             string[] dirs = Directory.GetDirectories(Path.GetTempPath() + "grub");
             Mountefi();
             Process process = new();
-            Debug.WriteLine("PATH : " + @dirs[0] + @"\grub-install.exe");
             process.StartInfo.FileName = @dirs[0] + @"\grub-install.exe";
             process.StartInfo.Arguments = "--bootloader-id=GRUB --boot-directory=Z:\\ --target=x86_64-efi --efi-directory=Z:\\";
             process.StartInfo.UseShellExecute = false;
@@ -309,16 +309,28 @@ namespace WinArch
                     logText.Text += process.StandardOutput + "\n";
                 });
                 string[] lines = {
-                    "menuentry 'SystemRescue' {",
+                    "set timeout_style=menu",
+                    "set timeout = 1",
+                    "insmod efi_gop",
+                    "insmod efi_uga",
+                    "insmod ieee1275_fb",
+                    "insmod vbe",
+                    "insmod vga",
+                    "insmod video_bochs",
+                    "insmod video_cirrus",
+                    "menuentry 'Finish installing' {",
                     "insmod gzio",
                     "insmod part_gpt",
-                    "insmod part_msdos",
                     "insmod exfat",
                     "search --no-floppy --label ARCH --set=root",
-                    "linux /sysresccd/boot/x86_64/vmlinuz archisobasedir=sysresccd archisolabel=ARCH copytoram setkmap=us ar_nowait ar_nofail",
+                    "linux /sysresccd/boot/x86_64/vmlinuz archisobasedir=sysresccd archisolabel=ARCH copytoram setkmap=us ar_nowait ar_nofail quiet",
                     "initrd /sysresccd/boot/x86_64/sysresccd.img",
                     "}",
-                    "set timeout = 1",
+                    "menuentry 'Return to Windows' {",
+                    "insmod part_gpt",
+                    "insmod fat",
+                    "chainloader /EFI/Microsoft/Boot/bootmgfw.efi",
+                    "}",
                 };
                 if (!Directory.Exists(@"Z:\grub"))
                 {
@@ -372,15 +384,26 @@ namespace WinArch
             {
                 UpdateProgress(true, "Cleaning things up", null);
             });
-            Process.Start("mountvol.exe", "Z: /D");
-            Process.Start("mountvol.exe", "L: /D");
-            Process.Start("mountvol.exe", "U: /D");
+            char[] letters = { 'L', 'U', 'Z' };
+            foreach (char letter in letters)
+            {
+                Process process = new();
+                process.StartInfo.FileName = "mountvol.exe";
+                process.StartInfo.Arguments = letter + ": /D";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.CreateNoWindow = true;
+                process.EnableRaisingEvents = true;
+                process.Start();
+                process.WaitForExit();
+            }
             Dispatcher.Invoke(() =>
             {
                 logText.Text += "------Unmounted ESP, Linux Partition and Archiso------\n";
             });
-            Process.Start("reg.exe", "ADD \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power\" /V HiberbootEnabled /T REG_dWORD /D 1 /F");
-            Process.Start("powercfg.exe", "/H off");
+            Registry.SetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Power", "HiberbootEnabled", 0, RegistryValueKind.DWord);
+            Registry.SetValue(@" HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power", "HibernateEnabled", 0, RegistryValueKind.DWord);
             Dispatcher.Invoke(() =>
             {
                 logText.Text += "------Disabled Fast Startup and Hibernation------\n";
@@ -411,18 +434,11 @@ namespace WinArch
                 progressTotal.Value = taskpercentage;
             });
         }
-        private void ScrollViewer_ScrollChanged(Object sender, ScrollChangedEventArgs e)
+        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             if (e.ExtentHeightChange == 0)
             {
-                if (Scroller.VerticalOffset == Scroller.ScrollableHeight)
-                {
-                    AutoScroll = true;
-                }
-                else
-                {
-                    AutoScroll = false;
-                }
+                AutoScroll = Scroller.VerticalOffset == Scroller.ScrollableHeight;
             }
 
             if (AutoScroll && e.ExtentHeightChange != 0)

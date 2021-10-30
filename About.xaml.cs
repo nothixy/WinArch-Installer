@@ -30,17 +30,15 @@ namespace WinArch
         }
         public void Previous(object sender, EventArgs e)
         {
-            NavigationService nav = NavigationService;
-            nav.Navigate(new Uri("Welcome.xaml", UriKind.Relative));
+            _ = NavigationService.Navigate(new Uri("Welcome.xaml", UriKind.Relative));
         }
         public void Next(object sender, EventArgs e)
         {
-            NavigationService nav = NavigationService;
-            nav.Navigate(new Uri("Partitioning.xaml", UriKind.Relative));
+            _ = NavigationService.Navigate(new Uri("Partitioning.xaml", UriKind.Relative));
         }
-        public void Scroller_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        public void ScrollerScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            var scrollViewer = (ScrollViewer)sender;
+            ScrollViewer scrollViewer = (ScrollViewer)sender;
             if (scrollViewer.VerticalOffset == scrollViewer.ScrollableHeight)
             {
                 ButtonNext.IsEnabled = true;

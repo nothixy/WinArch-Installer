@@ -25,10 +25,10 @@ namespace WinArch
     {
         public MainWindow()
         {
-            this.Dispatcher.UnhandledException += (s, e) =>
+            Dispatcher.UnhandledException += (s, e) =>
             {
-                using (StreamWriter sw = File.AppendText(Path.Combine(Path.GetTempPath() + "WinArch.log")))
-                    sw.WriteLine(e.Exception.ToString());
+                using StreamWriter sw = File.AppendText(Path.Combine(Path.GetTempPath() + "WinArch.log"));
+                sw.WriteLine(e.Exception.ToString());
             };
             InitializeComponent();
         }

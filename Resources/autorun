@@ -21,11 +21,11 @@ case $desktop in
 	kde) export packages=(plasma dolphin konsole discover packagekit-qt5 plasma-wayland-session); export dm=sddm;;
 	budgie) export packages=(budgie-desktop gnome gnome-software-packagekit-plugin lightdm-webkit-theme-litarvan lightdm-webkit2-greeter); export dm=lightdm; export greeter=lightdm-webkit2-greeter;;
 	cinnamon) export packages=(cinnamon gnome-software gnome-software-packagekit-plugin lightdm-slick-greeter); export dm=lightdm; export greeter=lightdm-slick-greeter;;
-	pantheon) export packages=(pantheon ligthdm-pantheon-greeter); export dm=lightdm; export greeter=ligthdm-pantheon-greeter;;
+	pantheon) export packages=(pantheon ligthdm-pantheon-greeter); export dm=lightdm; export greeter=io.elementary.greeter;;
 	dde) export packages=(deepin deepin-extra deepin-store deepin-session-shell); export dm=lightdm; export greeter=ligthdm-deepin-greeter;;
 esac
 dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Wait\Zn : Installing packages" 20 50
-pacstrap /mnt $packages $dm linux flatpak base base-devel networkmanager bluez firefox xterm bash-completion grub os-prober xorg > /dev/tty2 2>&1
+pacstrap /mnt $packages $dm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg > /dev/tty2 2>&1
 dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Wait\Zn : Editing fstab" 20 50
 genfstab -U /mnt | tee -a /mnt/etc/fstab > /dev/tty2 2>&1
 dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Wait\Zn : Setting hostname" 20 50

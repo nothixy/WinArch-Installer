@@ -46,7 +46,7 @@
             <Button Width="60" Content="Go back" HorizontalAlignment="Right" Margin="0,0,75,0" VerticalAlignment="Center" Click="Previous"/>
             <Button Width="60" x:Name="NextButton" Content="Next" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" Click="Next"/>
             <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="10,0,0,0" Text="Checking for installable volumes" TextWrapping="Wrap" VerticalAlignment="Center"/>
-            <ProgressBar x:Name="progressBar2" HorizontalAlignment="Stretch" Height="20" Margin="185,0,140,0" VerticalAlignment="Stretch"/>
+            <ProgressBar x:Name="progressBar2" IsIndeterminate="true" HorizontalAlignment="Stretch" Height="20" Margin="185,0,140,0" VerticalAlignment="Stretch"/>
         </Grid>
     </Grid>
 </Page>

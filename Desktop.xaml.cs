@@ -32,15 +32,13 @@ namespace WinArch
         }
         public void Previous(object sender, EventArgs e)
         {
-            NavigationService nav = NavigationService;
-            nav.Navigate(new Uri("User.xaml", UriKind.Relative));
+            _ = NavigationService.Navigate(new Uri("User.xaml", UriKind.Relative));
         }
         public void Next(object sender, EventArgs e)
         {
-            var btnchecked = GridTop.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked.Value);
+            RadioButton btnchecked = GridTop.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked.Value);
             Application.Current.Properties["Desktop"] = btnchecked.Name;
-            NavigationService nav = NavigationService;
-            nav.Navigate(new Uri("Slideshow.xaml", UriKind.Relative));
+            _ = NavigationService.Navigate(new Uri("Slideshow.xaml", UriKind.Relative));
         }
     }
 }

@@ -17,7 +17,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -52,7 +51,7 @@ namespace WinArch
             process.EnableRaisingEvents = true;
             process.Exited += (s, e) =>
             {
-                string output = Regex.Replace(process.StandardOutput.ReadToEnd(), "\\s", "").ToUpper();
+                string output = Regex.Replace(process.StandardOutput.ReadToEnd(), "\\s", "").ToUpper(System.Globalization.CultureInfo.CurrentUICulture);
                 if (output != "UEFI")
                 {
                     string messageBoxText = "Error : this tool is made for UEFI machines only";
@@ -67,12 +66,12 @@ namespace WinArch
                 }
                 IsDiskInstallable();
             };
-            process.Start();
+            _ = process.Start();
 
         }
         private void IsDiskInstallable()
         {
-            Process process = new Process();
+            Process process = new();
             process.StartInfo.FileName = "powershell.exe";
             process.StartInfo.Arguments = "(Get-Volume | where-object {$_.Path -eq ((Get-Partition -DiskNumber 0) | where-object {$_.GptType -eq '{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}'}).AccessPaths[-1]}).SizeRemaining -gt 50000000";
             process.StartInfo.UseShellExecute = false;
@@ -82,7 +81,7 @@ namespace WinArch
             process.EnableRaisingEvents = true;
             process.Exited += (s, e) =>
             {
-                returncode = bool.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(), "\\s", ""));
+                returncode = bool.Parse(Regex.Replace(process.StandardOutput.ReadToEnd().ToLower(System.Globalization.CultureInfo.CurrentUICulture), "\\s", ""));
                 if (returncode)
                 {
                     MainFunction();
@@ -100,46 +99,36 @@ namespace WinArch
                     });
                 }
             };
-            process.Start();
+            _ = process.Start();
 
         }
         public void MainFunction()
         {
             DriveInfo[] allDrives = DriveInfo.GetDrives();
-            Dispatcher.Invoke(() =>
-            {
-                progressBar2.IsIndeterminate = false;
-                progressBar2.Maximum = allDrives.Length;
-                progressBar2.Value = 0;
-            });
             foreach (DriveInfo d in allDrives)
             {
-                Dispatcher.Invoke(() =>
-                {
-                    progressBar2.Value++;
-                });
                 if (d.DriveType == DriveType.Fixed)
                 {
                     if (((float)d.TotalSize / (1024 * 1024)) >= minimalSpaceRequired)
                     {
                         Dispatcher.Invoke(() =>
                         {
-                            comboBox.Items.Add(d.Name[..1]);
+                            _ = comboBox.Items.Add(d.Name[..1]);
                         });
                     }
                 }
             }
             if (comboBox.Items.Count == 0)
             {
-                    string messageBoxText = "Error : not enough space left on any partition, please make some and try again";
-                    string caption = "Requirement error";
-                    MessageBoxButton button = MessageBoxButton.OK;
-                    MessageBoxImage icon = MessageBoxImage.Error;
-                    _ = MessageBox.Show(messageBoxText, caption, button, icon);
-                    Dispatcher.Invoke(() =>
-                    {
-                        Application.Current.Shutdown();
-                    });
+                string messageBoxText = "Error : not enough space left on any partition, please make some and try again";
+                string caption = "Requirement error";
+                MessageBoxButton button = MessageBoxButton.OK;
+                MessageBoxImage icon = MessageBoxImage.Error;
+                _ = MessageBox.Show(messageBoxText, caption, button, icon);
+                Dispatcher.Invoke(() =>
+                {
+                    Application.Current.Shutdown();
+                });
             };
             Dispatcher.Invoke(() =>
             {
@@ -164,37 +153,35 @@ namespace WinArch
 
         private void SizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            TextBoxSize.Text = SizeSlider.Value.ToString();
+            TextBoxSize.Text = SizeSlider.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
         private void TextBoxSize_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (Regex.IsMatch(TextBoxSize.Text, "\\d+"))
             {
-                SizeSlider.Value = Math.Round(float.Parse(TextBoxSize.Text), 0);
+                SizeSlider.Value = Math.Round(float.Parse(TextBoxSize.Text, System.Globalization.CultureInfo.InvariantCulture), 0);
             }
         }
         public void Previous(object sender, EventArgs e)
         {
-            NavigationService nav = NavigationService;
-            _ = nav.Navigate(new Uri("About.xaml", UriKind.Relative));
+            _ = NavigationService.Navigate(new Uri("About.xaml", UriKind.Relative), System.Globalization.CultureInfo.InvariantCulture);
         }
         public void Next(object sender, EventArgs e)
         {
-            if (float.Parse(TextBoxSize.Text) < minimalSpaceRequired / Math.Pow(1024, Unit.SelectedIndex))
+            if (float.Parse(TextBoxSize.Text, System.Globalization.CultureInfo.InvariantCulture) < minimalSpaceRequired / Math.Pow(1024, Unit.SelectedIndex))
             {
-                TextBoxSize.Text = Math.Round(minimalSpaceRequired / Math.Pow(1024, Unit.SelectedIndex), 0).ToString();
+                TextBoxSize.Text = Math.Round(minimalSpaceRequired / Math.Pow(1024, Unit.SelectedIndex), 0).ToString(System.Globalization.CultureInfo.InvariantCulture);
             }
-            if (float.Parse(TextBoxSize.Text) > spaceleft_mb / Math.Pow(1024, Unit.SelectedIndex))
+            if (float.Parse(TextBoxSize.Text, System.Globalization.CultureInfo.InvariantCulture) > spaceleft_mb / Math.Pow(1024, Unit.SelectedIndex))
             {
-                TextBoxSize.Text = Math.Round(spaceleft_mb / Math.Pow(1024, Unit.SelectedIndex), 0).ToString();
+                TextBoxSize.Text = Math.Round(spaceleft_mb / Math.Pow(1024, Unit.SelectedIndex), 0).ToString(System.Globalization.CultureInfo.InvariantCulture);
             }
-            float spaceneeded = (float)(float.Parse(TextBoxSize.Text) * Math.Pow(1024, Unit.SelectedIndex));
+            float spaceneeded = (float)(float.Parse(TextBoxSize.Text, System.Globalization.CultureInfo.InvariantCulture) * Math.Pow(1024, Unit.SelectedIndex));
             Application.Current.Properties["SpaceRequired"] = spaceneeded;
             Application.Current.Properties["Repartition"] = checkBox.IsChecked;
             Application.Current.Properties["Volume"] = comboBox.SelectedItem;
-            NavigationService nav = NavigationService;
-            _ = nav.Navigate(new Uri("Locale.xaml", UriKind.Relative));
+            _ = NavigationService.Navigate(new Uri("Locale.xaml", UriKind.Relative), System.Globalization.CultureInfo.InvariantCulture);
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -202,10 +189,10 @@ namespace WinArch
             DriveInfo[] drives = DriveInfo.GetDrives();
             foreach (DriveInfo d in drives)
             {
-                if (d.Name[..1].ToString() == comboBox.SelectedItem.ToString())
+                if (d.Name[..1] == comboBox.SelectedItem.ToString())
                 {
                     spaceleft = d.AvailableFreeSpace;
-                    if (d.Name[..1].ToString() == "C" && (d.AvailableFreeSpace / (1024 * 1024)) < minimalSpaceRequired)
+                    if (d.Name[..1] == "C" && (d.AvailableFreeSpace / (1024 * 1024)) < minimalSpaceRequired)
                     {
                         comboBox.Items.Remove("C");
                         if (comboBox.Items.Count == 0)
@@ -223,7 +210,7 @@ namespace WinArch
                     };
                 }
             }
-            if (comboBox.SelectedItem.ToString() == "C")
+            if ((string)comboBox.SelectedItem == "C")
             {
                 checkBox.IsChecked = true;
                 checkBox.IsEnabled = false;

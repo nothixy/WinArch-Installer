@@ -32,8 +32,7 @@ namespace WinArch
         }
         public void Previous(object sender, EventArgs e)
         {
-            NavigationService nav = this.NavigationService;
-            nav.Navigate(new Uri("Locale.xaml", UriKind.Relative));
+            _ = NavigationService.Navigate(new Uri("Locale.xaml", UriKind.Relative));
         }
         public void Next(object sender, EventArgs e)
         {
@@ -64,8 +63,7 @@ namespace WinArch
                 Application.Current.Properties["Uname"] = unameBox.Text;
             }
             Application.Current.Properties["UnameSys"] = unamesysBox.Text;
-            NavigationService nav = this.NavigationService;
-            nav.Navigate(new Uri("Desktop.xaml", UriKind.Relative));
+            _ = NavigationService.Navigate(new Uri("Desktop.xaml", UriKind.Relative));
         }
     }
 }
