@@ -205,7 +205,7 @@ namespace WinArch
                 if (d.Name[..1].ToString() == comboBox.SelectedItem.ToString())
                 {
                     spaceleft = d.AvailableFreeSpace;
-                    if (d.Name[..1].ToString() == "C")
+                    if (d.Name[..1].ToString() == "C" && (d.AvailableFreeSpace / (1024 * 1024)) < minimalSpaceRequired)
                     {
                         comboBox.Items.Remove("C");
                         if (comboBox.Items.Count == 0)

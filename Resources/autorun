@@ -9,32 +9,30 @@ if ! ping -c2 google.com >/dev/null 2>&1; then
 	fi
 fi
 timedatectl set-ntp true
-dialog --colors --infobox "\Z2Wait\Zn : Formatting partitions" 10 50
+dialog --colors --infobox "\Z2Wait\Zn : Formatting partitions" 20 50
 yes | mkfs.ext4 -F -F -q -L ARCH /dev/disk/by-label/ARCH > /dev/tty2 2>&1
 mount /dev/disk/by-label/ARCH /mnt
-if [ -d /sys/firmware/efi/efivars ]; then
-	mkdir -p /mnt/boot
-	drive="/dev/$(lsblk -ndo pkname $(findmnt /mnt -o SOURCE -un))"
-	device="$(fdisk -l $device -o Device,Type | grep "EFI System" | cut -d' ' -f1)"
-	mount "$device" /mnt/boot
-fi
+mkdir -p /mnt/boot
+drive="/dev/$(lsblk -ndo pkname $(findmnt /mnt -o SOURCE -un))"
+device="$(fdisk -l $device -o Device,Type | grep "EFI System" | cut -d' ' -f1)"
+mount "$device" /mnt/boot
 case $desktop in
-	gnome) export packages=(gnome gdm gnome-software-packagekit-plugin);;
-	kde) export packages=(plasma sddm dolphin konsole discover packagekit-qt5 plasma-wayland-session);;
-	budgie) export packages=(budgie-desktop gnome gnome-software-packagekit-plugin lightdm lightdm-webkit2-greeter lightdm-webkit-theme-litarvan);;
-	cinnamon) export packages=(cinnamon lightdm lightdm-slick-greeter);;
-	pantheon) export packages=(pantheon lightdm ligthdm-pantheon-greeter);;
-	dde) export packages=(deepin deepin-extra lightdm deepin-session-shell);;
+	gnome) export packages=(gnome gnome-software-packagekit-plugin); export dm=gdm;;
+	kde) export packages=(plasma dolphin konsole discover packagekit-qt5 plasma-wayland-session); export dm=sddm;;
+	budgie) export packages=(budgie-desktop gnome gnome-software-packagekit-plugin lightdm-webkit-theme-litarvan lightdm-webkit2-greeter); export dm=lightdm; export greeter=lightdm-webkit2-greeter;;
+	cinnamon) export packages=(cinnamon gnome-software gnome-software-packagekit-plugin lightdm-slick-greeter); export dm=lightdm; export greeter=lightdm-slick-greeter;;
+	pantheon) export packages=(pantheon ligthdm-pantheon-greeter); export dm=lightdm; export greeter=ligthdm-pantheon-greeter;;
+	dde) export packages=(deepin deepin-extra deepin-store deepin-session-shell); export dm=lightdm; export greeter=ligthdm-deepin-greeter;;
 esac
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Wait\Zn : Installing packages" 10 50
-pacstrap /mnt linux base base-devel networkmanager bluez bash-completion $packages grub os-prober xorg > /dev/tty2 2>&1
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Wait\Zn : Editing fstab" 10 50
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Wait\Zn : Installing packages" 20 50
+pacstrap /mnt $packages $dm linux flatpak base base-devel networkmanager bluez firefox xterm bash-completion grub os-prober xorg > /dev/tty2 2>&1
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Wait\Zn : Editing fstab" 20 50
 genfstab -U /mnt | tee -a /mnt/etc/fstab > /dev/tty2 2>&1
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Wait\Zn : Setting hostname" 10 50
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Wait\Zn : Setting hostname" 20 50
 cat <<- EOF | arch-chroot /mnt > /dev/tty2 2>&1
 	echo "$hostname" | tee /etc/hostname
 EOF
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Wait\Zn : Configuring locale" 10 50
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Wait\Zn : Configuring locale" 20 50
 cat <<- EOF | arch-chroot /mnt > /dev/tty2 2>&1
 	echo "$language" | tee -a /etc/locale.gen
 	locale-gen
@@ -42,7 +40,7 @@ cat <<- EOF | arch-chroot /mnt > /dev/tty2 2>&1
 	echo "KEYMAP=$keymap" | tee /etc/vconsole.conf
 	ln -svf /usr/share/zoneinfo/$timezone /etc/localtime
 EOF
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Done\Zn : Configuring locale\n\Z2Wait\Zn : Configuring users" 10 50
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Done\Zn : Configuring locale\n\Z2Wait\Zn : Configuring users" 20 50
 cat <<- EOF | arch-chroot /mnt > /dev/tty2 2>&1
 	useradd -mG wheel,sys "$unamesys"
 	echo -e "$password\n$password" | passwd "$unamesys"
@@ -50,29 +48,25 @@ cat <<- EOF | arch-chroot /mnt > /dev/tty2 2>&1
 	rand=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
 	echo -e "$rand\n$rand" | passwd root
 EOF
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Done\Zn : Configuring locale\n\Z2Done\Zn : Configuring user\n\Z2Wait\Zn : Configuring system services" 10 50
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Done\Zn : Configuring locale\n\Z2Done\Zn : Configuring user\n\Z2Wait\Zn : Configuring system services" 20 50
 cat <<- EOF | arch-chroot /mnt > /dev/tty2 2>&1
-	for displaymanager in lightdm gdm sddm; do
-		if which $displaymanager >/dev/null 2>&1; then
-			systemctl enable $displaymanager
+	if [ $dm = "lightdm" ]; then
+		sed -i "s/example-gtk-gnome/$greeter/g" /etc/lightdm/lightdm.conf
+		if [ $greeter = "lightdm-webkit2-greeter" ]; then
+			sed -i "s/antergos/litarvan/" /etc/lightdm/lightdm-webkit2-greeter.conf
 		fi
-		if [ $displaymanager == "lightdm" ]; then
-			for greeter in /usr/share/xgreeters/*; do
-				sed -i "s/example-gtk-gnome/$(basename $greeter .desktop)/g" /etc/lightdm/lightdm.conf
-			done
-		fi
-	done
-	systemctl enable NetworkManager bluetooth
+	fi
+	systemctl enable NetworkManager bluetooth $dm
 EOF
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Done\Zn : Configuring locale\n\Z2Done\Zn : Configuring user\n\Z2Done\Zn : Configuring system services\n\Z2Wait\Zn : Configuring details" 10 50
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Done\Zn : Configuring locale\n\Z2Done\Zn : Configuring user\n\Z2Done\Zn : Configuring system services\n\Z2Wait\Zn : Configuring details" 20 50
 cat <<- EOF | arch-chroot /mnt > /dev/tty2 2>&1
 	echo -e "127.0.0.1	localhost\n::1		localhost\n127.0.1.1	$hostname" | tee -a /etc/hosts
 	echo -e "%wheel ALL=(ALL) ALL" | tee -a /etc/sudoers
 EOF
-dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Done\Zn : Configuring locale\n\Z2Done\Zn : Configuring user\n\Z2Done\Zn : Configuring system services\n\Z2Done\Zn : Configuring details\n\Z2Wait\Zn : Installing bootloader" 10 50
+dialog --colors --infobox "\Z2Done\Zn : Formatting partitions\n\Z2Done\Zn : Installing packages\n\Z2Done\Zn : Editing fstab\n\Z2Done\Zn : Setting hostname\n\Z2Done\Zn : Configuring locale\n\Z2Done\Zn : Configuring user\n\Z2Done\Zn : Configuring system services\n\Z2Done\Zn : Configuring details\n\Z2Wait\Zn : Installing bootloader" 20 50
 cat <<- EOF | arch-chroot /mnt > /dev/tty2 2>&1
 	echo "GRUB_DISABLE_OS_PROBER=false" | tee -a /etc/default/grub
 	grub-mkconfig -o /boot/grub/grub.cfg
 EOF
-dialog --msgbox "Everything should be installed now, press Enter to reboot" 10 50
+dialog --msgbox "Everything should be installed now, press Enter to reboot" 20 50
 systemctl reboot
