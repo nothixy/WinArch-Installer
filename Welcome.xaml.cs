@@ -17,6 +17,7 @@ using System;
 using System.IO;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using System.Windows;
 
 namespace WinArch
 {
@@ -42,6 +43,11 @@ namespace WinArch
         public void Next(object sender, EventArgs e)
         {
             _ = NavigationService.Navigate(new Uri("About.xaml", UriKind.Relative));
+        }
+
+        private void Exit(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 }

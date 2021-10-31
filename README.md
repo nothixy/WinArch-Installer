@@ -1,7 +1,6 @@
 [![pipeline status](https://gitlab.com/srgoti/winarch-installer/badges/master/pipeline.svg)](https://gitlab.com/srgoti/winarch-installer/-/commits/master)
 # WinArch Installer
-[Download](https://gitlab.com/srgoti/winarch-installer/-/releases)
-A Windows executable to create an Archlinux dual boot on your computer, written with WPF(C#)/XAML.
+A Windows executable to create an Archlinux dual boot on your computer, written with WPF(C#)/XAML. You can download it [here](https://gitlab.com/srgoti/winarch-installer/-/releases).
 
 ## What does it support ?
 WinArch works only on x86_46 UEFI machines (Any computer made after 2010 should be compatible with this software).
