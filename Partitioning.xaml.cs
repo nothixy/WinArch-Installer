@@ -37,7 +37,27 @@ namespace WinArch
         {
             InitializeComponent();
             Mouse.OverrideCursor = Cursors.Wait;
+            GetCPUArch();
             GetBIOSMode();
+        }
+        public void GetCPUArch()
+        {
+            switch (typeof(string).Assembly.GetName().ProcessorArchitecture)
+            {
+                case System.Reflection.ProcessorArchitecture.Amd64:
+                    break;
+                default:
+                    string messageBoxText = "Error : this tool is made for AMD64/X86_64 machines only";
+                    string caption = "Requirement error";
+                    MessageBoxButton button = MessageBoxButton.OK;
+                    MessageBoxImage icon = MessageBoxImage.Error;
+                    _ = MessageBox.Show(messageBoxText, caption, button, icon);
+                    Dispatcher.Invoke(() =>
+                    {
+                        Application.Current.Shutdown();
+                    });
+                    break;
+            }
         }
         public void GetBIOSMode()
         {

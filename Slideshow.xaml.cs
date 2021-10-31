@@ -194,27 +194,27 @@ namespace WinArch
         }
         public void DownloadArchIso()
         {
-             WebClient client2 = new();
-             client2.DownloadProgressChanged += (s, e) =>
-             {
-                 UpdateProgress(false, "Downloading Archlinux iso", e.ProgressPercentage);
-             };
-             client2.DownloadFileCompleted += (s, e) =>
-             {
-                 Dispatcher.Invoke(() =>
-                 {
-                     logText.Text += "Downloaded\n";
-                 });
-                 UpdateProgressFull(3);
-                 MountArchIso();
-             };
-             Uri download = new("https://sourceforge.net/projects/systemrescuecd/files/latest/download");
-             Dispatcher.Invoke(() =>
-             {
-                 logText.Text += "------Downloading Archlinux------\n";
-                 logText.Text += "Downloading " + download.AbsoluteUri + " as arch.iso\n";
-             });
-             client2.DownloadFileAsync(download, Path.GetTempPath() + "arch.iso");
+            WebClient client2 = new();
+            client2.DownloadProgressChanged += (s, e) =>
+            {
+                UpdateProgress(false, "Downloading Archlinux iso", e.ProgressPercentage);
+            };
+            client2.DownloadFileCompleted += (s, e) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    logText.Text += "Downloaded\n";
+                });
+                UpdateProgressFull(3);
+                MountArchIso();
+            };
+            Uri download = new("https://sourceforge.net/projects/systemrescuecd/files/latest/download");
+            Dispatcher.Invoke(() =>
+            {
+                logText.Text += "------Downloading Archlinux------\n";
+                logText.Text += "Downloading " + download.AbsoluteUri + " as arch.iso\n";
+            });
+            client2.DownloadFileAsync(download, Path.GetTempPath() + "arch.iso");
         }
         public void CopyAll(DirectoryInfo source, DirectoryInfo target)
         {
