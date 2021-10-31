@@ -3,8 +3,8 @@
 A Windows executable to create an Archlinux dual boot on your computer, written with WPF(C#)/XAML. You can download it [here](https://gitlab.com/srgoti/winarch-installer/-/releases).
 
 ## What does it support ?
-WinArch works only on x86_46 UEFI machines (Any computer made after 2010 should be compatible with this software).
-It requires at least 3.5GB of free space on a single partition, and at least 50MB on the EFI System Partition (Windows leaves this space by default).
+WinArch works only on x86_64 UEFI machines (Any computer made after 2010 should be compatible with this software).
+It requires at least 5GB of free space on a single partition, and at least 50MB on the EFI System Partition (Windows leaves this space by default).
 
 ## How does it work ?
 WinArch creates an empty partition, downloads SystemRescueCD on it, boots it to ram and installs Archlinux on that same partition

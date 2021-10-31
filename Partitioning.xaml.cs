@@ -31,7 +31,7 @@ namespace WinArch
     {
         private float spaceleft;
         private float spaceleft_mb;
-        private readonly int minimalSpaceRequired = 2500;
+        private readonly int minimalSpaceRequired = 5000;
         private bool returncode;
         public Partitioning()
         {
