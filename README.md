@@ -18,6 +18,7 @@ WinArch creates an empty partition, downloads SystemRescueCD on it, boots it to 
 - Remove previously mentionned limitations
 - Use a real gui for the Linux-side installer
 - Use Preloader/shim to work with Secure Boot
+- Autocomplete some fields like username and hostname
 
 ## Thanks
 - Microsoft for WPF
