@@ -30,9 +30,9 @@
         <Grid VerticalAlignment="Center" Height="336" Margin="0,40,0,0">
             <TextBlock x:Name="unamesys" HorizontalAlignment="Center" Margin="0,27,0,0" Text="User ID (lowercase letters and numbers only) - this will be the name of your home folder" TextWrapping="Wrap" VerticalAlignment="Top"/>
             <TextBox x:Name="unamesysBox" HorizontalAlignment="Center" Margin="0,48,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Cursor="IBeam"/>
-            <TextBlock x:Name="uname" HorizontalAlignment="Center" Margin="0,128,0,0" Text="User name (the name that will be showed by the user interface)" TextWrapping="Wrap" VerticalAlignment="Top"/>
+            <TextBlock x:Name="uname" HorizontalAlignment="Center" Margin="0,128,0,0" Text="User name (the name that will be displayed by the user interface)" TextWrapping="Wrap" VerticalAlignment="Top"/>
             <TextBox x:Name="unameBox" HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Margin="0,149,0,0" Cursor="IBeam"/>
-            <TextBlock x:Name="uname_Copy" HorizontalAlignment="Center" Margin="0,224,0,0" Text="Password (leave empty to skip password)" TextWrapping="Wrap" VerticalAlignment="Top"/>
+            <TextBlock x:Name="uname_Copy" HorizontalAlignment="Center" Margin="0,224,0,0" Text="Password" TextWrapping="Wrap" VerticalAlignment="Top"/>
             <PasswordBox x:Name="pwdBox1" HorizontalAlignment="Center" Margin="0,245,0,0" VerticalAlignment="Top" Width="200" Cursor="IBeam"/>
             <PasswordBox x:Name="pwdBox2" HorizontalAlignment="Center" Margin="0,268,0,0" VerticalAlignment="Top" Width="200" RenderTransformOrigin="0.505,0.557" Cursor="IBeam"/>
             <TextBlock x:Name="idempty" HorizontalAlignment="Center" Margin="0,78,0,0" Text="User ID cannot be empty" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="Red" Visibility="Hidden"/>

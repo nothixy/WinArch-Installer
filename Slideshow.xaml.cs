@@ -124,7 +124,7 @@ namespace WinArch
                     logText.Text += "Arguments : " + process.StartInfo.Arguments + "\n";
                     logText.Text += process.StandardOutput.ReadToEnd() + "\n";
                     UpdateProgressFull(1);
-                    _ = DownloadLatestGrub();
+                    DownloadLatestGrub();
                 });
             };
             process.StartInfo.FileName = "diskpart.exe";
@@ -359,14 +359,14 @@ namespace WinArch
             string[] lines =
             {
                 "#!/bin/sh",
-                "desktop=" + desktop,
-                "hostname=" + hostname,
+                "desktop=\"" + desktop + "\"",
+                "hostname=\"" + hostname + "\"",
                 "language=\"" + language + "\"",
-                "keymap=" + keymap,
-                "timezone=" + timezone,
-                "password=" + password,
+                "keymap=\"" + keymap + "\"",
+                "timezone=\"" + timezone + "\"",
+                "password=\"" + password + "\"",
                 "uname=\"" + uname + "\"",
-                "unamesys=" + unameSys,
+                "unamesys=\"" + unameSys + "\"",
             };
             File.WriteAllLines(@"L:\autorun", lines);
             File.AppendAllLines(@"L:\autorun", autorun);
