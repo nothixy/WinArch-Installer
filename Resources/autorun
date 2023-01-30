@@ -1,301 +1,279 @@
-﻿cat <<- EOF | base64 -d > /bin.py
-aW1wb3J0IG9zCmltcG9ydCByYW5kb20KaW1wb3J0IHN5cwppbXBvcnQgdGhyZWFkaW5nCmltcG9y
-dCB0aW1lCmltcG9ydCBiYXNlNjQKaW1wb3J0IG1hdGgKaW1wb3J0IHN0cmluZwppbXBvcnQgY29u
-ZmlncGFyc2VyCgpmcm9tIFB5U2lkZTYuUXRDb3JlIGltcG9ydCBRdCwgU2xvdCwgUVByb2Nlc3MK
-ZnJvbSBQeVNpZGU2LlF0V2lkZ2V0cyBpbXBvcnQgKFFBcHBsaWNhdGlvbiwgUUxhYmVsLCBRUHVz
-aEJ1dHRvbiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFFWQm94TGF5b3V0LCBRV2lk
-Z2V0LCBRUHJvZ3Jlc3NCYXIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBRVGFiV2lk
-Z2V0LCBRSEJveExheW91dCwgUURpYWxvZywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IFFEaWFsb2dCdXR0b25Cb3gsIFFTY3JvbGxBcmVhKQoKCmNsYXNzIERpYWxvZyhRRGlhbG9nKToK
-ICAgIGRlZiBfX2luaXRfXyhzZWxmKToKICAgICAgICBzdXBlcigpLl9faW5pdF9fKCkKCiAgICAg
-ICAgc2VsZi5zZXRXaW5kb3dUaXRsZSgiV2luQXJjaCAoc3RhZ2UgMikgLSBFcnJvciIpCiAgICAg
-ICAgc2VsZi5zZXRHZW9tZXRyeSgwLCAwLCAxMDAsIDUwKQogICAgICAgIHFfYnRuID0gUURpYWxv
-Z0J1dHRvbkJveC5ZZXMgfCBRRGlhbG9nQnV0dG9uQm94Lk5vCgogICAgICAgIHNlbGYuYnV0dG9u
-Qm94ID0gUURpYWxvZ0J1dHRvbkJveChxX2J0bikKICAgICAgICBzZWxmLmJ1dHRvbkJveC5hY2Nl
-cHRlZC5jb25uZWN0KHNlbGYuYWNjZXB0KQogICAgICAgIHNlbGYuYnV0dG9uQm94LnJlamVjdGVk
-LmNvbm5lY3Qoc2VsZi5yZWplY3QpCgogICAgICAgIHNlbGYubGF5b3V0ID0gUVZCb3hMYXlvdXQo
-KQogICAgICAgIG1lc3NhZ2UgPSBRTGFiZWwoIkFuIGVycm9yIG9jY3VycmVkLCBkbyB5b3Ugd2Fu
-dCB0byBleGl0IG5vdyA/IikKICAgICAgICBzZWxmLmxheW91dC5hZGRXaWRnZXQobWVzc2FnZSkK
-ICAgICAgICBzZWxmLmxheW91dC5hZGRXaWRnZXQoc2VsZi5idXR0b25Cb3gpCiAgICAgICAgc2Vs
-Zi5zZXRMYXlvdXQoc2VsZi5sYXlvdXQpCgoKZGVmIGFwcF9lcnJvcigpOgogICAgaWYgRGlhbG9n
-KCkuZXhlYygpOgogICAgICAgIHN5cy5leGl0KCkKCgpjbGFzcyBNeVdpZGdldChRV2lkZ2V0KToK
-ICAgIGRlZiBfX2luaXRfXyhzZWxmKToKICAgICAgICBRV2lkZ2V0Ll9faW5pdF9fKHNlbGYpCiAg
-ICAgICAgXywgc2VsZi5kZXNrdG9wLCBzZWxmLmhvc3RuYW1lLCBzZWxmLmtleW1hcCwgc2VsZi5s
-YW5ndWFnZSwgc2VsZi50aW1lem9uZSwgc2VsZi51bmFtZXN5cywgc2VsZi51bmFtZSwgc2VsZi5w
-YXNzd29yZCA9IHN5cy5hcmd2CiAgICAgICAgc2VsZi5udW1iZXJvZnRhc2tzID0gOAogICAgICAg
-IHNlbGYuZG9icmVhayA9IEZhbHNlCiAgICAgICAgc2VsZi5zZXRXaW5kb3dUaXRsZSgiV2luQXJj
-aCBpbnN0YWxsZXIgKHN0YWdlIDIpIikKICAgICAgICBzZWxmLm1lc3NhZ2UgPSBRTGFiZWwoIkNo
-ZWNraW5nIGZvciBuZXR3b3JrIGNvbm5lY3Rpdml0eSIpCiAgICAgICAgc2VsZi5tZXNzYWdlLnNl
-dEFsaWdubWVudChRdC5BbGlnbkNlbnRlcikKICAgICAgICBzZWxmLnByb2dyZXNzYmFyID0gUVBy
-b2dyZXNzQmFyKCkKICAgICAgICBzZWxmLnByb2dyZXNzYmFyLnNldE1pbmltdW0oMCkKICAgICAg
-ICBzZWxmLnByb2dyZXNzYmFyLnNldE1heGltdW0oMCkKICAgICAgICBzZWxmLnByb2dyZXNzYmFy
-LnNldFZhbHVlKDApCiAgICAgICAgc2VsZi5zZXRHZW9tZXRyeSgwLCAwLCA4MDAsIDQ1MCkKICAg
-ICAgICBzZWxmLnNldE1pbmltdW1TaXplKDgwMCwgNDUwKQogICAgICAgIHNlbGYubGF5b3V0ID0g
-UVZCb3hMYXlvdXQoc2VsZikKICAgICAgICBzZWxmLmxheW91dC5hZGRXaWRnZXQoc2VsZi5tZXNz
-YWdlKQogICAgICAgIHNlbGYubGF5b3V0LmFkZFdpZGdldChzZWxmLnByb2dyZXNzYmFyKQogICAg
-ICAgIHNlbGYuY2hlY2tmb3JuZXR3b3JrKCkKCiAgICBkZWYgY2hhbmdldGFiKHNlbGYpOgogICAg
-ICAgIHdoaWxlIFRydWU6CiAgICAgICAgICAgIGlmIHNlbGYuZG9icmVhazoKICAgICAgICAgICAg
-ICAgIGJyZWFrCiAgICAgICAgICAgIGVsc2U6CiAgICAgICAgICAgICAgICB0aW1lLnNsZWVwKDIp
-CiAgICAgICAgICAgICAgICBpZiBzZWxmLnRhYnMuY3VycmVudEluZGV4KCkgPD0gKHNlbGYudGFi
-cy5jb3VudCgpIC0gMik6CiAgICAgICAgICAgICAgICAgICAgc2VsZi50YWJzLnNldEN1cnJlbnRJ
-bmRleCgoc2VsZi50YWJzLmN1cnJlbnRJbmRleCgpICsgMSkgJSAoc2VsZi50YWJzLmNvdW50KCkg
-LSAyKSkKCiAgICBkZWYgc3RhcnRpbnN0YWxsaW5nKHNlbGYpOgogICAgICAgICMgdGhyZWFkaW5n
-LlRocmVhZCh0YXJnZXQ9c2VsZi5jaGFuZ2V0YWIpLnN0YXJ0KCkKICAgICAgICBjb25maWcgPSBj
-b25maWdwYXJzZXIuQ29uZmlnUGFyc2VyKGFsbG93X25vX3ZhbHVlPVRydWUpCiAgICAgICAgY29u
-ZmlnLm9wdGlvbnhmb3JtID0gc3RyCiAgICAgICAgY29uZmlnLnJlYWQoJy9ldGMvcGFjbWFuLmNv
-bmYnKQogICAgICAgIGNvbmZpZ1snb3B0aW9ucyddWydQYXJhbGxlbERvd25sb2FkcyddID0gJzEw
-JwogICAgICAgIGNvbmZpZy53cml0ZShvcGVuKCcvZXRjL3BhY21hbi5jb25mJywgJ3cnKSkKICAg
-ICAgICBzZWxmLm1lc3NhZ2UuZGVsZXRlTGF0ZXIoKQogICAgICAgIHNlbGYudGFiYmFyID0gUVRh
-YldpZGdldCgpCiAgICAgICAgc2VsZi50YXNrID0gUUxhYmVsKCkKICAgICAgICBzZWxmLmxheW91
-dC5hZGRXaWRnZXQoc2VsZi50YWJiYXIpCiAgICAgICAgc2VsZi5sYXlvdXQuYWRkV2lkZ2V0KHNl
-bGYudGFzaykKICAgICAgICBzZWxmLmxheW91dC5hZGRXaWRnZXQoc2VsZi5wcm9ncmVzc2JhcikK
-ICAgICAgICBzZWxmLnByb2dyZXNzYmFyLnNldE1heGltdW0oMTAwKQogICAgICAgIHNlbGYucHJv
-Z3Jlc3NiYXIuc2V0VmFsdWUoMCkKICAgICAgICBzZWxmLmxvZ3MgPSBRTGFiZWwoKQogICAgICAg
-IHNlbGYubG9ncy5zZXRBbGlnbm1lbnQoUXQuQWxpZ25Ub3ApCiAgICAgICAgc2VsZi5vdXRwdXQg
-PSBRTGFiZWwoKQogICAgICAgIHNlbGYub3V0cHV0LnNldEFsaWdubWVudChRdC5BbGlnblRvcCkK
-ICAgICAgICBzZWxmLnNjcm9sbGVybG9ncyA9IFFTY3JvbGxBcmVhKCkKICAgICAgICBzZWxmLnNj
-cm9sbGVybG9ncy5zZXRXaWRnZXQoc2VsZi5sb2dzKQogICAgICAgIHNlbGYuc2Nyb2xsZXJsb2dz
-LnNldFdpZGdldFJlc2l6YWJsZShUcnVlKQogICAgICAgIHNlbGYuc2Nyb2xsZXJvdXRwdXQgPSBR
-U2Nyb2xsQXJlYSgpCiAgICAgICAgc2VsZi5zY3JvbGxlcm91dHB1dC5zZXRXaWRnZXQoc2VsZi5v
-dXRwdXQpCiAgICAgICAgc2VsZi5zY3JvbGxlcm91dHB1dC5zZXRXaWRnZXRSZXNpemFibGUoVHJ1
-ZSkKICAgICAgICBzZWxmLnRhYmJhci5hZGRUYWIoc2VsZi5zY3JvbGxlcm91dHB1dCwgIkluc3Rh
-bGxlciBvdXRwdXQiKQogICAgICAgIHNlbGYudGFiYmFyLmFkZFRhYihzZWxmLnNjcm9sbGVybG9n
-cywgIkluc3RhbGxlciBlcnJvcnMiKQogICAgICAgIHNlbGYudGFzay5zZXRUZXh0KCJGb3JtYXR0
-aW5nIHBhcnRpdGlvbnMiKQogICAgICAgIHNlbGYuc25hcHNob3QgPSAiIgogICAgICAgIHNlbGYu
-cGFydGl0aW9uID0gUVByb2Nlc3MoKQogICAgICAgIHNlbGYucGFydGl0aW9uLmZpbmlzaGVkLmNv
-bm5lY3Qoc2VsZi5pbnN0YWxscGFja2FnZXMpCiAgICAgICAgc2VsZi5wYXJ0aXRpb24ucmVhZHlS
-ZWFkLmNvbm5lY3QobGFtYmRhOiBzZWxmLnVwZGF0ZU91dHB1dChzZWxmLnBhcnRpdGlvbi5yZWFk
-QWxsU3RhbmRhcmRPdXRwdXQoKSwgRmFsc2UpKQogICAgICAgIHNlbGYucGFydGl0aW9uLnN0YXJ0
-KCJzaCIsIFsnLWMnLCAnc2V0IC1lRTsgdHJhcCAiZWNobyAtZSBcXFwiXG5GQUlMXFxcIiIgRVJS
-OyBlY2hvIC1lbiAiV2FpdDogU2V0dGluZyBOVFAiOyB0aW1lZGF0ZWN0bCBzZXQtbnRwIHRydWU7
-IHVtb3VudCAtbCAvbW50IDI+L2Rldi9udWxsIHx8IHRydWU7IGVjaG8gLWVuICJEb25lOiBTZXR0
-aW5nIE5UUFxuV2FpdDogRm9ybWF0dGluZyAvZGV2L2Rpc2svYnktbGFiZWwvQVJDSCBhcyBleHQ0
-IHdpdGggbGFiZWwgQVJDSCI7ICB5ZXMgfCBta2ZzLmV4dDQgLUYgLUYgLXEgLUwgQVJDSCAvZGV2
-L2Rpc2svYnktbGFiZWwvQVJDSDsgZWNobyAtZW4gIkRvbmU6IFNldHRpbmcgTlRQXG5Eb25lOiBG
-b3JtYXR0aW5nIC9kZXYvZGlzay9ieS1sYWJlbC9BUkNIIGFzIGV4dDQgd2l0aCBsYWJlbCBBUkNI
-XG5XYWl0OiBNb3VudGluZyB0aGlzIHBhcnRpdGlvbiB0byAvbW50IjsgbW91bnQgL2Rldi9kaXNr
-L2J5LWxhYmVsL0FSQ0ggL21udDsgbWtkaXIgLXAgL21udC9ib290OyBkcml2ZT0iL2Rldi8kKGxz
-YmxrIC1uZG8gcGtuYW1lICQoZmluZG1udCAvbW50IC1vIFNPVVJDRSAtdW4pKSI7IGRldmljZT0i
-JChmZGlzayAtbCAkZHJpdmUgLW8gRGV2aWNlLFR5cGUgfCBncmVwICJFRkkgU3lzdGVtIiB8IGN1
-dCAtZCBcIiBcIiAtZjEpIjsgZWNobyAtZW4gIkRvbmU6IFNldHRpbmcgTlRQXG5Eb25lOiBGb3Jt
-YXR0aW5nIC9kZXYvZGlzay9ieS1sYWJlbC9BUkNIIGFzIGV4dDQgd2l0aCBsYWJlbCBBUkNIXG5E
-b25lOiBNb3VudGluZyB0aGlzIHBhcnRpdGlvbiB0byAvbW50XG5XYWl0OiBNb3VudGluZyAkZGV2
-aWNlIHRvIC9tbnQvYm9vdCI7IG1vdW50IFwiJGRldmljZVwiIC9tbnQvYm9vdDsgZWNobyAtZW4g
-IkRvbmU6IFNldHRpbmcgTlRQXG5Eb25lOiBGb3JtYXR0aW5nIC9kZXYvZGlzay9ieS1sYWJlbC9B
-UkNIIGFzIGV4dDQgd2l0aCBsYWJlbCBBUkNIXG5Eb25lOiBNb3VudGluZyB0aGlzIHBhcnRpdGlv
-biB0byAvbW50XG5Eb25lOiBNb3VudGluZyAkZGV2aWNlIHRvIC9tbnQvYm9vdCI7J10pCgogICAg
-ZGVmIHVwZGF0ZU91dHB1dChzZWxmLCBvdXRwdXQsIGNsZWFyKToKICAgICAgICBpZiBvdXRwdXQg
-PT0gIlxuRkFJTFxuIjoKICAgICAgICAgICAgc2VsZi5vdXRwdXQuc2V0VGV4dChzZWxmLm91dHB1
-dC50ZXh0KCkgKyBvdXRwdXQpCiAgICAgICAgZWxzZToKICAgICAgICAgICAgaWYgY2xlYXI6CiAg
-ICAgICAgICAgICAgICBzZWxmLnNuYXBzaG90ID0gc2VsZi5vdXRwdXQudGV4dCgpICsgIlxuIgog
-ICAgICAgICAgICBzZWxmLm91dHB1dC5zZXRUZXh0KHNlbGYuc25hcHNob3QgKyBvdXRwdXQpCgog
-ICAgZGVmIGluc3RhbGxwYWNrYWdlcyhzZWxmKToKICAgICAgICBzZWxmLmxvZ3Muc2V0VGV4dChz
-ZWxmLmxvZ3MudGV4dCgpICsgc2VsZi5wYXJ0aXRpb24ucmVhZEFsbFN0YW5kYXJkRXJyb3IoKSkK
-ICAgICAgICBpZiBzZWxmLnBhcnRpdGlvbi5leGl0Q29kZSgpICE9IDA6CiAgICAgICAgICAgIGFw
-cF9lcnJvcigpCiAgICAgICAgICAgIHJldHVybgogICAgICAgIHNlbGYudXBkYXRlT3V0cHV0KCIi
-LCBUcnVlKQogICAgICAgIHNlbGYudXBkYXRlcHJvZ3Jlc3NiYXIoKQogICAgICAgIHNlbGYudGFz
-ay5zZXRUZXh0KCJJbnN0YWxsaW5nIHBhY2thZ2VzIikKICAgICAgICBzZWxmLnBhY3N0cmFwID0g
-UVByb2Nlc3MoKQogICAgICAgIHNlbGYucGFjc3RyYXAuZmluaXNoZWQuY29ubmVjdChzZWxmLmdl
-bmVyYXRlZnN0YWIpCiAgICAgICAgc2VsZi5wYWNzdHJhcC5yZWFkeVJlYWQuY29ubmVjdChsYW1i
-ZGE6IHNlbGYudXBkYXRlT3V0cHV0KHNlbGYucGFjc3RyYXAucmVhZEFsbFN0YW5kYXJkT3V0cHV0
-KCksIEZhbHNlKSkKICAgICAgICBzZWxmLnBhY3N0cmFwLnN0YXJ0KCJzaCIsIFsnLWMnLCAnZGVz
-a3RvcD0nICsgc2VsZi5kZXNrdG9wICsgJzsgZWNobyAtbmUgIldhaXQ6IEluc3RhbGxpbmcgYmFz
-ZSBwYWNrYWdlcyB3aXRoIGRlc2t0b3AgJGRlc2t0b3AgdG8gL21udCI7IGNhc2UgJGRlc2t0b3Ag
-aW4gZ25vbWUpIHBhY3N0cmFwIC9tbnQgLS1ub3Byb2dyZXNzYmFyIGdub21lLXNvZnR3YXJlLXBh
-Y2thZ2VraXQtcGx1Z2luIGdub21lIGdkbSBsaW51eCBsaW51eC1maXJtd2FyZSBmbGF0cGFrIGJh
-c2UgYmFzZS1kZXZlbCBuZXR3b3JrbWFuYWdlciBibHVleiBmaXJlZm94IGJhc2gtY29tcGxldGlv
-biBncnViIG9zLXByb2JlciB4b3JnOzsga2RlKSBwYWNzdHJhcCAvbW50IC0tbm9wcm9ncmVzc2Jh
-ciBwbGFzbWEgZG9scGhpbiBrb25zb2xlIGRpc2NvdmVyIHBhY2thZ2VraXQtcXQ1IHBsYXNtYS13
-YXlsYW5kLXNlc3Npb24gc2RkbSBsaW51eCBsaW51eC1maXJtd2FyZSBmbGF0cGFrIGJhc2UgYmFz
-ZS1kZXZlbCBuZXR3b3JrbWFuYWdlciBibHVleiBmaXJlZm94IGJhc2gtY29tcGxldGlvbiBncnVi
-IG9zLXByb2JlciB4b3JnOzsgYnVkZ2llKSBwYWNzdHJhcCAvbW50IC0tbm9wcm9ncmVzc2JhciBi
-dWRnaWUtZGVza3RvcCBnbm9tZSBnbm9tZS1zb2Z0d2FyZS1wYWNrYWdla2l0LXBsdWdpbiBsaWdo
-dGRtLXdlYmtpdC10aGVtZS1saXRhcnZhbiBsaWdodGRtLXdlYmtpdDItZ3JlZXRlciBsaWdodGRt
-IGxpbnV4IGxpbnV4LWZpcm13YXJlIGZsYXRwYWsgYmFzZSBiYXNlLWRldmVsIG5ldHdvcmttYW5h
-Z2VyIGJsdWV6IGZpcmVmb3ggYmFzaC1jb21wbGV0aW9uIGdydWIgb3MtcHJvYmVyIHhvcmc7OyBj
-aW5uYW1vbikgcGFjc3RyYXAgL21udCAtLW5vcHJvZ3Jlc3NiYXIgY2lubmFtb24gZ25vbWUtc29m
-dHdhcmUgZ25vbWUtc29mdHdhcmUtcGFja2FnZWtpdC1wbHVnaW4gbGlnaHRkbS1zbGljay1ncmVl
-dGVyIGxpZ2h0ZG0gbGludXggbGludXgtZmlybXdhcmUgZmxhdHBhayBiYXNlIGJhc2UtZGV2ZWwg
-bmV0d29ya21hbmFnZXIgYmx1ZXogZmlyZWZveCBiYXNoLWNvbXBsZXRpb24gZ3J1YiBvcy1wcm9i
-ZXIgeG9yZzs7IHBhbnRoZW9uKSBwYWNzdHJhcCAvbW50IC0tbm9wcm9ncmVzc2JhciBwYW50aGVv
-biBsaWd0aGRtLXBhbnRoZW9uLWdyZWV0ZXIgbGlnaHRkbSBsaW51eCBsaW51eC1maXJtd2FyZSBm
-bGF0cGFrIGJhc2UgYmFzZS1kZXZlbCBuZXR3b3JrbWFuYWdlciBibHVleiBmaXJlZm94IGJhc2gt
-Y29tcGxldGlvbiBncnViIG9zLXByb2JlciB4b3JnOzsgZGRlKSBwYWNzdHJhcCAvbW50IC0tbm9w
-cm9ncmVzc2JhciBkZWVwaW4gZGVlcGluLWV4dHJhIGRlZXBpbi1zdG9yZSBkZWVwaW4tc2Vzc2lv
-bi1zaGVsbCBsaWdodGRtIGxpbnV4IGxpbnV4LWZpcm13YXJlIGZsYXRwYWsgYmFzZSBiYXNlLWRl
-dmVsIG5ldHdvcmttYW5hZ2VyIGJsdWV6IGZpcmVmb3ggYmFzaC1jb21wbGV0aW9uIGdydWIgb3Mt
-cHJvYmVyIHhvcmc7OyBlc2FjOyBlY2hvIC1uZSAiRG9uZTogSW5zdGFsbGluZyBiYXNlIHBhY2th
-Z2VzIHdpdGggZGVza3RvcCAkZGVza3RvcCB0byAvbW50IiddKQoKICAgIGRlZiBnZW5lcmF0ZWZz
-dGFiKHNlbGYpOgogICAgICAgIHNlbGYubG9ncy5zZXRUZXh0KHNlbGYubG9ncy50ZXh0KCkgKyAi
-XG4iICsgc2VsZi5wYWNzdHJhcC5yZWFkQWxsU3RhbmRhcmRFcnJvcigpKQogICAgICAgIGlmIHNl
-bGYucGFjc3RyYXAuZXhpdENvZGUoKSAhPSAwOgogICAgICAgICAgICBhcHBfZXJyb3IoKQogICAg
-ICAgICAgICByZXR1cm4KICAgICAgICBzZWxmLnVwZGF0ZU91dHB1dCgiIiwgVHJ1ZSkKICAgICAg
-ICBzZWxmLnVwZGF0ZXByb2dyZXNzYmFyKCkKICAgICAgICBzZWxmLnRhc2suc2V0VGV4dCgiR2Vu
-ZXJhdGluZyBmc3RhYiIpCiAgICAgICAgc2VsZi5nZW5mc3RhYiA9IFFQcm9jZXNzKCkKICAgICAg
-ICBzZWxmLmdlbmZzdGFiLmZpbmlzaGVkLmNvbm5lY3Qoc2VsZi5jb25maWdwY2luZm8pCiAgICAg
-ICAgc2VsZi5nZW5mc3RhYi5yZWFkeVJlYWQuY29ubmVjdChsYW1iZGE6IHNlbGYudXBkYXRlT3V0
-cHV0KHNlbGYuZ2VuZnN0YWIucmVhZEFsbFN0YW5kYXJkT3V0cHV0KCksIEZhbHNlKSkKICAgICAg
-ICBzZWxmLmdlbmZzdGFiLnN0YXJ0KCJzaCIsIFsnLWMnLCAnc2V0IC1lRTsgdHJhcCAiZWNobyAt
-ZSBcXFwiXG5GQUlMXFxcIiIgRVJSOyBlY2hvIC1uZSAiV2FpdDogR2VuZXJhdGluZyBmc3RhYiI7
-IGdlbmZzdGFiIC1VIC9tbnQgPj4gL21udC9ldGMvZnN0YWI7IGVjaG8gLW5lICJEb25lOiBHZW5l
-cmF0aW5nIGZzdGFiIiddKQoKICAgIGRlZiBjb25maWdwY2luZm8oc2VsZik6CiAgICAgICAgc2Vs
-Zi5sb2dzLnNldFRleHQoc2VsZi5sb2dzLnRleHQoKSArICJcbiIgKyBzZWxmLmdlbmZzdGFiLnJl
-YWRBbGxTdGFuZGFyZEVycm9yKCkpCiAgICAgICAgaWYgc2VsZi5nZW5mc3RhYi5leGl0Q29kZSgp
-ICE9IDA6CiAgICAgICAgICAgIGFwcF9lcnJvcigpCiAgICAgICAgICAgIHJldHVybgogICAgICAg
-IHNlbGYudXBkYXRlT3V0cHV0KCIiLCBUcnVlKQogICAgICAgIHNlbGYudXBkYXRlcHJvZ3Jlc3Ni
-YXIoKQogICAgICAgIHNlbGYudGFzay5zZXRUZXh0KCJTZXR0aW5nIFBDIGNvbmZpZ3VyYXRpb24i
-KQogICAgICAgIHNlbGYuY29uZmlncGMgPSBRUHJvY2VzcygpCiAgICAgICAgc2VsZi5jb25maWdw
-Yy5maW5pc2hlZC5jb25uZWN0KHNlbGYuY29uZmlndXNlcnMpCiAgICAgICAgc2VsZi5jb25maWdw
-Yy5yZWFkeVJlYWQuY29ubmVjdChsYW1iZGE6IHNlbGYudXBkYXRlT3V0cHV0KHNlbGYuY29uZmln
-cGMucmVhZEFsbFN0YW5kYXJkT3V0cHV0KCksIEZhbHNlKSkKICAgICAgICBzZWxmLmNvbmZpZ3Bj
-LnN0YXJ0KCJzaCIsIFsnLWMnLCAnaG9zdG5hbWU9JyArIHNlbGYuaG9zdG5hbWUgKyAnOyBsYW5n
-dWFnZT0nICsgc2VsZi5sYW5ndWFnZSArICc7IGtleW1hcD0nICsgc2VsZi5rZXltYXAgKyAnOyB0
-aW1lem9uZT0nICsgc2VsZi50aW1lem9uZSArICc7IHNldCAtZUU7IHRyYXAgImVjaG8gLWUgXFxc
-IlxuRkFJTFxcXCIiIEVSUjsgZWNobyAtbmUgIldhaXQ6IFNldHRpbmcgaG9zdG5hbWUiOyBlY2hv
-ICIkaG9zdG5hbWUiID4+IC9tbnQvZXRjL2hvc3RuYW1lOyBlY2hvIC1uZSAiRG9uZTogU2V0dGlu
-ZyBob3N0bmFtZVxuV2FpdDogU2V0dGluZyBsb2NhbGUiOyBlY2hvIFwiJGxhbmd1YWdlXCIgPj4g
-L21udC9ldGMvbG9jYWxlLmdlbjsgYXJjaC1jaHJvb3QgL21udCBsb2NhbGUtZ2VuOyBlY2hvIFwi
-TEFORz0kKGVjaG8gJGxhbmd1YWdlIHwgY3V0IC1kIFxcXCIgXFxcIiAtZiAxKVwiID4gL21udC9l
-dGMvbG9jYWxlLmNvbmY7IGVjaG8gLW5lICJEb25lOiBTZXR0aW5nIGhvc3RuYW1lXG5Eb25lOiBT
-ZXR0aW5nIGxvY2FsZVxuV2FpdDogU2V0dGluZyBrZXltYXAiOyBlY2hvIFwiS0VZTUFQPSRrZXlt
-YXBcIiA+IC9tbnQvZXRjL3Zjb25zb2xlLmNvbmY7IGVjaG8gLW5lICJEb25lOiBTZXR0aW5nIGhv
-c3RuYW1lXG5Eb25lOiBTZXR0aW5nIGxvY2FsZVxuRG9uZTogU2V0dGluZyBrZXltYXBcbldhaXQ6
-IFNldHRpbmcgdGltZXpvbmUiOyBjZCAvbW50L2V0Yy87IGxuIC1zdmYgLi4vdXNyL3NoYXJlL3pv
-bmVpbmZvLyR0aW1lem9uZSBsb2NhbHRpbWU7IGVjaG8gLW5lICJEb25lOiBTZXR0aW5nIGhvc3Ru
-YW1lXG5Eb25lOiBTZXR0aW5nIGxvY2FsZVxuRG9uZTogU2V0dGluZyBrZXltYXBcbkRvbmU6IFNl
-dHRpbmcgdGltZXpvbmUiJ10pCgogICAgZGVmIGNvbmZpZ3VzZXJzKHNlbGYpOgogICAgICAgIHNl
-bGYubG9ncy5zZXRUZXh0KHNlbGYubG9ncy50ZXh0KCkgKyAiXG4iICsgc2VsZi5jb25maWdwYy5y
-ZWFkQWxsU3RhbmRhcmRFcnJvcigpKQogICAgICAgIGlmIHNlbGYuY29uZmlncGMuZXhpdENvZGUo
-KSAhPSAwOgogICAgICAgICAgICBhcHBfZXJyb3IoKQogICAgICAgICAgICByZXR1cm4KICAgICAg
-ICBzZWxmLnVwZGF0ZU91dHB1dCgiIiwgVHJ1ZSkKICAgICAgICBzZWxmLnVwZGF0ZXByb2dyZXNz
-YmFyKCkKICAgICAgICBzZWxmLnRhc2suc2V0VGV4dCgiQ29uZmlndXJpbmcgdXNlcnMiKQogICAg
-ICAgIHNlbGYudXNlcmFkZCA9IFFQcm9jZXNzKCkKICAgICAgICBzZWxmLnVzZXJhZGQuZmluaXNo
-ZWQuY29ubmVjdChzZWxmLmNvbmZpZ3NlcnZpY2VzKQogICAgICAgIHNlbGYudXNlcmFkZC5yZWFk
-eVJlYWQuY29ubmVjdChsYW1iZGE6IHNlbGYudXBkYXRlT3V0cHV0KHNlbGYudXNlcmFkZC5yZWFk
-QWxsU3RhbmRhcmRPdXRwdXQoKSwgRmFsc2UpKQogICAgICAgIHJvb3Rwd2QgPSAnJy5qb2luKHJh
-bmRvbS5TeXN0ZW1SYW5kb20oKS5jaG9pY2Uoc3RyaW5nLmFzY2lpX3VwcGVyY2FzZSArIHN0cmlu
-Zy5kaWdpdHMpIGZvciBfIGluIHJhbmdlKDUwKSkKICAgICAgICBzZWxmLnVzZXJhZGQuc3RhcnQo
-InNoIiwgWyctYycsICd1bmFtZXN5cz0nICsgc2VsZi51bmFtZXN5cyArICc7IHVuYW1lPScgKyBz
-ZWxmLnVuYW1lICsgJzsgcGFzc3dvcmQ9JyArIHNlbGYucGFzc3dvcmQgKyAnOyBzZXQgLWVFOyB0
-cmFwICJlY2hvIFxcXCJcbkZBSUxcXFwiIiBFUlI7IGVjaG8gLW5lICJXYWl0OiBBZGRpbmcgdXNl
-ciBcIiR1bmFtZXN5c1wiIjsgdXNlcmFkZCAtUiAvbW50IC1tRyB3aGVlbCxzeXMgIiR1bmFtZXN5
-cyI7IGVjaG8gLW5lICJEb25lOiBBZGRpbmcgdXNlciBcIiR1bmFtZXN5c1wiXG5XYWl0OiBTZXR0
-aW5nIHBhc3N3b3JkIGZvciBcIiR1bmFtZXN5c1wiIjsgZWNobyAtZSAiJHBhc3N3b3JkXG4kcGFz
-c3dvcmQiIHwgcGFzc3dkIC1SIC9tbnQgIiR1bmFtZXN5cyI7IGlmIFsgIiR1bmFtZSIgIT0gIiIg
-XTsgdGhlbiBleHBvcnQgYT10cnVlOyBlY2hvIC1uZSAiRG9uZTogQWRkaW5nIHVzZXIgXCIkdW5h
-bWVzeXNcIlxuRG9uZTogU2V0dGluZyBwYXNzd29yZCBmb3IgXCJ1bmFtZXN5c1wiXG5XYWl0OiBT
-ZXR0aW5nIHByZXR0eSBuYW1lIHRvIFwiJHVuYW1lXCIgZm9yIHVzZXIgXCIkdW5hbWVzeXNcIiI7
-IGFyY2gtY2hyb290IC9tbnQgY2hmbiAtZiAiJHVuYW1lIiAiJHVuYW1lc3lzIjsgZmk7IGlmIFsg
-JGEgPT0gdHJ1ZSBdOyB0aGVuIGVjaG8gLW5lICJEb25lOiBBZGRpbmcgdXNlciBcIiR1bmFtZXN5
-c1wiXG5Eb25lOiBTZXR0aW5nIHBhc3N3b3JkIGZvciBcIiR1bmFtZXN5c1wiXG5Eb25lOiBTZXR0
-aW5nIHByZXR0eSBuYW1lIHRvIFwiJHVuYW1lXCIgZm9yIHVzZXIgXCIkdW5hbWVzeXNcIlxuV2Fp
-dDogU2V0dGluZyByYW5kb20gcm9vdCBwYXNzd29yZCI7IGVsc2UgZWNobyAtbmUgIkRvbmU6IEFk
-ZGluZyB1c2VyIFwiJHVuYW1lc3lzXCJcbkRvbmU6IFNldHRpbmcgcGFzc3dvcmQgZm9yIFwiJHVu
-YW1lc3lzXCJcbldhaXQ6IFNldHRpbmcgcmFuZG9tIHJvb3QgcGFzc3dvcmQiOyBmaTsgZWNobyAi
-JyArIHJvb3Rwd2QgKyAnXG4nICsgcm9vdHB3ZCArICciIHwgcGFzc3dkIC1SIC9tbnQgcm9vdDsg
-aWYgWyAkYSA9PSB0cnVlIF07IHRoZW4gZWNobyAtbmUgIkRvbmU6IEFkZGluZyB1c2VyIFwiJHVu
-YW1lc3lzXCJcbkRvbmU6IFNldHRpbmcgcGFzc3dvcmQgZm9yIFwiJHVuYW1lc3lzXCJcbkRvbmU6
-IFNldHRpbmcgcHJldHR5IG5hbWUgdG8gXCIkdW5hbWVcIiBmb3IgdXNlciBcIiR1bmFtZXN5c1wi
-XG5Eb25lOiBTZXR0aW5nIHJhbmRvbSByb290IHBhc3N3b3JkIjsgZWxzZSBlY2hvIC1uZSAiRG9u
-ZTogQWRkaW5nIHVzZXIgXCIkdW5hbWVzeXNcIlxuRG9uZTogU2V0dGluZyBwYXNzd29yZCBmb3Ig
-XCIkdW5hbWVzeXNcIlxuRG9uZTogU2V0dGluZyByYW5kb20gcm9vdCBwYXNzd29yZCI7IGZpJ10p
-CgogICAgZGVmIGNvbmZpZ3NlcnZpY2VzKHNlbGYpOgogICAgICAgIHNlbGYubG9ncy5zZXRUZXh0
-KHNlbGYubG9ncy50ZXh0KCkgKyAiXG4iICsgc2VsZi51c2VyYWRkLnJlYWRBbGxTdGFuZGFyZEVy
-cm9yKCkpCiAgICAgICAgaWYgc2VsZi51c2VyYWRkLmV4aXRDb2RlKCkgIT0gMDoKICAgICAgICAg
-ICAgYXBwX2Vycm9yKCkKICAgICAgICAgICAgcmV0dXJuCiAgICAgICAgc2VsZi51cGRhdGVPdXRw
-dXQoIiIsIFRydWUpCiAgICAgICAgc2VsZi51cGRhdGVwcm9ncmVzc2JhcigpCiAgICAgICAgc2Vs
-Zi50YXNrLnNldFRleHQoIkVuYWJsaW5nIHN5c3RlbSBzZXJ2aWNlcyIpCiAgICAgICAgc2VsZi5z
-eXN0ZW1jdGwgPSBRUHJvY2VzcygpCiAgICAgICAgc2VsZi5zeXN0ZW1jdGwuZmluaXNoZWQuY29u
-bmVjdChzZWxmLnRvdWNoZXMpCiAgICAgICAgc2VsZi5zeXN0ZW1jdGwucmVhZHlSZWFkLmNvbm5l
-Y3QobGFtYmRhOiBzZWxmLnVwZGF0ZU91dHB1dChzZWxmLnN5c3RlbWN0bC5yZWFkQWxsU3RhbmRh
-cmRPdXRwdXQoKSwgRmFsc2UpKQogICAgICAgIHNlbGYuc3lzdGVtY3RsLnN0YXJ0KCJzaCIsIFsn
-LWMnLCAnZGVza3RvcD0nICsgc2VsZi5kZXNrdG9wICsgJzsgc2V0IC1lRTsgdHJhcCAiZWNobyBc
-XFwiXG5GQUlMXFxcIiIgRVJSO2Nhc2UgJGRlc2t0b3AgaW4gZ25vbWUpIGV4cG9ydCBkbT1nZG07
-OyBrZGUpIGV4cG9ydCBkbT1zZGRtOzsgYnVkZ2llKSBleHBvcnQgZG09bGlnaHRkbTsgZXhwb3J0
-IGdyZWV0ZXI9bGlnaHRkbS13ZWJraXQyLWdyZWV0ZXI7OyBjaW5uYW1vbikgZXhwb3J0IGRtPWxp
-Z2h0ZG07IGV4cG9ydCBncmVldGVyPWxpZ2h0ZG0tc2xpY2stZ3JlZXRlcjs7IHBhbnRoZW9uKSBl
-eHBvcnQgZG09bGlnaHRkbTsgZXhwb3J0IGdyZWV0ZXI9aW8uZWxlbWVudGFyeS5ncmVldGVyOzsg
-ZGRlKSBleHBvcnQgZG09bGlnaHRkbTsgZXhwb3J0IGdyZWV0ZXI9bGlndGhkbS1kZWVwaW4tZ3Jl
-ZXRlcjs7IGVzYWM7IGlmIFsgIiRkbSIgPT0gImxpZ2h0ZG0iIF07IHRoZW4gc2VkIC1pICJzL2V4
-YW1wbGUtZ3RrLWdub21lLyRncmVldGVyL2ciIC9tbnQvZXRjL2xpZ2h0ZG0vbGlnaHRkbS5jb25m
-OyBpZiBbICIkZ3JlZXRlciIgPT0gImxpZ2h0ZG0td2Via2l0Mi1ncmVldGVyIl07IHRoZW4gc2Vk
-IC1pICJzL2FudGVyZ29zL2xpdGFydmFuLyIgL21udC9ldGMvbGlnaHRkbS9saWdodGRtLXdlYmtp
-dDItZ3JlZXRlci5jb25mOyBmaTsgZmk7IGVjaG8gLW5lICJXYWl0OiBFbmFibGluZyBzeXN0ZW0g
-c2VydmljZXMiOyBhcmNoLWNocm9vdCAvbW50IHN5c3RlbWN0bCBlbmFibGUgTmV0d29ya01hbmFn
-ZXIgYmx1ZXRvb3RoICRkbTsgZWNobyAtbmUgIkRvbmU6IEVuYWJsaW5nIHN5c3RlbSBzZXJ2aWNl
-cyInXSkKCiAgICBkZWYgdG91Y2hlcyhzZWxmKToKICAgICAgICBzZWxmLmxvZ3Muc2V0VGV4dChz
-ZWxmLmxvZ3MudGV4dCgpICsgIlxuIiArIHNlbGYuc3lzdGVtY3RsLnJlYWRBbGxTdGFuZGFyZEVy
-cm9yKCkpCiAgICAgICAgaWYgc2VsZi5zeXN0ZW1jdGwuZXhpdENvZGUoKSAhPSAwOgogICAgICAg
-ICAgICBhcHBfZXJyb3IoKQogICAgICAgICAgICByZXR1cm4KICAgICAgICBzZWxmLnVwZGF0ZU91
-dHB1dCgiIiwgVHJ1ZSkKICAgICAgICBzZWxmLnVwZGF0ZXByb2dyZXNzYmFyKCkKICAgICAgICBz
-ZWxmLnRhc2suc2V0VGV4dCgiQWRkaW5nIGZpbmlzaGluZyB0b3VjaGVzIikKICAgICAgICBzZWxm
-LmVjaG8gPSBRUHJvY2VzcygpCiAgICAgICAgc2VsZi5lY2hvLmZpbmlzaGVkLmNvbm5lY3Qoc2Vs
-Zi5ib290bG9hZGVyKQogICAgICAgIHNlbGYuZWNoby5yZWFkeVJlYWQuY29ubmVjdChsYW1iZGE6
-IHNlbGYudXBkYXRlT3V0cHV0KHNlbGYuZWNoby5yZWFkQWxsU3RhbmRhcmRPdXRwdXQoKSwgRmFs
-c2UpKQogICAgICAgIHNlbGYuZWNoby5zdGFydCgic2giLCBbJy1jJywgJ2hvc3RuYW1lPScgKyBz
-ZWxmLmhvc3RuYW1lICsgJzsgc2V0IC1lRTsgdHJhcCAiZWNobyBcXFwiXG5GQUlMXFxcIiIgRVJS
-OyBlY2hvIC1uZSAiV2FpdDogU2V0dGluZyBob3N0cyBmaWxlIjsgZWNobyAtZSAiMTI3LjAuMC4x
-CWxvY2FsaG9zdFxuOjoxCQlsb2NhbGhvc3RcbjEyNy4wLjEuMQlcIiRob3N0bmFtZVwiIiA+PiAv
-bW50L2V0Yy9ob3N0czsgZWNobyAtbmUgIkRvbmU6IFNldHRpbmcgaG9zdHMgZmlsZVxuV2FpdDog
-RW5hYmxpbmcgc3VkbyBhY2Nlc3MgZm9yIGdyb3VwIHdoZWVsIjsgZWNobyAtZSAiJXdoZWVsIEFM
-TD0oQUxMKSBBTEwiID4+IC9tbnQvZXRjL3N1ZG9lcnM7IGVjaG8gLW5lICJEb25lOiBTZXR0aW5n
-IGhvc3RzIGZpbGVcbkRvbmU6IEVuYWJsaW5nIHN1ZG8gYWNjZXNzIGZvciBncm91cCB3aGVlbCIn
-XSkKCiAgICBkZWYgYm9vdGxvYWRlcihzZWxmKToKICAgICAgICBzZWxmLmxvZ3Muc2V0VGV4dChz
-ZWxmLmxvZ3MudGV4dCgpICsgIlxuIiArIHNlbGYuZWNoby5yZWFkQWxsU3RhbmRhcmRFcnJvcigp
-KQogICAgICAgIGlmIHNlbGYuZWNoby5leGl0Q29kZSgpICE9IDA6CiAgICAgICAgICAgIGFwcF9l
-cnJvcigpCiAgICAgICAgICAgIHJldHVybgogICAgICAgIHNlbGYudXBkYXRlT3V0cHV0KCIiLCBU
-cnVlKQogICAgICAgIHNlbGYudXBkYXRlcHJvZ3Jlc3NiYXIoKQogICAgICAgIHNlbGYudGFzay5z
-ZXRUZXh0KCJVcGRhdGluZyBib290bG9hZGVyIGVudHJpZXMiKQogICAgICAgIHNlbGYuZ3J1YiA9
-IFFQcm9jZXNzKCkKICAgICAgICBzZWxmLmdydWIuZmluaXNoZWQuY29ubmVjdChzZWxmLnByZWZp
-bmlzaCkKICAgICAgICBzZWxmLmdydWIucmVhZHlSZWFkLmNvbm5lY3QobGFtYmRhOiBzZWxmLnVw
-ZGF0ZU91dHB1dChzZWxmLmdydWIucmVhZEFsbFN0YW5kYXJkT3V0cHV0KCksIEZhbHNlKSkKICAg
-ICAgICBzZWxmLmdydWIuc3RhcnQoInNoIiwgWyctYycsICdzZXQgLWVFOyB0cmFwICJlY2hvIFxc
-XCJcbkZBSUxcXFwiIiBFUlI7IGVjaG8gLW5lICJXYWl0OiBDb25maWd1cmluZyBib290bG9hZGVy
-IGVudHJpZXMiOyBlY2hvICJHUlVCX0RJU0FCTEVfT1NfUFJPQkVSPWZhbHNlIiA+PiAvbW50L2V0
-Yy9kZWZhdWx0L2dydWI7IGFyY2gtY2hyb290IC9tbnQgZ3J1Yi1ta2NvbmZpZyAtbyAvYm9vdC9n
-cnViL2dydWIuY2ZnOyBlY2hvIC1uZSAiRG9uZTogQ29uZmlndXJpbmcgYm9vdGxvYWRlciBlbnRy
-aWVzIiddKQoKICAgIGRlZiBwcmVmaW5pc2goc2VsZik6CiAgICAgICAgc2VsZi5sb2dzLnNldFRl
-eHQoc2VsZi5sb2dzLnRleHQoKSArICJcbiIgKyBzZWxmLmdydWIucmVhZEFsbFN0YW5kYXJkRXJy
-b3IoKSkKICAgICAgICBpZiBzZWxmLmdydWIuZXhpdENvZGUoKSAhPSAwOgogICAgICAgICAgICBh
-cHBfZXJyb3IoKQogICAgICAgICAgICByZXR1cm4KICAgICAgICBzZWxmLmZpbmlzaCgpCgogICAg
-ZGVmIGZpbmlzaChzZWxmKToKICAgICAgICBzZWxmLnRhYmJhci5kZWxldGVMYXRlcigpCiAgICAg
-ICAgc2VsZi50YXNrLmRlbGV0ZUxhdGVyKCkKICAgICAgICBzZWxmLnByb2dyZXNzYmFyLmRlbGV0
-ZUxhdGVyKCkKICAgICAgICBzZWxmLmZpbmlzaGVkID0gUUxhYmVsKCJUaGUgaW5zdGFsbGF0aW9u
-IGhhcyBmaW5pc2hlZCIpCiAgICAgICAgc2VsZi5maW5pc2hlZC5zZXRBbGlnbm1lbnQoUXQuQWxp
-Z25DZW50ZXIpCiAgICAgICAgc2VsZi5yZWJvb3RCdXR0b24gPSBRUHVzaEJ1dHRvbigiUmVib290
-IG5vdyIpCiAgICAgICAgc2VsZi5sYXlvdXQuYWRkV2lkZ2V0KHNlbGYuZmluaXNoZWQpCiAgICAg
-ICAgc2VsZi5sYXlvdXQuYWRkV2lkZ2V0KHNlbGYucmVib290QnV0dG9uKQogICAgICAgIHNlbGYu
-cmVib290QnV0dG9uLmNsaWNrZWQuY29ubmVjdChsYW1iZGE6IG9zLnN5c3RlbSgncmVib290Jykp
-CgogICAgZGVmIHVwZGF0ZXByb2dyZXNzYmFyKHNlbGYpOgogICAgICAgIG51bWJlcm9mdGltZXMg
-PSBtYXRoLmNlaWwoc2VsZi5wcm9ncmVzc2Jhci52YWx1ZSgpICogc2VsZi5udW1iZXJvZnRhc2tz
-IC8gMTAwKQogICAgICAgIHNlbGYucHJvZ3Jlc3NiYXIuc2V0VmFsdWUoKG51bWJlcm9mdGltZXMg
-KyAxKSAqIDEwMCAvIHNlbGYubnVtYmVyb2Z0YXNrcykKCiAgICBkZWYgZG9zdGgoc2VsZik6CiAg
-ICAgICAgaWYgc2VsZi5waW5nLmV4aXRDb2RlKCkgIT0gMDoKICAgICAgICAgICAgc2VsZi5tZXNz
-YWdlLnNldFRleHQoIlVuYWJsZSB0byBjb25uZWN0IHRvIG5ldHdvcmssIHBsZWFzZSBjb25uZWN0
-IHdpdGggdGhlIHRhc2tiYXIgaWNvbiBhbmQgcmVzdGFydCB0aGUgaW5zdGFsbGVyIikKICAgICAg
-ICAgICAgc2VsZi5wcm9ncmVzc2Jhci5oaWRlKCkKICAgICAgICBlbHNlOgogICAgICAgICAgICBz
-ZWxmLnN0YXJ0aW5zdGFsbGluZygpCgogICAgQFNsb3QoKQogICAgZGVmIGNoZWNrZm9ybmV0d29y
-ayhzZWxmKToKICAgICAgICBzZWxmLnNob3coKQogICAgICAgIHNlbGYubWVzc2FnZS5zZXRUZXh0
-KCJDaGVja2luZyIpCiAgICAgICAgc2VsZi5waW5nID0gUVByb2Nlc3MoKQogICAgICAgIHNlbGYu
-cGluZy5maW5pc2hlZC5jb25uZWN0KHNlbGYuZG9zdGgpCiAgICAgICAgc2VsZi5waW5nLnN0YXJ0
-KCJwaW5nIiwgWyItYzEiLCAiYXJjaGxpbnV4Lm9yZyJdKQoKCmlmIF9fbmFtZV9fID09ICJfX21h
-aW5fXyI6CiAgICBhcHAgPSBRQXBwbGljYXRpb24oc3lzLmFyZ3YpCgogICAgd2lkZ2V0ID0gTXlX
-aWRnZXQoKQogICAgd2lkZ2V0LnNob3coKQoKICAgIHN5cy5leGl0KGFwcC5leGVjKCkpCg==
+﻿cat <<- EOF > /bin.py
+import os
+import random
+import sys
+import threading
+import time
+import base64
+import math
+import string
+import configparser
+
+from PySide6.QtCore import Qt, Slot, QProcess
+from PySide6.QtWidgets import (QApplication, QLabel, QPushButton,
+                               QVBoxLayout, QWidget, QProgressBar,
+                               QTabWidget, QHBoxLayout, QDialog,
+                               QDialogButtonBox, QScrollArea)
+
+
+class Dialog(QDialog):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("WinArch (stage 2) - Error")
+        self.setGeometry(0, 0, 100, 50)
+        q_btn = QDialogButtonBox.Yes | QDialogButtonBox.No
+
+        self.buttonBox = QDialogButtonBox(q_btn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        self.layout = QVBoxLayout()
+        message = QLabel("An error occurred, do you want to exit now ?")
+        self.layout.addWidget(message)
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
+
+
+def app_error():
+    if Dialog().exec():
+        sys.exit()
+
+
+class MyWidget(QWidget):
+    def __init__(self):
+        QWidget.__init__(self)
+        _, self.desktop, self.hostname, self.keymap, self.language, self.timezone, self.unamesys, self.uname, self.password = sys.argv
+        self.numberoftasks = 8
+        self.dobreak = False
+        self.setWindowTitle("WinArch installer (stage 2)")
+        self.message = QLabel("Checking for network connectivity")
+        self.message.setAlignment(Qt.AlignCenter)
+        self.progressbar = QProgressBar()
+        self.progressbar.setMinimum(0)
+        self.progressbar.setMaximum(0)
+        self.progressbar.setValue(0)
+        self.setGeometry(0, 0, 800, 450)
+        self.setMinimumSize(800, 450)
+        self.layout = QVBoxLayout(self)
+        self.layout.addWidget(self.message)
+        self.layout.addWidget(self.progressbar)
+        self.checkfornetwork()
+
+    def changetab(self):
+        while True:
+            if self.dobreak:
+                break
+            else:
+                time.sleep(2)
+                if self.tabs.currentIndex() <= (self.tabs.count() - 2):
+                    self.tabs.setCurrentIndex((self.tabs.currentIndex() + 1) % (self.tabs.count() - 2))
+
+    def startinstalling(self):
+        # threading.Thread(target=self.changetab).start()
+        config = configparser.ConfigParser(allow_no_value=True)
+        config.optionxform = str
+        config.read('/etc/pacman.conf')
+        config['options']['ParallelDownloads'] = '10'
+        config.write(open('/etc/pacman.conf', 'w'))
+        self.message.deleteLater()
+        self.tabbar = QTabWidget()
+        self.task = QLabel()
+        self.layout.addWidget(self.tabbar)
+        self.layout.addWidget(self.task)
+        self.layout.addWidget(self.progressbar)
+        self.progressbar.setMaximum(100)
+        self.progressbar.setValue(0)
+        self.logs = QLabel()
+        self.logs.setAlignment(Qt.AlignTop)
+        self.output = QLabel()
+        self.output.setAlignment(Qt.AlignTop)
+        self.scrollerlogs = QScrollArea()
+        self.scrollerlogs.setWidget(self.logs)
+        self.scrollerlogs.setWidgetResizable(True)
+        self.scrolleroutput = QScrollArea()
+        self.scrolleroutput.setWidget(self.output)
+        self.scrolleroutput.setWidgetResizable(True)
+        self.tabbar.addTab(self.scrolleroutput, "Installer output")
+        self.tabbar.addTab(self.scrollerlogs, "Installer errors")
+        self.task.setText("Formatting partitions")
+        self.snapshot = ""
+        self.partition = QProcess()
+        self.partition.finished.connect(self.installpackages)
+        self.partition.readyRead.connect(lambda: self.updateOutput(self.partition.readAllStandardOutput(), False))
+        self.partition.start("sh", ['-c', 'set -eE; trap "echo -e \\\"\nFAIL\\\"" ERR; echo -en "Wait: Setting NTP"; timedatectl set-ntp true; umount -l /mnt 2>/dev/null || true; echo -en "Done: Setting NTP\nWait: Formatting /dev/disk/by-label/ARCH as ext4 with label ARCH";  yes | mkfs.ext4 -F -F -q -L ARCH /dev/disk/by-label/ARCH; echo -en "Done: Setting NTP\nDone: Formatting /dev/disk/by-label/ARCH as ext4 with label ARCH\nWait: Mounting this partition to /mnt"; mount /dev/disk/by-label/ARCH /mnt; mkdir -p /mnt/boot; drive="/dev/$(lsblk -ndo pkname $(findmnt /mnt -o SOURCE -un))"; device="$(fdisk -l $drive -o Device,Type | grep "EFI System" | cut -d \" \" -f1)"; echo -en "Done: Setting NTP\nDone: Formatting /dev/disk/by-label/ARCH as ext4 with label ARCH\nDone: Mounting this partition to /mnt\nWait: Mounting $device to /mnt/boot"; mount \"$device\" /mnt/boot; echo -en "Done: Setting NTP\nDone: Formatting /dev/disk/by-label/ARCH as ext4 with label ARCH\nDone: Mounting this partition to /mnt\nDone: Mounting $device to /mnt/boot";'])
+
+    def updateOutput(self, output, clear):
+        if output == "\nFAIL\n":
+            self.output.setText(self.output.text() + output)
+        else:
+            if clear:
+                self.snapshot = self.output.text() + "\n"
+            self.output.setText(self.snapshot + output)
+
+    def installpackages(self):
+        self.logs.setText(self.logs.text() + self.partition.readAllStandardError())
+        if self.partition.exitCode() != 0:
+            app_error()
+            return
+        self.updateOutput("", True)
+        self.updateprogressbar()
+        self.task.setText("Installing packages")
+        self.pacstrap = QProcess()
+        self.pacstrap.finished.connect(self.generatefstab)
+        self.pacstrap.readyRead.connect(lambda: self.updateOutput(self.pacstrap.readAllStandardOutput(), False))
+        self.pacstrap.start("sh", ['-c', 'desktop=' + self.desktop + '; echo -ne "Wait: Installing base packages with desktop $desktop to /mnt"; case $desktop in gnome) pacstrap /mnt --noprogressbar gnome-software-packagekit-plugin gnome gdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;; kde) pacstrap /mnt --noprogressbar plasma dolphin konsole discover packagekit-qt5 plasma-wayland-session sddm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;; budgie) pacstrap /mnt --noprogressbar budgie-desktop gnome gnome-software-packagekit-plugin lightdm-webkit-theme-litarvan lightdm-webkit2-greeter lightdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;; cinnamon) pacstrap /mnt --noprogressbar cinnamon gnome-software gnome-software-packagekit-plugin lightdm-slick-greeter lightdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;; pantheon) pacstrap /mnt --noprogressbar pantheon ligthdm-pantheon-greeter lightdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;; dde) pacstrap /mnt --noprogressbar deepin deepin-extra deepin-store deepin-session-shell lightdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;; esac; echo -ne "Done: Installing base packages with desktop $desktop to /mnt"'])
+
+    def generatefstab(self):
+        self.logs.setText(self.logs.text() + "\n" + self.pacstrap.readAllStandardError())
+        if self.pacstrap.exitCode() != 0:
+            app_error()
+            return
+        self.updateOutput("", True)
+        self.updateprogressbar()
+        self.task.setText("Generating fstab")
+        self.genfstab = QProcess()
+        self.genfstab.finished.connect(self.configpcinfo)
+        self.genfstab.readyRead.connect(lambda: self.updateOutput(self.genfstab.readAllStandardOutput(), False))
+        self.genfstab.start("sh", ['-c', 'set -eE; trap "echo -e \\\"\nFAIL\\\"" ERR; echo -ne "Wait: Generating fstab"; genfstab -U /mnt >> /mnt/etc/fstab; echo -ne "Done: Generating fstab"'])
+
+    def configpcinfo(self):
+        self.logs.setText(self.logs.text() + "\n" + self.genfstab.readAllStandardError())
+        if self.genfstab.exitCode() != 0:
+            app_error()
+            return
+        self.updateOutput("", True)
+        self.updateprogressbar()
+        self.task.setText("Setting PC configuration")
+        self.configpc = QProcess()
+        self.configpc.finished.connect(self.configusers)
+        self.configpc.readyRead.connect(lambda: self.updateOutput(self.configpc.readAllStandardOutput(), False))
+        self.configpc.start("sh", ['-c', 'hostname=' + self.hostname + '; language=' + self.language + '; keymap=' + self.keymap + '; timezone=' + self.timezone + '; set -eE; trap "echo -e \\\"\nFAIL\\\"" ERR; echo -ne "Wait: Setting hostname"; echo "$hostname" >> /mnt/etc/hostname; echo -ne "Done: Setting hostname\nWait: Setting locale"; echo \"$language\" >> /mnt/etc/locale.gen; arch-chroot /mnt locale-gen; echo \"LANG=$(echo $language | cut -d \\\" \\\" -f 1)\" > /mnt/etc/locale.conf; echo -ne "Done: Setting hostname\nDone: Setting locale\nWait: Setting keymap"; echo \"KEYMAP=$keymap\" > /mnt/etc/vconsole.conf; echo -ne "Done: Setting hostname\nDone: Setting locale\nDone: Setting keymap\nWait: Setting timezone"; cd /mnt/etc/; ln -svf ../usr/share/zoneinfo/$timezone localtime; echo -ne "Done: Setting hostname\nDone: Setting locale\nDone: Setting keymap\nDone: Setting timezone"'])
+
+    def configusers(self):
+        self.logs.setText(self.logs.text() + "\n" + self.configpc.readAllStandardError())
+        if self.configpc.exitCode() != 0:
+            app_error()
+            return
+        self.updateOutput("", True)
+        self.updateprogressbar()
+        self.task.setText("Configuring users")
+        self.useradd = QProcess()
+        self.useradd.finished.connect(self.configservices)
+        self.useradd.readyRead.connect(lambda: self.updateOutput(self.useradd.readAllStandardOutput(), False))
+        rootpwd = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(50))
+        self.useradd.start("sh", ['-c', 'unamesys=' + self.unamesys + '; uname=' + self.uname + '; password=' + self.password + '; set -eE; trap "echo \\\"\nFAIL\\\"" ERR; echo -ne "Wait: Adding user \"$unamesys\""; useradd -R /mnt -mG wheel,sys "$unamesys"; echo -ne "Done: Adding user \"$unamesys\"\nWait: Setting password for \"$unamesys\""; echo -e "$password\n$password" | passwd -R /mnt "$unamesys"; if [ "$uname" != "" ]; then export a=true; echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"unamesys\"\nWait: Setting pretty name to \"$uname\" for user \"$unamesys\""; arch-chroot /mnt chfn -f "$uname" "$unamesys"; fi; if [ $a == true ]; then echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"$unamesys\"\nDone: Setting pretty name to \"$uname\" for user \"$unamesys\"\nWait: Setting random root password"; else echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"$unamesys\"\nWait: Setting random root password"; fi; echo "' + rootpwd + '\n' + rootpwd + '" | passwd -R /mnt root; if [ $a == true ]; then echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"$unamesys\"\nDone: Setting pretty name to \"$uname\" for user \"$unamesys\"\nDone: Setting random root password"; else echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"$unamesys\"\nDone: Setting random root password"; fi'])
+
+    def configservices(self):
+        self.logs.setText(self.logs.text() + "\n" + self.useradd.readAllStandardError())
+        if self.useradd.exitCode() != 0:
+            app_error()
+            return
+        self.updateOutput("", True)
+        self.updateprogressbar()
+        self.task.setText("Enabling system services")
+        self.systemctl = QProcess()
+        self.systemctl.finished.connect(self.touches)
+        self.systemctl.readyRead.connect(lambda: self.updateOutput(self.systemctl.readAllStandardOutput(), False))
+        self.systemctl.start("sh", ['-c', 'desktop=' + self.desktop + '; set -eE; trap "echo \\\"\nFAIL\\\"" ERR;case $desktop in gnome) export dm=gdm;; kde) export dm=sddm;; budgie) export dm=lightdm; export greeter=lightdm-webkit2-greeter;; cinnamon) export dm=lightdm; export greeter=lightdm-slick-greeter;; pantheon) export dm=lightdm; export greeter=io.elementary.greeter;; dde) export dm=lightdm; export greeter=ligthdm-deepin-greeter;; esac; if [ "$dm" == "lightdm" ]; then sed -i "s/example-gtk-gnome/$greeter/g" /mnt/etc/lightdm/lightdm.conf; if [ "$greeter" == "lightdm-webkit2-greeter"]; then sed -i "s/antergos/litarvan/" /mnt/etc/lightdm/lightdm-webkit2-greeter.conf; fi; fi; echo -ne "Wait: Enabling system services"; arch-chroot /mnt systemctl enable NetworkManager bluetooth $dm; echo -ne "Done: Enabling system services"'])
+
+    def touches(self):
+        self.logs.setText(self.logs.text() + "\n" + self.systemctl.readAllStandardError())
+        if self.systemctl.exitCode() != 0:
+            app_error()
+            return
+        self.updateOutput("", True)
+        self.updateprogressbar()
+        self.task.setText("Adding finishing touches")
+        self.echo = QProcess()
+        self.echo.finished.connect(self.bootloader)
+        self.echo.readyRead.connect(lambda: self.updateOutput(self.echo.readAllStandardOutput(), False))
+        self.echo.start("sh", ['-c', 'hostname=' + self.hostname + '; set -eE; trap "echo \\\"\nFAIL\\\"" ERR; echo -ne "Wait: Setting hosts file"; echo -e "127.0.0.1  localhost\n::1          localhost\n127.0.1.1     \"$hostname\"" >> /mnt/etc/hosts; echo -ne "Done: Setting hosts file\nWait: Enabling sudo access for group wheel"; echo -e "%wheel ALL=(ALL) ALL" >> /mnt/etc/sudoers; echo -ne "Done: Setting hosts file\nDone: Enabling sudo access for group wheel"'])
+
+    def bootloader(self):
+        self.logs.setText(self.logs.text() + "\n" + self.echo.readAllStandardError())
+        if self.echo.exitCode() != 0:
+            app_error()
+            return
+        self.updateOutput("", True)
+        self.updateprogressbar()
+        self.task.setText("Updating bootloader entries")
+        self.grub = QProcess()
+        self.grub.finished.connect(self.prefinish)
+        self.grub.readyRead.connect(lambda: self.updateOutput(self.grub.readAllStandardOutput(), False))
+        self.grub.start("sh", ['-c', 'set -eE; trap "echo \\\"\nFAIL\\\"" ERR; echo -ne "Wait: Configuring bootloader entries"; echo "GRUB_DISABLE_OS_PROBER=false" >> /mnt/etc/default/grub; arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg; echo -ne "Done: Configuring bootloader entries"'])
+
+    def prefinish(self):
+        self.logs.setText(self.logs.text() + "\n" + self.grub.readAllStandardError())
+        if self.grub.exitCode() != 0:
+            app_error()
+            return
+        self.finish()
+
+    def finish(self):
+        self.tabbar.deleteLater()
+        self.task.deleteLater()
+        self.progressbar.deleteLater()
+        self.finished = QLabel("The installation has finished")
+        self.finished.setAlignment(Qt.AlignCenter)
+        self.rebootButton = QPushButton("Reboot now")
+        self.layout.addWidget(self.finished)
+        self.layout.addWidget(self.rebootButton)
+        self.rebootButton.clicked.connect(lambda: os.system('reboot'))
+
+    def updateprogressbar(self):
+        numberoftimes = math.ceil(self.progressbar.value() * self.numberoftasks / 100)
+        self.progressbar.setValue((numberoftimes + 1) * 100 / self.numberoftasks)
+
+    def dosth(self):
+        if self.ping.exitCode() != 0:
+            self.message.setText("Unable to connect to network, please connect with the taskbar icon and restart the installer")
+            self.progressbar.hide()
+        else:
+            self.startinstalling()
+
+    @Slot()
+    def checkfornetwork(self):
+        self.show()
+        self.message.setText("Checking")
+        self.ping = QProcess()
+        self.ping.finished.connect(self.dosth)
+        self.ping.start("ping", ["-c1", "archlinux.org"])
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+
+    widget = MyWidget()
+    widget.show()
+
+    sys.exit(app.exec())
 EOF
 
-cat <<- EOF | base64 -d > /usr/bin/startinstaller.sh
-IyEvYmluL2Jhc2gKY29ubmVjdCgpIHsKCXhmY2U0LXRlcm1pbmFsIC0tZGlzYWJsZS1zZXJ2ZXIg
-LXggbm10dWktY29ubmVjdAoJc2xlZXAgNQoJaWYgISBwaW5nIC1jMSBhcmNobGludXgub3JnID4v
-ZGV2L251bGwgMj4mMTsgdGhlbgoJCWNvbm5lY3Q7CgllbHNlCgkJcmV0dXJuOwoJZmkKfQppZiAh
-IHBpbmcgLWMxIGFyY2hsaW51eC5vcmcgPi9kZXYvbnVsbCAyPiYxOyB0aGVuCgljb25uZWN0Owpm
-aQp4ZmNlNC10ZXJtaW5hbCAtLWRpc2FibGUtc2VydmVyIC14IHBpcCBpbnN0YWxsIFB5U2lkZTYK
+cat <<- EOF > /usr/bin/startinstaller.sh
+#!/bin/bash
+connect() {
+        xfce4-terminal --disable-server -x nmtui-connect
+        sleep 5
+        if ! ping -c1 archlinux.org >/dev/null 2>&1; then
+                connect;
+        else
+                return;
+        fi
+}
+if ! ping -c1 archlinux.org >/dev/null 2>&1; then
+        connect;
+fi
+xfce4-terminal --disable-server -x pip install PySide6
 EOF
 
 chmod a+x /usr/bin/startinstaller.sh
 
-cat <<- EOF | base64 -d > /etc/xdg/autostart/installer.desktop
-W0Rlc2t0b3AgRW50cnldClR5cGU9QXBwbGljYXRpb24KTmFtZT1QeXRob24gaW5zdGFsbGVyCkV4
-ZWM9L3Vzci9iaW4vc3RhcnRpbnN0YWxsZXIuc2gK
+cat <<- EOF > /etc/xdg/autostart/installer.desktop
+[Desktop Entry]
+Type=Application
+Name=Python installer
+Exec=/usr/bin/startinstaller.sh
 EOF
 
 echo "python /bin.py \"'$desktop'\" \"'$hostname'\" \"'$keymap'\" \"'$language'\" \"'$timezone'\" \"'$unamesys'\" \"'$uname'\" \"'$password'\"" >> /usr/bin/startinstaller.sh
