@@ -101,7 +101,23 @@ class MyWidget(QWidget):
         self.partition = QProcess()
         self.partition.finished.connect(self.installpackages)
         self.partition.readyRead.connect(lambda: self.updateOutput(self.partition.readAllStandardOutput(), False))
-        self.partition.start("sh", ['-c', 'set -eE; trap "echo -e \\\"\nFAIL\\\"" ERR; echo -en "Wait: Setting NTP"; timedatectl set-ntp true; umount -l /mnt 2>/dev/null || true; echo -en "Done: Setting NTP\nWait: Formatting /dev/disk/by-label/ARCH as ext4 with label ARCH";  yes | mkfs.ext4 -F -F -q -L ARCH /dev/disk/by-label/ARCH; echo -en "Done: Setting NTP\nDone: Formatting /dev/disk/by-label/ARCH as ext4 with label ARCH\nWait: Mounting this partition to /mnt"; mount /dev/disk/by-label/ARCH /mnt; mkdir -p /mnt/boot; drive="/dev/$(lsblk -ndo pkname $(findmnt /mnt -o SOURCE -un))"; device="$(fdisk -l $drive -o Device,Type | grep "EFI System" | cut -d \" \" -f1)"; echo -en "Done: Setting NTP\nDone: Formatting /dev/disk/by-label/ARCH as ext4 with label ARCH\nDone: Mounting this partition to /mnt\nWait: Mounting $device to /mnt/boot"; mount \"$device\" /mnt/boot; echo -en "Done: Setting NTP\nDone: Formatting /dev/disk/by-label/ARCH as ext4 with label ARCH\nDone: Mounting this partition to /mnt\nDone: Mounting $device to /mnt/boot";'])
+        self.partition.start("sh", ['-c',
+            '''set -eE;
+            trap "echo -e \\\"\nFAIL\\\"" ERR;
+            echo -en "Wait: Setting NTP";
+            timedatectl set-ntp true;
+            umount -l /mnt 2>/dev/null || true;
+            echo -en "Done: Setting NTP\nWait: Formatting /dev/disk/by-label/ARCH as ext4 with label ARCH";
+            yes | mkfs.ext4 -F -F -q -L ARCH /dev/disk/by-label/ARCH;
+            echo -en "Done: Setting NTP\nDone: Formatting /dev/disk/by-label/ARCH as ext4 with label ARCH\nWait: Mounting this partition to /mnt";
+            mount /dev/disk/by-label/ARCH /mnt;
+            mkdir -p /mnt/boot;
+            drive="/dev/$(lsblk -ndo pkname $(findmnt /mnt -o SOURCE -un))";
+            device="$(fdisk -l $drive -o Device,Type | grep "EFI System" | cut -d \" \" -f1)";
+            echo -en "Done: Setting NTP\nDone: Formatting /dev/disk/by-label/ARCH as ext4 with label ARCH\nDone: Mounting this partition to /mnt\nWait: Mounting $device to /mnt/boot";
+            mount \"$device\" /mnt/boot;
+            echo -en "Done: Setting NTP\nDone: Formatting /dev/disk/by-label/ARCH as ext4 with label ARCH\nDone: Mounting this partition to /mnt\nDone: Mounting $device to /mnt/boot";'''
+        ])
 
     def updateOutput(self, output, clear):
         if output == "\nFAIL\n":
@@ -122,7 +138,17 @@ class MyWidget(QWidget):
         self.pacstrap = QProcess()
         self.pacstrap.finished.connect(self.generatefstab)
         self.pacstrap.readyRead.connect(lambda: self.updateOutput(self.pacstrap.readAllStandardOutput(), False))
-        self.pacstrap.start("sh", ['-c', 'desktop=' + self.desktop + '; echo -ne "Wait: Installing base packages with desktop $desktop to /mnt"; case $desktop in gnome) pacstrap /mnt --noprogressbar gnome-software-packagekit-plugin gnome gdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;; kde) pacstrap /mnt --noprogressbar plasma dolphin konsole discover packagekit-qt5 plasma-wayland-session sddm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;; budgie) pacstrap /mnt --noprogressbar budgie-desktop gnome gnome-software-packagekit-plugin lightdm-webkit-theme-litarvan lightdm-webkit2-greeter lightdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;; cinnamon) pacstrap /mnt --noprogressbar cinnamon gnome-software gnome-software-packagekit-plugin lightdm-slick-greeter lightdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;; pantheon) pacstrap /mnt --noprogressbar pantheon ligthdm-pantheon-greeter lightdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;; dde) pacstrap /mnt --noprogressbar deepin deepin-extra deepin-store deepin-session-shell lightdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;; esac; echo -ne "Done: Installing base packages with desktop $desktop to /mnt"'])
+        self.pacstrap.start("sh", ['-c', 
+            '''desktop={desktop};
+            echo -ne "Wait: Installing base packages with desktop $desktop to /mnt";
+            case $desktop in
+                gnome) pacstrap /mnt --noprogressbar gnome-software-packagekit-plugin gnome gdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;;
+                kde) pacstrap /mnt --noprogressbar plasma dolphin konsole discover packagekit-qt5 plasma-wayland-session sddm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;;
+                budgie) pacstrap /mnt --noprogressbar budgie-desktop gnome gnome-software-packagekit-plugin lightdm-webkit-theme-litarvan lightdm-webkit2-greeter lightdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;;
+                cinnamon) pacstrap /mnt --noprogressbar cinnamon gnome-software gnome-software-packagekit-plugin lightdm-slick-greeter lightdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;;
+                pantheon) pacstrap /mnt --noprogressbar pantheon ligthdm-pantheon-greeter lightdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;;
+                dde) pacstrap /mnt --noprogressbar deepin deepin-extra deepin-store deepin-session-shell lightdm linux linux-firmware flatpak base base-devel networkmanager bluez firefox bash-completion grub os-prober xorg;; esac; echo -ne "Done: Installing base packages with desktop $desktop to /mnt"'''.format(desktop=self.desktop)
+            ])
 
     def generatefstab(self):
         self.logs.setText(self.logs.text() + "\n" + self.pacstrap.readAllStandardError())
@@ -135,7 +161,13 @@ class MyWidget(QWidget):
         self.genfstab = QProcess()
         self.genfstab.finished.connect(self.configpcinfo)
         self.genfstab.readyRead.connect(lambda: self.updateOutput(self.genfstab.readAllStandardOutput(), False))
-        self.genfstab.start("sh", ['-c', 'set -eE; trap "echo -e \\\"\nFAIL\\\"" ERR; echo -ne "Wait: Generating fstab"; genfstab -U /mnt >> /mnt/etc/fstab; echo -ne "Done: Generating fstab"'])
+        self.genfstab.start("sh", ['-c', 
+            '''set -eE;
+            trap "echo -e \\\"\nFAIL\\\"" ERR;
+            echo -ne "Wait: Generating fstab";
+            genfstab -U /mnt >> /mnt/etc/fstab;
+            echo -ne "Done: Generating fstab"'''
+        ])
 
     def configpcinfo(self):
         self.logs.setText(self.logs.text() + "\n" + self.genfstab.readAllStandardError())
@@ -148,7 +180,26 @@ class MyWidget(QWidget):
         self.configpc = QProcess()
         self.configpc.finished.connect(self.configusers)
         self.configpc.readyRead.connect(lambda: self.updateOutput(self.configpc.readAllStandardOutput(), False))
-        self.configpc.start("sh", ['-c', 'hostname=' + self.hostname + '; language=' + self.language + '; keymap=' + self.keymap + '; timezone=' + self.timezone + '; set -eE; trap "echo -e \\\"\nFAIL\\\"" ERR; echo -ne "Wait: Setting hostname"; echo "$hostname" >> /mnt/etc/hostname; echo -ne "Done: Setting hostname\nWait: Setting locale"; echo \"$language\" >> /mnt/etc/locale.gen; arch-chroot /mnt locale-gen; echo \"LANG=$(echo $language | cut -d \\\" \\\" -f 1)\" > /mnt/etc/locale.conf; echo -ne "Done: Setting hostname\nDone: Setting locale\nWait: Setting keymap"; echo \"KEYMAP=$keymap\" > /mnt/etc/vconsole.conf; echo -ne "Done: Setting hostname\nDone: Setting locale\nDone: Setting keymap\nWait: Setting timezone"; cd /mnt/etc/; ln -svf ../usr/share/zoneinfo/$timezone localtime; echo -ne "Done: Setting hostname\nDone: Setting locale\nDone: Setting keymap\nDone: Setting timezone"'])
+        self.configpc.start("sh", ['-c', 
+            '''hostname={hostname};
+            language={language};
+            keymap={keymap};
+            timezone={timezone};
+            set -eE;
+            trap "echo -e \\\"\nFAIL\\\"" ERR;
+            echo -ne "Wait: Setting hostname";
+            echo "$hostname" >> /mnt/etc/hostname;
+            echo -ne "Done: Setting hostname\nWait: Setting locale";
+            echo \"$language\" >> /mnt/etc/locale.gen;
+            arch-chroot /mnt locale-gen;
+            echo \"LANG=$(echo $language | cut -d \\\" \\\" -f 1)\" > /mnt/etc/locale.conf;
+            echo -ne "Done: Setting hostname\nDone: Setting locale\nWait: Setting keymap";
+            echo \"KEYMAP=$keymap\" > /mnt/etc/vconsole.conf;
+            echo -ne "Done: Setting hostname\nDone: Setting locale\nDone: Setting keymap\nWait: Setting timezone";
+            cd /mnt/etc/;
+            ln -svf ../usr/share/zoneinfo/$timezone localtime;
+            echo -ne "Done: Setting hostname\nDone: Setting locale\nDone: Setting keymap\nDone: Setting timezone"'''.format(hostname=self.hostname, language=self.language, keymap=self.keymap, timezone=self.timezone)
+        ])
 
     def configusers(self):
         self.logs.setText(self.logs.text() + "\n" + self.configpc.readAllStandardError())
@@ -162,7 +213,32 @@ class MyWidget(QWidget):
         self.useradd.finished.connect(self.configservices)
         self.useradd.readyRead.connect(lambda: self.updateOutput(self.useradd.readAllStandardOutput(), False))
         rootpwd = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(50))
-        self.useradd.start("sh", ['-c', 'unamesys=' + self.unamesys + '; uname=' + self.uname + '; password=' + self.password + '; set -eE; trap "echo \\\"\nFAIL\\\"" ERR; echo -ne "Wait: Adding user \"$unamesys\""; useradd -R /mnt -mG wheel,sys "$unamesys"; echo -ne "Done: Adding user \"$unamesys\"\nWait: Setting password for \"$unamesys\""; echo -e "$password\n$password" | passwd -R /mnt "$unamesys"; if [ "$uname" != "" ]; then export a=true; echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"unamesys\"\nWait: Setting pretty name to \"$uname\" for user \"$unamesys\""; arch-chroot /mnt chfn -f "$uname" "$unamesys"; fi; if [ $a == true ]; then echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"$unamesys\"\nDone: Setting pretty name to \"$uname\" for user \"$unamesys\"\nWait: Setting random root password"; else echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"$unamesys\"\nWait: Setting random root password"; fi; echo "' + rootpwd + '\n' + rootpwd + '" | passwd -R /mnt root; if [ $a == true ]; then echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"$unamesys\"\nDone: Setting pretty name to \"$uname\" for user \"$unamesys\"\nDone: Setting random root password"; else echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"$unamesys\"\nDone: Setting random root password"; fi'])
+        self.useradd.start("sh", ['-c', 
+            '''unamesys={unamesys};
+            uname={uname};
+            password={password};
+            set -eE;
+            trap "echo \\\"\nFAIL\\\"" ERR; echo -ne "Wait: Adding user \"$unamesys\"";
+            useradd -R /mnt -mG wheel,sys "$unamesys";
+            echo -ne "Done: Adding user \"$unamesys\"\nWait: Setting password for \"$unamesys\"";
+            echo -e "$password\n$password" | passwd -R /mnt "$unamesys";
+            if [ "$uname" != "" ]; then
+                export a=true;
+                echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"unamesys\"\nWait: Setting pretty name to \"$uname\" for user \"$unamesys\"";
+                arch-chroot /mnt chfn -f "$uname" "$unamesys";
+            fi;
+            if [ $a == true ]; then
+                echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"$unamesys\"\nDone: Setting pretty name to \"$uname\" for user \"$unamesys\"\nWait: Setting random root password";
+            else
+                echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"$unamesys\"\nWait: Setting random root password";
+            fi;
+            echo "' + rootpwd + '\n' + rootpwd + '" | passwd -R /mnt root;
+            if [ $a == true ]; then
+                echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"$unamesys\"\nDone: Setting pretty name to \"$uname\" for user \"$unamesys\"\nDone: Setting random root password";
+            else
+                echo -ne "Done: Adding user \"$unamesys\"\nDone: Setting password for \"$unamesys\"\nDone: Setting random root password";
+            fi'''.format(unamesys=self.unamesys, uname=self.uname, password=self.password)
+        ])
 
     def configservices(self):
         self.logs.setText(self.logs.text() + "\n" + self.useradd.readAllStandardError())
@@ -175,7 +251,28 @@ class MyWidget(QWidget):
         self.systemctl = QProcess()
         self.systemctl.finished.connect(self.touches)
         self.systemctl.readyRead.connect(lambda: self.updateOutput(self.systemctl.readAllStandardOutput(), False))
-        self.systemctl.start("sh", ['-c', 'desktop=' + self.desktop + '; set -eE; trap "echo \\\"\nFAIL\\\"" ERR;case $desktop in gnome) export dm=gdm;; kde) export dm=sddm;; budgie) export dm=lightdm; export greeter=lightdm-webkit2-greeter;; cinnamon) export dm=lightdm; export greeter=lightdm-slick-greeter;; pantheon) export dm=lightdm; export greeter=io.elementary.greeter;; dde) export dm=lightdm; export greeter=ligthdm-deepin-greeter;; esac; if [ "$dm" == "lightdm" ]; then sed -i "s/example-gtk-gnome/$greeter/g" /mnt/etc/lightdm/lightdm.conf; if [ "$greeter" == "lightdm-webkit2-greeter"]; then sed -i "s/antergos/litarvan/" /mnt/etc/lightdm/lightdm-webkit2-greeter.conf; fi; fi; echo -ne "Wait: Enabling system services"; arch-chroot /mnt systemctl enable NetworkManager bluetooth $dm; echo -ne "Done: Enabling system services"'])
+        self.systemctl.start("sh", ['-c',
+            '''desktop={desktop};
+            set -eE;
+            trap "echo \\\"\nFAIL\\\"" ERR;
+            case $desktop in
+                gnome) export dm=gdm;;
+                kde) export dm=sddm;;
+                budgie) export dm=lightdm; export greeter=lightdm-webkit2-greeter;;
+                cinnamon) export dm=lightdm; export greeter=lightdm-slick-greeter;;
+                pantheon) export dm=lightdm; export greeter=io.elementary.greeter;;
+                dde) export dm=lightdm; export greeter=ligthdm-deepin-greeter;;
+            esac;
+            if [ "$dm" == "lightdm" ]; then
+                sed -i "s/example-gtk-gnome/$greeter/g" /mnt/etc/lightdm/lightdm.conf;
+                if [ "$greeter" == "lightdm-webkit2-greeter"]; then
+                    sed -i "s/antergos/litarvan/" /mnt/etc/lightdm/lightdm-webkit2-greeter.conf;
+                fi;
+            fi;
+            echo -ne "Wait: Enabling system services";
+            arch-chroot /mnt systemctl enable NetworkManager bluetooth $dm;
+            echo -ne "Done: Enabling system services"'''.format(desktop=self.desktop)
+        ])
 
     def touches(self):
         self.logs.setText(self.logs.text() + "\n" + self.systemctl.readAllStandardError())
@@ -188,7 +285,16 @@ class MyWidget(QWidget):
         self.echo = QProcess()
         self.echo.finished.connect(self.bootloader)
         self.echo.readyRead.connect(lambda: self.updateOutput(self.echo.readAllStandardOutput(), False))
-        self.echo.start("sh", ['-c', 'hostname=' + self.hostname + '; set -eE; trap "echo \\\"\nFAIL\\\"" ERR; echo -ne "Wait: Setting hosts file"; echo -e "127.0.0.1  localhost\n::1          localhost\n127.0.1.1     \"$hostname\"" >> /mnt/etc/hosts; echo -ne "Done: Setting hosts file\nWait: Enabling sudo access for group wheel"; echo -e "%wheel ALL=(ALL) ALL" >> /mnt/etc/sudoers; echo -ne "Done: Setting hosts file\nDone: Enabling sudo access for group wheel"'])
+        self.echo.start("sh", ['-c',
+            '''hostname={hostname};
+            set -eE;
+            trap "echo \\\"\nFAIL\\\"" ERR;
+            echo -ne "Wait: Setting hosts file";
+            echo -e "127.0.0.1  localhost\n::1          localhost\n127.0.1.1     \"$hostname\"" >> /mnt/etc/hosts;
+            echo -ne "Done: Setting hosts file\nWait: Enabling sudo access for group wheel";
+            echo -e "%wheel ALL=(ALL) ALL" >> /mnt/etc/sudoers;
+            echo -ne "Done: Setting hosts file\nDone: Enabling sudo access for group wheel"'''.format(hostname=self.hostname)
+        ])
 
     def bootloader(self):
         self.logs.setText(self.logs.text() + "\n" + self.echo.readAllStandardError())
@@ -201,7 +307,14 @@ class MyWidget(QWidget):
         self.grub = QProcess()
         self.grub.finished.connect(self.prefinish)
         self.grub.readyRead.connect(lambda: self.updateOutput(self.grub.readAllStandardOutput(), False))
-        self.grub.start("sh", ['-c', 'set -eE; trap "echo \\\"\nFAIL\\\"" ERR; echo -ne "Wait: Configuring bootloader entries"; echo "GRUB_DISABLE_OS_PROBER=false" >> /mnt/etc/default/grub; arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg; echo -ne "Done: Configuring bootloader entries"'])
+        self.grub.start("sh", ['-c', 
+            '''set -eE;
+            trap "echo \\\"\nFAIL\\\"" ERR;
+            echo -ne "Wait: Configuring bootloader entries";
+            echo "GRUB_DISABLE_OS_PROBER=false" >> /mnt/etc/default/grub;
+            arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg;
+            echo -ne "Done: Configuring bootloader entries"'''
+        ])
 
     def prefinish(self):
         self.logs.setText(self.logs.text() + "\n" + self.grub.readAllStandardError())
@@ -269,12 +382,12 @@ EOF
 
 chmod a+x /usr/bin/startinstaller.sh
 
-cat <<- EOF > /etc/xdg/autostart/installer.desktop
-[Desktop Entry]
-Type=Application
-Name=Python installer
-Exec=/usr/bin/startinstaller.sh
-EOF
+#cat <<- EOF > /etc/xdg/autostart/installer.desktop
+#[Desktop Entry]
+#Type=Application
+#Name=Python installer
+#Exec=/usr/bin/startinstaller.sh
+#EOF
 
 echo "python /bin.py \"'$desktop'\" \"'$hostname'\" \"'$keymap'\" \"'$language'\" \"'$timezone'\" \"'$unamesys'\" \"'$uname'\" \"'$password'\"" >> /usr/bin/startinstaller.sh
 

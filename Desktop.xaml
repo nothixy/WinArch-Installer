@@ -37,17 +37,17 @@
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
-            <Image Grid.Row="0" Grid.Column="0" x:Name="gnome_img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/gnome.png" Margin="5,0,5,25"/>
+            <Image Grid.Row="0" Grid.Column="0" x:Name="gnome_img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="pack://application:,,,/Resources/gnome.png" Margin="5,0,5,25"/>
             <RadioButton Grid.Row="0" Grid.Column="0" x:Name="gnome" Content="Gnome 40 (recommended)" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom" IsChecked="True"/>
-            <Image Grid.Row="0" Grid.Column="1" x:Name="kde_img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/kde.png" Margin="5,0,5,25"/>
+            <Image Grid.Row="0" Grid.Column="1" x:Name="kde_img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="pack://application:,,,/Resources/kde.png" Margin="5,0,5,25"/>
             <RadioButton Grid.Row="0" Grid.Column="1" x:Name="kde" Content="Plasma 5" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
-            <Image Grid.Row="0" Grid.Column="2" x:Name="budgie_img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/budgie.png" Margin="5,0,5,25"/>
+            <Image Grid.Row="0" Grid.Column="2" x:Name="budgie_img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="pack://application:,,,/Resources/budgie.png" Margin="5,0,5,25"/>
             <RadioButton Grid.Row="0" Grid.Column="2" x:Name="budgie" Content="Budgie" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
-            <Image Grid.Row="1" Grid.Column="0" x:Name="cinnamon_img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/cinnamon.png" Margin="5,0,5,25"/>
+            <Image Grid.Row="1" Grid.Column="0" x:Name="cinnamon_img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="pack://application:,,,/Resources/cinnamon.png" Margin="5,0,5,25"/>
             <RadioButton Grid.Row="1" Grid.Column="0" x:Name="cinnamon" Content="Cinnamon" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
-            <Image Grid.Row="1" Grid.Column="1" x:Name="dde_img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/dde.png" Margin="5,0,5,25"/>
+            <Image Grid.Row="1" Grid.Column="1" x:Name="dde_img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="pack://application:,,,/Resources/dde.png" Margin="5,0,5,25"/>
             <RadioButton Grid.Row="1" Grid.Column="1" x:Name="dde" Content="Deepin Desktop" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
-            <Image Grid.Row="1" Grid.Column="2" x:Name="pantheon_img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/pantheon.png" Margin="5,0,5,25"/>
+            <Image Grid.Row="1" Grid.Column="2" x:Name="pantheon_img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="pack://application:,,,/Resources/pantheon.png" Margin="5,0,5,25"/>
             <RadioButton Grid.Row="1" Grid.Column="2" x:Name="pantheon" Content="Pantheon" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom"/>
         </Grid>
         <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40" Background="#FFA2A2A2">

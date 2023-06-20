@@ -29,7 +29,7 @@
         <TabControl x:Name="tabControl" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,10,10,95">
             <TabItem Header="Software center">
                 <Grid Background="#FFA2A2A2">
-                    <Image x:Name="image" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/gnome-software.png"/>
+                    <Image x:Name="image" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="pack://application:,,,/Resources/gnome-software.png"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Windows software">
@@ -38,12 +38,12 @@
                         <ColumnDefinition Width="341*"/>
                         <ColumnDefinition Width="433*"/>
                     </Grid.ColumnDefinitions>
-                    <Image x:Name="image1" Source="/Resources/epic-games-store.png" Grid.ColumnSpan="2"/>
+                    <Image x:Name="image1" Source="pack://application:,,,/Resources/epic-games-store.png" Grid.ColumnSpan="2"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Virtual machines">
                 <Grid Background="#FFA2A2A2">
-                    <Image x:Name="image2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/Resources/virt-manager.png"/>
+                    <Image x:Name="image2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="pack://application:,,,/Resources/virt-manager.png"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Installer logs">

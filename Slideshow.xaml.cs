@@ -26,6 +26,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Path = System.IO.Path;
 using Microsoft.Win32;
+using System.Linq;
 
 namespace WinArch
 {
@@ -123,8 +124,9 @@ namespace WinArch
                     logText.Text += "------Running Diskpart------\n";
                     logText.Text += "Arguments : " + process.StartInfo.Arguments + "\n";
                     logText.Text += process.StandardOutput.ReadToEnd() + "\n";
+                    Mountefi();
                     UpdateProgressFull(1);
-                    DownloadLatestGrub();
+                    _ = DownloadLatestGrub();
                 });
             };
             process.StartInfo.FileName = "diskpart.exe";
@@ -182,7 +184,7 @@ namespace WinArch
                     logText.Text += "Downloaded\n";
                 });
                 UpdateProgressFull(2);
-                DownloadArchIso();
+                DownloadPreloader();
             };
             Uri todownload = new("ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
             Dispatcher.Invoke(() =>
@@ -192,6 +194,55 @@ namespace WinArch
             });
             client.DownloadFileAsync(todownload, Path.GetTempPath() + "grub.zip");
         }
+        public void DownloadPreloader()
+        {
+            WebClient client2 = new();
+            client2.DownloadProgressChanged += (s, e) =>
+            {
+                UpdateProgress(false, "Downloading PreLoader", e.ProgressPercentage);
+            };
+            client2.DownloadFileCompleted += (s, e) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    logText.Text += "Downloaded\n";
+                });
+                UpdateProgressFull(3);
+                DownloadHashTool();
+            };
+            Uri download = new("https://blog.hansenpartnership.com/wp-uploads/2013/PreLoader.efi");
+            Dispatcher.Invoke(() =>
+            {
+                logText.Text += "------Downloading PreLoader------\n";
+                logText.Text += "Downloading " + download.AbsoluteUri + " as PreLoader.efi\n";
+            });
+            client2.DownloadFileAsync(download, Path.GetTempPath() + "PreLoader.efi");
+        }
+        public void DownloadHashTool()
+        {
+            WebClient client2 = new();
+            client2.DownloadProgressChanged += (s, e) =>
+            {
+                UpdateProgress(false, "Downloading HashTool", e.ProgressPercentage);
+            };
+            client2.DownloadFileCompleted += (s, e) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    logText.Text += "Downloaded\n";
+                });
+                UpdateProgressFull(4);
+                DownloadArchIso();
+            };
+            Uri download = new("https://blog.hansenpartnership.com/wp-uploads/2013/HashTool.efi");
+            Dispatcher.Invoke(() =>
+            {
+                logText.Text += "------Downloading HashTool------\n";
+                logText.Text += "Downloading " + download.AbsoluteUri + " as HashTool.efi\n";
+            });
+            client2.DownloadFileAsync(download, Path.GetTempPath() + "HashTool.efi");
+        }
+
         public void DownloadArchIso()
         {
             WebClient client2 = new();
@@ -205,7 +256,7 @@ namespace WinArch
                 {
                     logText.Text += "Downloaded\n";
                 });
-                UpdateProgressFull(3);
+                UpdateProgressFull(5);
                 MountArchIso();
             };
             Uri download = new("https://sourceforge.net/projects/systemrescuecd/files/latest/download");
@@ -258,7 +309,7 @@ namespace WinArch
             process.Exited += (s, e) =>
             {
                 CopyAll(new DirectoryInfo(@"U:\sysresccd\"), new DirectoryInfo(@"L:\sysresccd\"));
-                UpdateProgressFull(4);
+                UpdateProgressFull(6);
                 InstallGrub();
             };
             _ = process.Start();
@@ -337,7 +388,7 @@ namespace WinArch
                     _ = Directory.CreateDirectory(@"Z:\grub");
                 }
                 File.WriteAllLines(@"Z:\grub\grub.cfg", lines);
-                UpdateProgressFull(5);
+                UpdateProgressFull(7);
                 SetupSystem();
             };
             _ = process.Start();
@@ -368,14 +419,19 @@ namespace WinArch
                 "uname=\"" + uname + "\"",
                 "unamesys=\"" + unameSys + "\"",
             };
-            File.WriteAllLines(@"L:\autorun", lines);
-            File.AppendAllLines(@"L:\autorun", autorun);
+            string[] finalArray = lines.Concat(autorun).ToArray();
+            //File.WriteAllLines(@"L:\autorun", lines);
+            //File.AppendAllLines(@"L:\autorun", autorun);
+            File.WriteAllText(@"L:\autorun", string.Join("\n", finalArray) + "\n");
             Dispatcher.Invoke(() =>
             {
                 logText.Text += "------Creating linux autorun file------\n";
                 logText.Text += File.ReadAllText(@"L:\autorun") + "\n";
             });
-            UpdateProgressFull(6);
+            File.Copy(Path.GetTempPath() + "HashTool.efi", @"Z:\EFI\GRUB\HashTool.efi");
+            File.Move(@"Z:\EFI\GRUB\grubx64.efi", @"Z:\EFI\GRUB\loader.efi");
+            File.Copy(Path.GetTempPath() + "PreLoader.efi", @"Z:\EFI\GRUB\grubx64.efi");
+            UpdateProgressFull(8);
             Cleanup();
         }
         public void Cleanup()
@@ -408,7 +464,7 @@ namespace WinArch
             {
                 logText.Text += "------Disabled Fast Startup and Hibernation------\n";
             });
-            UpdateProgressFull(7);
+            UpdateProgressFull(9);
             Dispatcher.Invoke(() =>
             {
                 _ = NavigationService.Navigate(new Uri("Finish.xaml", UriKind.Relative));
@@ -428,7 +484,7 @@ namespace WinArch
         }
         public void UpdateProgressFull(float currentPercentage)
         {
-            taskpercentage = currentPercentage * 100 / 7;
+            taskpercentage = currentPercentage * 100 / 9;
             Dispatcher.Invoke(() =>
             {
                 progressTotal.Value = taskpercentage;
