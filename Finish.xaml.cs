@@ -52,7 +52,10 @@ namespace WinArch
                 if (output == "True")
                 {
                     secureboot = true;
-                    Reminder.Visibility = Visibility.Visible;
+                    Dispatcher.Invoke(() =>
+                    {
+                        Reminder.Visibility = Visibility.Visible;
+                    });
                 }
                 else
                 {
@@ -83,7 +86,10 @@ namespace WinArch
             process.EnableRaisingEvents = true;
             process.Exited += (s, e) =>
             {
-                Application.Current.Shutdown();
+                Dispatcher.Invoke(() =>
+                {
+                    Application.Current.Shutdown();
+                });
             };
             _ = process.Start();
         }

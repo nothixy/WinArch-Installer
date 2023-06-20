@@ -165,7 +165,7 @@ namespace WinArch
             {
                 for (int i = 1; i < filenames.Count; i++)
                 {
-                    if (string.Compare(filenamemaster, filenames[i], StringComparison.Ordinal) == -1)
+                    if (string.Compare(filenamemaster, filenames[i], StringComparison.Ordinal) == 1)
                     {
                         filenamemaster = filenames[i];
                     }
@@ -399,7 +399,8 @@ namespace WinArch
             {
                 UpdateProgress(true, "Preparing Linux autorun file", null);
             });
-            StreamReader setupfile = new(GetType().Assembly.GetManifestResourceStream("WinArch.Resources.autorun"));
+            var setupuri = new System.Uri("pack://application:,,,/Resources/autorun");
+            StreamReader setupfile = new(Application.GetResourceStream(setupuri).Stream);
             List<string> list = new();
             string line;
             while ((line = setupfile.ReadLine()) != null)

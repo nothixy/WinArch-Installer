@@ -12,8 +12,8 @@
 	<PublishSingleFile>true</PublishSingleFile>
 	<SelfContained>true</SelfContained>
 	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-	<DebugType>None</DebugType>
-	<DebugSymbols>False</DebugSymbols>
+	<!--<DebugType>None</DebugType>
+	<DebugSymbols>False</DebugSymbols>-->
 	<Configurations>Debug;Release;rel</Configurations>
 	<Platforms>AnyCPU;x64</Platforms>
 	<SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
