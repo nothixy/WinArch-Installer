@@ -1,4 +1,6 @@
-﻿cat <<- EOF > /bin.py
+﻿# This is the second stage installer, automatically executed in SystemRescue
+
+cat <<- EOF > /bin.py
 import os
 import random
 import sys

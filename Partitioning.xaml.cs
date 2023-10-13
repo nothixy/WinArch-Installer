@@ -1,19 +1,4 @@
-﻿/*    WinArch installer - a Windows executable to install Archlinux on your PC
-    Copyright (C) 2020  srgoti
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -40,6 +25,8 @@ namespace WinArch
             GetCPUArch();
             GetBIOSMode();
         }
+
+		// Check if running on a x86_64 cpu else exit
         public void GetCPUArch()
         {
             switch (typeof(string).Assembly.GetName().ProcessorArchitecture)
@@ -59,6 +46,8 @@ namespace WinArch
                     break;
             }
         }
+
+		// Check if system booted in UEFI mode, else exit
         public void GetBIOSMode()
         {
             Process process = new();
@@ -89,6 +78,8 @@ namespace WinArch
             _ = process.Start();
 
         }
+
+		// Check if the EFI partition has enough space left to install, else exit
         private void IsDiskInstallable()
         {
             Process process = new();
@@ -124,6 +115,7 @@ namespace WinArch
         }
         public void MainFunction()
         {
+			// Get all volumes with sufficient space
             DriveInfo[] allDrives = DriveInfo.GetDrives();
             foreach (DriveInfo d in allDrives)
             {
@@ -138,6 +130,7 @@ namespace WinArch
                     }
                 }
             }
+			// If there are no disks, exit
             if (comboBox.Items.Count == 0)
             {
                 string messageBoxText = "Error : not enough space left on any partition, please make some and try again";
@@ -150,16 +143,14 @@ namespace WinArch
                     Application.Current.Shutdown();
                 });
             };
+			// The user is now able to interact with the page
             Dispatcher.Invoke(() =>
             {
                 Mouse.OverrideCursor = Cursors.Arrow;
                 textBlock1.Visibility = Visibility.Hidden;
                 progressBar2.Visibility = Visibility.Hidden;
                 page.IsEnabled = true;
-            });
-            Dispatcher.Invoke(() =>
-            {
-                comboBox.SelectedIndex = 0;
+				comboBox.SelectedIndex = 0;
                 checkBox.IsChecked = true;
             });
         }
@@ -171,11 +162,13 @@ namespace WinArch
             SizeSlider.Value = SizeSlider.Minimum;
         }
 
+		// Update the text value with the slider
         private void SizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             TextBoxSize.Text = SizeSlider.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
+		// Update the slider with the text value
         private void TextBoxSize_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (Regex.IsMatch(TextBoxSize.Text, "\\d+"))
@@ -183,12 +176,17 @@ namespace WinArch
                 SizeSlider.Value = Math.Round(float.Parse(TextBoxSize.Text, System.Globalization.CultureInfo.InvariantCulture), 0);
             }
         }
+
+		// Navigate back
         public void Previous(object sender, EventArgs e)
         {
             _ = NavigationService.Navigate(new Uri("About.xaml", UriKind.Relative), System.Globalization.CultureInfo.InvariantCulture);
         }
+
+		// Navigate forward
         public void Next(object sender, EventArgs e)
         {
+			// Check that the space asked by the user is correct
             if (float.Parse(TextBoxSize.Text, System.Globalization.CultureInfo.InvariantCulture) < minimalSpaceRequired / Math.Pow(1024, Unit.SelectedIndex))
             {
                 TextBoxSize.Text = Math.Round(minimalSpaceRequired / Math.Pow(1024, Unit.SelectedIndex), 0).ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -204,32 +202,38 @@ namespace WinArch
             _ = NavigationService.Navigate(new Uri("Locale.xaml", UriKind.Relative), System.Globalization.CultureInfo.InvariantCulture);
         }
 
+		// When the drive changes, change all the disk space values
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DriveInfo[] drives = DriveInfo.GetDrives();
             foreach (DriveInfo d in drives)
             {
-                if (d.Name[..1] == comboBox.SelectedItem.ToString())
+                if (d.Name[..1] != comboBox.SelectedItem.ToString())
                 {
-                    spaceleft = d.AvailableFreeSpace;
-                    if (d.Name[..1] == "C" && (d.AvailableFreeSpace / (1024 * 1024)) < minimalSpaceRequired)
-                    {
-                        comboBox.Items.Remove("C");
-                        if (comboBox.Items.Count == 0)
-                        {
-                            string messageBoxText = "Error : not enough space left on any partition, please make some and try again";
-                            string caption = "Requirement error";
-                            MessageBoxButton button = MessageBoxButton.OK;
-                            MessageBoxImage icon = MessageBoxImage.Error;
-                            _ = MessageBox.Show(messageBoxText, caption, button, icon);
-                            Dispatcher.Invoke(() =>
-                            {
-                                Application.Current.Shutdown();
-                            });
-                        }
-                    };
+					continue;
                 }
+				spaceleft = d.AvailableFreeSpace;
+				if (d.Name[..1] != "C" || (d.AvailableFreeSpace / (1024 * 1024)) >= minimalSpaceRequired)
+				{
+					continue;
+				};
+				comboBox.Items.Remove("C");
+				if (comboBox.Items.Count != 0)
+				{
+					continue;
+				}
+				// We don't have any volume available to install
+				string messageBoxText = "Error : not enough space left on any partition, please make some and try again";
+				string caption = "Requirement error";
+				MessageBoxButton button = MessageBoxButton.OK;
+				MessageBoxImage icon = MessageBoxImage.Error;
+				_ = MessageBox.Show(messageBoxText, caption, button, icon);
+				Dispatcher.Invoke(() =>
+				{
+					Application.Current.Shutdown();
+				});
             }
+			// Do not prompt to erase the C drive
             if ((string)comboBox.SelectedItem == "C")
             {
                 checkBox.IsChecked = true;
@@ -240,11 +244,14 @@ namespace WinArch
                 checkBox.IsEnabled = true;
             }
 
+			// Remove `TeraBytes` in setups with less than 1TB
             spaceleft_mb = spaceleft / (1024 * 1024);
             if (spaceleft_mb < 1024 * 1024)
             {
                 Unit.Items.Remove("TB");
             }
+
+			// If the space in a volume is too low, do not prompt to reduce it
             if (spaceleft_mb < minimalSpaceRequired)
             {
                 checkBox.IsChecked = false;
@@ -253,6 +260,7 @@ namespace WinArch
             SizeSlider.Maximum = spaceleft_mb;
         }
 
+		// User wants to resize a volume
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             SizeSlider.IsEnabled = true;
@@ -260,6 +268,7 @@ namespace WinArch
             TextBoxSize.IsEnabled = true;
         }
 
+		// User wants to use a full volume
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             SizeSlider.IsEnabled = false;

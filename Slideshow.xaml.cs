@@ -1,20 +1,4 @@
-﻿/*    WinArch installer - a Windows executable to install Archlinux on your PC
-    Copyright (C) 2020  srgoti
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -68,6 +52,8 @@ namespace WinArch
             _ = Task.Run(() => DoSlideshow());
             PartitionDisks();
         }
+
+		// Every 10 seconds, change the image
         public void DoSlideshow()
         {
             while (true)
@@ -75,6 +61,7 @@ namespace WinArch
                 System.Threading.Thread.Sleep(10000);
                 Dispatcher.Invoke(() =>
                 {
+					// If we are on the log page, don't move from it
                     if (tabControl.SelectedIndex != tabControl.Items.Count - 1)
                     {
                         tabControl.SelectedIndex = (tabControl.SelectedIndex + 1) % (tabControl.Items.Count - 1);
@@ -83,9 +70,11 @@ namespace WinArch
             }
         }
 
+		// Format and create required volumes
         public void PartitionDisks()
         {
             UpdateProgress(true, "Formatting disks", null);
+			// Create a text file containing all the instructions diskpart will execute
             string diskpartfile = Path.GetTempPath() + "diskpart.txt";
             if (File.Exists(diskpartfile))
             {
@@ -94,28 +83,29 @@ namespace WinArch
             if (repartition)
             {
                 string[] lines =
-                {
+                [
                     "select volume " + volume,
                     "shrink desired=" + spaceleft_mb + " minimum=2500",
                     "create partition primary",
                     "format unit=4096 fs=exfat quick label=ARCH",
                     "assign letter L",
-                };
+                ];
                 File.WriteAllLines(diskpartfile, lines);
             }
             else
             {
                 string[] lines =
-                {
+                [
                     "select volume " + volume,
                     "delete volume",
                     "create partition primary",
                     "format unit=4096 fs=exfat quick label=ARCH",
                     "assign letter L",
-                };
+                ];
                 File.WriteAllLines(diskpartfile, lines);
             }
             Process process = new();
+			// Once diskpart finished, go to next step
             process.Exited += (s, e) =>
             {
                 Dispatcher.Invoke(() =>
@@ -137,6 +127,7 @@ namespace WinArch
             _ = process.Start();
         }
 
+		// Download GRUB from GNU's FTP server
         private async Task DownloadLatestGrub()
         {
             UpdateProgress(true, "Finding GRUB version to download", null);
@@ -144,6 +135,7 @@ namespace WinArch
             request.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
             request.Credentials = new NetworkCredential("anonymous", "");
             WebResponse webResponse = await request.GetResponseAsync();
+			// Convert webResponse to a FtpWebResponse
             FtpWebResponse response = (FtpWebResponse)webResponse;
             Stream responseStream = response.GetResponseStream();
             StreamReader reader = new(responseStream);
@@ -153,12 +145,14 @@ namespace WinArch
             List<string> filenames = new();
             for (int i = 0; i < (files.Length - 1); i++)
             {
+				// Find all files that match grub*for-windows.zip
                 if (Regex.IsMatch(Regex.Replace(Regex.Replace(files[i], ".*\\sgrub-", "grub-"), "\\s*", ""), "grub-[0-9\\.]*-for-windows.zip(?!\\.sig)"))
                 {
                     filenames.Add(Regex.Replace(Regex.Replace(files[i], ".*\\sgrub-", "grub-"), "\\s*", ""));
                 }
             }
             string filenamemaster = filenames[0];
+			// Find the latest version
             if (filenames.Count > 1)
             {
                 for (int i = 1; i < filenames.Count; i++)
@@ -169,12 +163,15 @@ namespace WinArch
                     }
                 }
             }
-            WebClient client = new();
-            client.Credentials = new NetworkCredential("anonymous", "");
-            client.DownloadProgressChanged += (s, e) =>
+			WebClient client = new()
+			{
+				Credentials = new NetworkCredential("anonymous", "")
+			};
+			client.DownloadProgressChanged += (s, e) =>
             {
                 UpdateProgress(false, "Downloading GRUB file", e.ProgressPercentage);
             };
+			// On download ended, go to next step
             client.DownloadFileCompleted += (s, e) =>
             {
                 Dispatcher.Invoke(() =>
@@ -184,6 +181,7 @@ namespace WinArch
                 UpdateProgressFull(2);
                 DownloadArchIso();
             };
+			// Download the .zip file
             Uri todownload = new("ftp://ftp.gnu.org/gnu/grub/" + filenamemaster);
             Dispatcher.Invoke(() =>
             {
@@ -192,6 +190,8 @@ namespace WinArch
             });
             client.DownloadFileAsync(todownload, Path.GetTempPath() + "grub.zip");
         }
+
+		// Download SystemRescueCD latest version
         public void DownloadArchIso()
         {
             WebClient client2 = new();
@@ -199,6 +199,7 @@ namespace WinArch
             {
                 UpdateProgress(false, "Downloading Archlinux iso", e.ProgressPercentage);
             };
+			// On download ended, go to next step
             client2.DownloadFileCompleted += (s, e) =>
             {
                 Dispatcher.Invoke(() =>
@@ -216,6 +217,8 @@ namespace WinArch
             });
             client2.DownloadFileAsync(download, Path.GetTempPath() + "arch.iso");
         }
+		
+		// Copy all files from SystemRescueCD to the empty volume created before
         public void CopyAll(DirectoryInfo source, DirectoryInfo target)
         {
             if (source.FullName.ToLower(System.Globalization.CultureInfo.InvariantCulture) == target.FullName.ToLower(System.Globalization.CultureInfo.InvariantCulture))
@@ -240,6 +243,8 @@ namespace WinArch
                 CopyAll(diSourceSubDir, nextTargetSubDir);
             }
         }
+
+		// Mount SystemRescueCD
         public void MountArchIso()
         {
             UpdateProgress(true, "Copying Archlinux files to the new partition", null);
@@ -257,12 +262,15 @@ namespace WinArch
             process.StartInfo.Arguments = "mountvol.exe U: (Mount-DiskImage -ImagePath " + Path.GetTempPath() + "arch.iso -NoDriveLetter | Get-Volume).UniqueId";
             process.Exited += (s, e) =>
             {
+				// U = .iso file, L = empty volume created before
                 CopyAll(new DirectoryInfo(@"U:\sysresccd\"), new DirectoryInfo(@"L:\sysresccd\"));
                 UpdateProgressFull(4);
                 InstallGrub();
             };
             _ = process.Start();
         }
+
+		// Mount the EFI partition as Z:
         public static void Mountefi()
         {
             Process process = new();
@@ -278,6 +286,8 @@ namespace WinArch
             Debug.WriteLine(process.StandardOutput.ReadToEnd());
             Debug.WriteLine(process.StandardError.ReadToEnd());
         }
+
+		// Install Grub4windows
         private void InstallGrub()
         {
             Dispatcher.Invoke(() =>
@@ -285,6 +295,7 @@ namespace WinArch
                 logText.Text += "------Installing GRUB------\n";
                 UpdateProgress(true, "Installing GRUB", null);
             });
+			// Extract the archive
             ZipArchive archive = new(File.OpenRead(Path.GetTempPath() + "grub.zip"));
             if (Directory.Exists(Path.GetTempPath() + "grub"))
             {
@@ -304,44 +315,54 @@ namespace WinArch
             process.EnableRaisingEvents = true;
             process.Exited += (s, e) =>
             {
-                Dispatcher.Invoke(() =>
-                {
-                    logText.Text += process.StandardOutput + "\n";
-                });
-                string[] lines = {
-                    "set timeout_style=menu",
-                    "set timeout = 1",
-                    "insmod efi_gop",
-                    "insmod efi_uga",
-                    "insmod ieee1275_fb",
-                    "insmod vbe",
-                    "insmod vga",
-                    "insmod video_bochs",
-                    "insmod video_cirrus",
-                    "menuentry 'Finish installing' {",
-                    "insmod gzio",
-                    "insmod part_gpt",
-                    "insmod exfat",
-                    "search --no-floppy --label ARCH --set=root",
-                    "linux /sysresccd/boot/x86_64/vmlinuz archisobasedir=sysresccd archisolabel=ARCH copytoram setkmap=us ar_nowait ar_nofail quiet",
-                    "initrd /sysresccd/boot/x86_64/sysresccd.img",
-                    "}",
-                    "menuentry 'Return to Windows' {",
-                    "insmod part_gpt",
-                    "insmod fat",
-                    "chainloader /EFI/Microsoft/Boot/bootmgfw.efi",
-                    "}",
-                };
-                if (!Directory.Exists(@"Z:\grub"))
-                {
-                    _ = Directory.CreateDirectory(@"Z:\grub");
-                }
-                File.WriteAllLines(@"Z:\grub\grub.cfg", lines);
-                UpdateProgressFull(5);
-                SetupSystem();
+				SetupGrub();
             };
             _ = process.Start();
         }
+
+		// Write the GRUB config file
+		private void SetupGrub()
+		{
+			Dispatcher.Invoke(() =>
+			{
+				logText.Text += process.StandardOutput + "\n";
+			});
+			// Initialize grub video and display the entries in a menu
+			string[] lines =
+			[
+				"set timeout_style=menu",
+				"set timeout = 1",
+				"insmod efi_gop",
+				"insmod efi_uga",
+				"insmod ieee1275_fb",
+				"insmod vbe",
+				"insmod vga",
+				"insmod video_bochs",
+				"insmod video_cirrus",
+				"menuentry 'Finish installing' {",
+				"    insmod gzio",
+				"    insmod part_gpt",
+				"    insmod exfat",
+				"    search --no-floppy --label ARCH --set=root",
+				"    linux /sysresccd/boot/x86_64/vmlinuz archisobasedir=sysresccd archisolabel=ARCH copytoram setkmap=us ar_nowait ar_nofail quiet",
+				"    initrd /sysresccd/boot/x86_64/sysresccd.img",
+				"}",
+				"menuentry 'Return to Windows' {",
+				"    insmod part_gpt",
+				"    insmod fat",
+				"    chainloader /EFI/Microsoft/Boot/bootmgfw.efi",
+				"}",
+			];
+			if (!Directory.Exists(@"Z:\grub"))
+			{
+				_ = Directory.CreateDirectory(@"Z:\grub");
+			}
+			File.WriteAllLines(@"Z:\grub\grub.cfg", lines);
+			UpdateProgressFull(5);
+			SetupSystem();
+		}
+
+		// Write the autorun file with arguments
         public void SetupSystem()
         {
             Dispatcher.Invoke(() =>
@@ -356,8 +377,9 @@ namespace WinArch
                 list.Add(line);
             }
             string[] autorun = list.ToArray();
+			// Add variables
             string[] lines =
-            {
+            [
                 "#!/bin/sh",
                 "desktop=\"" + desktop + "\"",
                 "hostname=\"" + hostname + "\"",
@@ -367,7 +389,7 @@ namespace WinArch
                 "password=\"" + password + "\"",
                 "uname=\"" + uname + "\"",
                 "unamesys=\"" + unameSys + "\"",
-            };
+            ];
             File.WriteAllLines(@"L:\autorun", lines);
             File.AppendAllLines(@"L:\autorun", autorun);
             Dispatcher.Invoke(() =>
@@ -378,13 +400,15 @@ namespace WinArch
             UpdateProgressFull(6);
             Cleanup();
         }
+
+		// Unmount all volumes, disable icompatible settings
         public void Cleanup()
         {
             Dispatcher.Invoke(() =>
             {
                 UpdateProgress(true, "Cleaning things up", null);
             });
-            char[] letters = { 'L', 'U', 'Z' };
+            char[] letters = ['L', 'U', 'Z'];
             foreach (char letter in letters)
             {
                 Process process = new();
@@ -414,6 +438,8 @@ namespace WinArch
                 _ = NavigationService.Navigate(new Uri("Finish.xaml", UriKind.Relative));
             });
         }
+
+		// Update the upper progress bar
         public void UpdateProgress(bool indeterminate, string currentAction, double? currentPercentage)
         {
             progressCurrent.IsIndeterminate = indeterminate;
@@ -426,6 +452,8 @@ namespace WinArch
                 textBlock.Text = currentAction;
             });
         }
+
+		// Update the lower progress bar
         public void UpdateProgressFull(float currentPercentage)
         {
             taskpercentage = currentPercentage * 100 / 7;
@@ -434,6 +462,8 @@ namespace WinArch
                 progressTotal.Value = taskpercentage;
             });
         }
+
+		// Disable automatic scrolling of log text view
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             if (e.ExtentHeightChange == 0)
