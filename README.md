@@ -1,7 +1,7 @@
 # WinArch Installer
 A Windows executable to create an Archlinux dual boot on your computer, written with WPF(C#)/XAML. You can download it [here](https://github.com/srgoti/winarch-installer/releases).
 
-## ${\color{red}\textbf {WARNING}}$
+## WARNING
 Disable BitLocker / Drive Encryption or save your recovery key before running. Resizing a drive with BitLocker enabled will ask for its BitLocker key on the following boot. 
 
 ## What does it support ?
